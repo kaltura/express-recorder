@@ -1,6 +1,7 @@
 import {Component, h} from "preact";
-let style = require("./style.scss");
+//import * as style from  "./style.scss";
 
+const style: any = {};
 type Props = {
     text: string;
     className: string;

@@ -16,3 +16,5 @@ describe("Hello Snapshot", () => {
     expect(tree).toMatchSnapshot();
   });
 });
+
+console.log("I (test) render");

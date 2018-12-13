@@ -11,3 +11,5 @@ _habitat.render({
   selector: '[data-widget-host="habitat"]',
   clean: true
 });
+
+console.log("I render");
