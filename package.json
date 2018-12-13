@@ -12,7 +12,8 @@
     "build": "preact build --no-prerender --clean --template src/index.ejs --service-worker false",
     "serve": "npm run build && preact serve",
     "dev": "preact watch --template src/index.ejs",
-    "dist": "microbundle --entry src/components/hello-world/index.tsx"
+    "dist": "microbundle --entry src/components/hello-world/index.tsx",
+    "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "keywords": [],
   "author": "Zouhir <zouhir@zouhir.org>",
@@ -38,11 +39,12 @@
     "tslint-eslint-rules": "^5.4.0",
     "tslint-react": "^3.6.0",
     "typescript": "^3.2.1",
-    "typings-for-css-modules-loader": "^1.7.0"
+    "typings-for-css-modules-loader": "^1.7.0",
+    "@storybook/react": "^4.1.1",
+    "preact-compat": "^3.18.4"
   },
   "dependencies": {
     "preact": "^8.2.5",
-    "preact-compat": "^3.17.0",
     "preact-habitat": "^3.1.0",
     "preact-router": "^2.5.7"
   },
