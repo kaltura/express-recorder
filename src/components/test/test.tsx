@@ -1,6 +1,5 @@
 import {Component, h} from "preact";
 
-
 const style = require('./style.scss');
 
 
@@ -13,6 +12,8 @@ type Props = {
 type State = {
 
 }
+
+
 
 
 export class Test extends Component<Props, State>{
