@@ -127,6 +127,7 @@ export class Recorder extends Component<Props, State> {
                 <video
                     id="recorded"
                     muted={true}
+                    autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}
                 />
                 <div>
