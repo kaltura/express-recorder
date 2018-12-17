@@ -21,6 +21,6 @@ export class Test extends Component<Props, State>{
     render(props:Props) {
         const { text, className: classNameProp } = props;
 
-        return <div className={style.customText}>{text}</div>
+      return <div className={style.group}><div>{text}</div><div className={style.customText}>custom text</div> </div>
     }
 }

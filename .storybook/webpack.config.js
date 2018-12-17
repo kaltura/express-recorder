@@ -7,6 +7,13 @@ module.exports = {
     module: {
       rules: [
         {
+          enforce: 'pre',
+          test: /\.s[ac]ss$/,
+          use: [{
+            loader: 'sass-loader',
+          }]
+        },
+        {
           test: /\.js|\.jsx|\.ts|\.tsx$/,
           loaders: ["awesome-typescript-loader"],
           include: path.resolve(__dirname, "../src"),
@@ -33,7 +40,7 @@ module.exports = {
       ]
     },
     resolve: {
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
+        extensions: [".js", ".jsx", ".ts", ".tsx", ".scss"],
         alias: {
             react: "preact-compat",
             "react-dom": "preact-compat"
