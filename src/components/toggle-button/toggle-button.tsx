@@ -30,18 +30,18 @@ export class ToggleButton extends Component<Props, State>{
 
         return (
 <div class={`toggle-button ${styles['toggle-button']}`}>
-    <div class={styles['toggle-button__label']}>
+    <div class={`toggle-button__label ${styles['toggle-button__label']}`}>
         {text}
     </div>
-    <div class={styles['toggle-button__button']}>
+    <div class={`toggle-button__button ${styles['toggle-button__button']}`}>
         <div>
             <input
                 type={"checkbox"}
                 name={sName}
                 id={id}
-                class={styles['toggle-button__checkbox'] +" "+ styles['screenreader-only']}
+                class={`toggle-button__checkbox ${styles['toggle-button__checkbox']} ${styles['screenreader-only']}`}
             />
-            <label for={id} class={styles['toggle-button__checkbox-label']}>
+            <label for={id} class={`toggle-button__checkbox-label ${styles['toggle-button__checkbox-label']}`}>
                 <span class={styles['screenreader-only']}>{srText}</span>
             </label>
         </div>
