@@ -30,7 +30,7 @@ export class Recorder extends Component<Props, State> {
         this.recordedBlobs = [];
         this.videoRef = null;
     }
-
+    
     componentDidUpdate() {
         this.videoRef!.srcObject = this.props.stream;
     }
