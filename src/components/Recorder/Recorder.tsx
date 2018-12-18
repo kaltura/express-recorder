@@ -31,6 +31,10 @@ export class Recorder extends Component<Props, State> {
         this.videoRef = null;
     }
 
+    componentDidUpdate() {
+        this.videoRef!.srcObject = this.props.stream;
+    }
+
     toggleRecording = () => {
         const isRecording = this.state.isRecording;
         if (!isRecording) {
