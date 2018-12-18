@@ -3,6 +3,7 @@ import { h, Component } from "preact";
 type Props = {
     video: boolean;
     audio: boolean;
+    stream: MediaStream;
 };
 
 type State = {
@@ -16,7 +17,6 @@ export class Recorder extends Component<Props, State> {
     };
 
     mediaRecorder: any;
-    stream: MediaStream | null;
     recordedBlobs: any[];
     videoRef: HTMLMediaElement | null;
 
@@ -27,15 +27,9 @@ export class Recorder extends Component<Props, State> {
         };
 
         this.mediaRecorder = null;
-        this.stream = null;
         this.recordedBlobs = [];
         this.videoRef = null;
     }
-
-    componentDidMount = () => {
-        this.getMediaStream();
-        //this.videoRef = document.getElementById("video");
-    };
 
     toggleRecording = () => {
         const isRecording = this.state.isRecording;
@@ -47,33 +41,6 @@ export class Recorder extends Component<Props, State> {
         this.setState((prev: State) => {
             return { isRecording: !prev.isRecording };
         });
-    };
-
-    getMediaStream = async () => {
-        const constraints = {
-            audio: this.props.audio,
-            video: this.props.video
-        };
-
-        const stream = await navigator.mediaDevices
-            .getUserMedia(constraints)
-            .then(this.handleSuccess)
-            .catch(this.handleError);
-    };
-
-    handleSuccess = (stream: MediaStream) => {
-        console.log("getUserMedia() got stream: ", stream);
-        this.stream = stream;
-        // if (window.URL) {
-        //   this.videoRef!.src = window.URL.createObjectURL(stream);
-        // } else {
-        //const aaa: any = stream;
-        this.videoRef!.srcObject = stream;
-        // }
-    };
-
-    handleError = (error: any) => {
-        console.log("handleError : " + error);
     };
 
     startRecording = () => {
@@ -91,7 +58,7 @@ export class Recorder extends Component<Props, State> {
             }
         }
         try {
-            this.mediaRecorder = new MediaRecorder(this.stream, options);
+            this.mediaRecorder = new MediaRecorder(this.props.stream, options);
         } catch (e) {
             console.error("Exception while creating MediaRecorder: " + e);
             alert("Exception while creating MediaRecorder: " + e);
