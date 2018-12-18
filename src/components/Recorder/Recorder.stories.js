@@ -8,6 +8,13 @@ class LoadData extends Component {
         stream: null
     };
 
+    constructor(props) {
+        super(props);
+
+        this.handleSuccess = this.handleSuccess.bind(this);
+        this.handleError = this.handleError.bind(this);
+    }
+
     componentDidMount() {
         const constraints = {
             audio: true,
