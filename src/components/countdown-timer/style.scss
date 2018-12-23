@@ -11,6 +11,7 @@
     color: white;
     display: inline-block;
     line-height: 40px;
+    z-index: 1;
 }
 
 svg {
@@ -26,10 +27,11 @@ svg {
     stroke-dasharray: 113px;
     stroke-dashoffset: 0;
     stroke-linecap: round;
-    stroke-width: 2px;
+    stroke-width: 4px;
     stroke: white;
-    fill: rgba(0,0,0,0.5);
-    animation: countdown-anim 3s linear infinite forwards;
+    fill: black;
+    fill-opacity: 0.5;
+    animation: countdown-anim 3s linear forwards;
 }
 
 @keyframes countdown-anim {
