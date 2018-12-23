@@ -22,9 +22,14 @@ export class CountdownTimer extends Component<Props, State>{
     interval:Timer | undefined;
     circleRef:HTMLElement | undefined;
 
+
+    constructor(props:Props) {
+        super(props);
+        this.state = { countdown: props.initialValue };
+    }
+
     componentDidMount() {
         const {initialValue} = this.props;
-        this.setState({countdown: initialValue});
         this.interval = setInterval(() => {
             this.update();
         }, 1000);
