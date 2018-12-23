@@ -16,7 +16,7 @@ type State = {
 export class CountdownTimer extends Component<Props, State>{
 
     static defaultProps = {
-        radius: 20
+        radius: 44
     };
 
     interval:Timer | undefined;

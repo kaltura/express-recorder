@@ -2,35 +2,34 @@
     position: relative;
     margin: auto;
     margin-top: 100px;
-    height: 40px;
-    width: 40px;
+    height: 88px;
+    width: 88px;
     text-align: center;
 }
 
 .countdown-number {
     color: white;
     display: inline-block;
-    line-height: 40px;
-    z-index: 1;
+    line-height: 88px;
 }
 
 svg {
     position: absolute;
     top: 0;
     right: 0;
-    width: 40px;
-    height: 40px;
+    width: 88px;
+    height: 88px;
     transform: rotateY(-180deg) rotateZ(-90deg);
 }
 
 .svg .circle {
-    stroke-dasharray: 113px;
+    stroke-dasharray: 264px;
     stroke-dashoffset: 0;
     stroke-linecap: round;
     stroke-width: 4px;
     stroke: white;
-    fill: black;
-    fill-opacity: 0.5;
+    fill: transparent;
+    //fill-opacity: 0.5;
     animation: countdown-anim 3s linear forwards;
 }
 
@@ -39,6 +38,6 @@ svg {
         stroke-dashoffset: 0;
     }
     to {
-        stroke-dashoffset: 113px;
+        stroke-dashoffset: 264px;
     }
 }
