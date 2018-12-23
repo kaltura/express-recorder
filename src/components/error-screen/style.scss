@@ -1,0 +1,25 @@
+.error-screen-wrap {
+    height: 100%;
+    width: 100%;
+    display: table;
+    background-color: #FFDD87;
+    color: #8B572A;
+    text-shadow: 1px 1px 0 0 rgba(255, 255, 255, 0.5);
+
+    .error-screen {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+
+        h1.error-screen__title {
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 22px;
+        }
+
+        p.error-screen__text {
+            font-size: 16px;
+            line-height: 19px;
+        }
+    }
+}
