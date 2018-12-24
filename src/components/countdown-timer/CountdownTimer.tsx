@@ -26,7 +26,7 @@ export class CountdownTimer extends Component<Props, State> {
 
     componentDidMount() {
         const { initialValue } = this.props;
-        this.interval = window.setInterval(() => {
+        this.interval = setInterval(() => {
             this.update();
         }, 1000);
 
