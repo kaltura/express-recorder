@@ -9,7 +9,8 @@ import { KalturaMediaType } from "kaltura-typescript-client/api/types/index";
 class LoadData extends Component {
     state = {
         stream: null,
-        uploadMedia: false
+        uploadMedia: false,
+		doRecording: false
     };
 
     recordedBlobs;
@@ -50,6 +51,12 @@ class LoadData extends Component {
         this.setState({ uploadMedia: true });
     };
 
+	toggleRecording = () => {
+		this.setState(prevState => {
+			return { doRecording: !prevState.doRecording };
+		});
+	};
+
     render() {
         if (this.state.uploadMedia) {
         	if (this.executed)
@@ -66,7 +73,7 @@ class LoadData extends Component {
 					clientTag: "kms_client"
 				},
                 {
-                    ks: "djJ8MjMyNjgyMXyDMqaJUz7sLkXsAcqlMlEFvgmJ_vaap181wfuq9tMjzIRlejMmp-m2KwmpVbV-ZbIIgCH2dZv17PA-U72V_YrvrGF0BQ7bOd36DSmla54v4JJLXbsQtrtIAhNRrzq6boex7G5Vnp4UTHrJpv2_xu4oqbRrNA-T-jsZSeoXFw_5rA=="
+                    ks: "djJ8MjMyNjgyMXzWAZO0pKZ5_CNbLyYK3QaJbNPx0ZtgyLDY5UXFMtzibXOIs22KO45MCiYKYUdBLHvQH2uRCPDIa78w5dWAVuLoaBN4a6AQA-bh-Rh3TkDRyhGf2L7jZ95kqlcdT9WKFYiNgZuZeAPLTHd-ghGL1rFoCZpxGvtsRHR5RAfCUGe1cw=="
                 }
             );
             uploader.upload(
@@ -76,6 +83,7 @@ class LoadData extends Component {
 				"Uploader test"
             );
         }
+
         return (
             <div>
                 <Recorder
@@ -83,7 +91,14 @@ class LoadData extends Component {
                     audio={true}
                     stream={this.state.stream}
                     handleUpload={this.handleUpload}
+					doRecording={this.state.doRecording}
                 />
+				<button id="startRecord" onClick={this.toggleRecording}>
+					{this.state.doRecording && <span>Stop Recording</span>}
+					{!this.state.doRecording && (
+						<span>Start Recording</span>
+					)}
+				</button>
             </div>
         );
     }

@@ -6,6 +6,7 @@ type Props = {
     stream: MediaStream;
     onError: (error: string) => void;
     doRecording: boolean;
+    handleUpload?: (blobs: Blob[]) => void;
 };
 
 type State = {};
@@ -84,6 +85,12 @@ export class Recorder extends Component<Props, State> {
         }
     };
 
+    handleUpload = () => {
+        if (this.props.handleUpload) {
+            this.props.handleUpload(this.recordedBlobs);
+        }
+    };
+
     render(props: Props) {
         return (
             <div>
@@ -93,6 +100,7 @@ export class Recorder extends Component<Props, State> {
                     autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}
                 />
+                <button onClick={this.handleUpload}>Use This</button>
             </div>
         );
     }

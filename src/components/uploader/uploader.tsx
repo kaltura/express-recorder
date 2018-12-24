@@ -40,6 +40,7 @@ export class Uploader {
         const entry = new KalturaMediaEntry();
         entry.name = entryName;
         entry.mediaType = mediaType;
+        entry.adminTags = "expressrecorder";
         requests.requests.push(
             new MediaAddAction({
                 entry: entry
@@ -61,7 +62,7 @@ export class Uploader {
         this.client
             .multiRequest(requests)
             .then(
-                data => {
+                (data: any) => {
                     if (!data!.hasErrors()) {
                         console.log(
                             "Media entry has been created successfully"
@@ -74,11 +75,11 @@ export class Uploader {
                         );
                     }
                 },
-                err => {
+                (err: any) => {
                     console.log("Failed to create media entry: " + err);
                 }
             )
-            .catch(err => {
+            .catch((err: any) => {
                 console.log("Failed to create media entry: " + err);
             });
     }
@@ -94,12 +95,12 @@ export class Uploader {
         });
 
         this.client.request(request).then(
-            data => {
+            (data: any) => {
                 if (data) {
                     console.log("done upload media");
                 }
             },
-            err => {
+            (err: any) => {
                 console.log("failed to upload media: " + err);
             }
         );
