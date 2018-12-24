@@ -17,7 +17,7 @@ export class Recorder extends Component<Props, State> {
     };
 
     mediaRecorder: any;
-    recordedBlobs: any[];
+    recordedBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
 
     constructor(props: Props) {
