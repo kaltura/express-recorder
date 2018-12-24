@@ -4,6 +4,7 @@ type Props = {
     video: boolean;
     audio: boolean;
     stream: MediaStream;
+    onError: (error: string) => void;
 };
 
 type State = {
@@ -63,7 +64,9 @@ export class Recorder extends Component<Props, State> {
             this.mediaRecorder = new MediaRecorder(this.props.stream, options);
         } catch (e) {
             console.error("Exception while creating MediaRecorder: " + e);
-            alert("Exception while creating MediaRecorder: " + e);
+            if (this.props.onError) {
+                return this.props.onError("Exception while creating MediaRecorder: " + e)
+            }
             return;
         }
         console.log(
