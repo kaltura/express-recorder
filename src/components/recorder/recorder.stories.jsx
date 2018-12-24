@@ -1,6 +1,6 @@
 import { h, Component } from "preact";
 import { storiesOf } from "@storybook/react";
-import { Recorder } from "./Recorder";
+import { Recorder } from "./recorder";
 import { react } from 'preact';
 
 class LoadData extends Component {
