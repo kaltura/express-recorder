@@ -51,13 +51,10 @@ export class Recorder extends Component<Props, State> {
         const { stream } = this.props;
         let options = { mimeType: "video/webm;codecs=vp9" };
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            console.log(options.mimeType + " is not Supported");
             options = { mimeType: "video/webm;codecs=vp8" };
             if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                console.log(options.mimeType + " is not Supported");
                 options = { mimeType: "video/webm" };
                 if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                    console.log(options.mimeType + " is not Supported");
                     options = { mimeType: "" };
                 }
             }
@@ -65,7 +62,6 @@ export class Recorder extends Component<Props, State> {
         try {
             this.mediaRecorder = new MediaRecorder(stream, options);
         } catch (e) {
-            console.error("Exception while creating MediaRecorder: " + e);
             if (this.props.onError) {
                 return this.props.onError(
                     "Exception while creating MediaRecorder: " + e
@@ -73,21 +69,13 @@ export class Recorder extends Component<Props, State> {
             }
             return;
         }
-        console.log(
-            "Created MediaRecorder",
-            this.mediaRecorder,
-            "with options",
-            options
-        );
 
         this.mediaRecorder.ondataavailable = this.handleDataAvailable;
         this.mediaRecorder.start(10); // collect 10ms of data
-        console.log("MediaRecorder started", this.mediaRecorder);
     };
 
     stopRecording = () => {
         this.mediaRecorder.stop();
-        console.log("Recorded Blobs: ", this.recordedBlobs);
     };
 
     handleDataAvailable = (event: any) => {
