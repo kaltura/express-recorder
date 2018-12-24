@@ -30,7 +30,7 @@ export class Recorder extends Component<Props, State> {
         this.recordedBlobs = [];
         this.videoRef = null;
     }
-    
+
     componentDidUpdate() {
         this.videoRef!.srcObject = this.props.stream;
     }
@@ -42,9 +42,7 @@ export class Recorder extends Component<Props, State> {
         } else {
             this.stopRecording();
         }
-        this.setState((prev: State) => {
-            return { isRecording: !prev.isRecording };
-        });
+        this.setState({ isRecording: !isRecording });
     };
 
     startRecording = () => {
