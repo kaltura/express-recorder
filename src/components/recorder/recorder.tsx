@@ -5,7 +5,7 @@ type Props = {
     audio: boolean;
     stream: MediaStream;
     onError: (error: string) => void;
-    isRecording: boolean;
+    doRecording: boolean;
 };
 
 type State = {};
@@ -13,7 +13,8 @@ type State = {};
 export class Recorder extends Component<Props, State> {
     static defaultProps = {
         video: true,
-        audio: true
+        audio: true,
+        doRecording: false
     };
 
     mediaRecorder: any;
@@ -29,16 +30,17 @@ export class Recorder extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        this.videoRef!.srcObject = this.props.stream;
+        const { stream, doRecording } = this.props;
+        this.videoRef!.srcObject = stream;
 
-        if (this.props.isRecording !== prevProps.isRecording) {
+        if (doRecording !== prevProps.doRecording) {
             this.toggleRecording();
         }
     }
 
     toggleRecording = () => {
-        const isRecording = this.props.isRecording;
-        if (isRecording) {
+        const doRecording = this.props.doRecording;
+        if (doRecording) {
             this.startRecording();
         } else {
             this.stopRecording();
@@ -46,6 +48,7 @@ export class Recorder extends Component<Props, State> {
     };
 
     startRecording = () => {
+        const { stream } = this.props;
         let options = { mimeType: "video/webm;codecs=vp9" };
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
             console.log(options.mimeType + " is not Supported");
@@ -60,7 +63,7 @@ export class Recorder extends Component<Props, State> {
             }
         }
         try {
-            this.mediaRecorder = new MediaRecorder(this.props.stream, options);
+            this.mediaRecorder = new MediaRecorder(stream, options);
         } catch (e) {
             console.error("Exception while creating MediaRecorder: " + e);
             if (this.props.onError) {

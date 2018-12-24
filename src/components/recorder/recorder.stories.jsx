@@ -6,7 +6,7 @@ import { react } from "preact";
 class LoadData extends Component {
     state = {
         stream: null,
-        isRecording: false
+		doRecording: false
     };
 
     constructor(props) {
@@ -41,7 +41,7 @@ class LoadData extends Component {
 
     toggleRecording = () => {
         this.setState(prevState => {
-            return { isRecording: !prevState.isRecording };
+            return { doRecording: !prevState.doRecording };
         });
     };
 
@@ -52,12 +52,12 @@ class LoadData extends Component {
                     video={true}
                     audio={true}
                     stream={this.state.stream}
-					isRecording={this.state.isRecording}
+					doRecording={this.state.doRecording}
                 />
                 <div>
                     <button id="startRecord" onClick={this.toggleRecording}>
-                        {this.state.isRecording && <span>Stop Recording</span>}
-                        {!this.state.isRecording && (
+                        {this.state.doRecording && <span>Stop Recording</span>}
+                        {!this.state.doRecording && (
                             <span>Start Recording</span>
                         )}
                     </button>
