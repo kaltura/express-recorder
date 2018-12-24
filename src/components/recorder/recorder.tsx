@@ -95,7 +95,6 @@ export class Recorder extends Component<Props, State> {
     render(props: Props) {
         return (
             <div>
-                <h1>Recorded Stream</h1>
                 <video
                     id="recorded"
                     muted={true}
