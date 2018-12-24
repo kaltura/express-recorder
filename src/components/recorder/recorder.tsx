@@ -4,17 +4,17 @@ type Props = {
     video: boolean;
     audio: boolean;
     stream: MediaStream;
-    handleUpload?: (blobs: Blob[]) => void;
+    onError: (error: string) => void;
+    doRecording: boolean;
 };
 
-type State = {
-    isRecording: boolean;
-};
+type State = {};
 
 export class Recorder extends Component<Props, State> {
     static defaultProps = {
         video: true,
-        audio: true
+        audio: true,
+        doRecording: false
     };
 
     mediaRecorder: any;
@@ -23,67 +23,59 @@ export class Recorder extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {
-            isRecording: false
-        };
 
         this.mediaRecorder = null;
         this.recordedBlobs = [];
         this.videoRef = null;
     }
 
-    componentDidUpdate() {
-        this.videoRef!.srcObject = this.props.stream;
+    componentDidUpdate(prevProps: Props) {
+        const { stream, doRecording } = this.props;
+        this.videoRef!.srcObject = stream;
+
+        if (doRecording !== prevProps.doRecording) {
+            this.toggleRecording();
+        }
     }
 
     toggleRecording = () => {
-        const isRecording = this.state.isRecording;
-        if (!isRecording) {
+        const doRecording = this.props.doRecording;
+        if (doRecording) {
             this.startRecording();
         } else {
             this.stopRecording();
         }
-        this.setState((prev: State) => {
-            return { isRecording: !prev.isRecording };
-        });
     };
 
     startRecording = () => {
+        const { stream } = this.props;
         let options = { mimeType: "video/webm;codecs=vp9" };
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            console.log(options.mimeType + " is not Supported");
             options = { mimeType: "video/webm;codecs=vp8" };
             if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                console.log(options.mimeType + " is not Supported");
                 options = { mimeType: "video/webm" };
                 if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                    console.log(options.mimeType + " is not Supported");
                     options = { mimeType: "" };
                 }
             }
         }
         try {
-            this.mediaRecorder = new MediaRecorder(this.props.stream, options);
+            this.mediaRecorder = new MediaRecorder(stream, options);
         } catch (e) {
-            console.error("Exception while creating MediaRecorder: " + e);
-            alert("Exception while creating MediaRecorder: " + e);
+            if (this.props.onError) {
+                return this.props.onError(
+                    "Exception while creating MediaRecorder: " + e
+                );
+            }
             return;
         }
-        console.log(
-            "Created MediaRecorder",
-            this.mediaRecorder,
-            "with options",
-            options
-        );
 
         this.mediaRecorder.ondataavailable = this.handleDataAvailable;
         this.mediaRecorder.start(10); // collect 10ms of data
-        console.log("MediaRecorder started", this.mediaRecorder);
     };
 
     stopRecording = () => {
         this.mediaRecorder.stop();
-        console.log("Recorded Blobs: ", this.recordedBlobs);
     };
 
     handleDataAvailable = (event: any) => {
@@ -92,31 +84,15 @@ export class Recorder extends Component<Props, State> {
         }
     };
 
-    handleUpload = () => {
-      if (this.props.handleUpload) {
-          this.props.handleUpload(this.recordedBlobs);
-      }
-    };
-
     render(props: Props) {
         return (
             <div>
-                <h1>Recorded Stream</h1>
                 <video
                     id="recorded"
                     muted={true}
                     autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}
                 />
-                <div>
-                    <button id="record" onClick={this.toggleRecording}>
-                        {this.state.isRecording && <span>Stop Recording</span>}
-                        {!this.state.isRecording && (
-                            <span>Start Recording</span>
-                        )}
-                    </button>
-                    <button onClick={this.handleUpload}>Use This</button>
-                </div>
             </div>
         );
     }
