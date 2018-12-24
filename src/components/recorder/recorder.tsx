@@ -5,11 +5,10 @@ type Props = {
     audio: boolean;
     stream: MediaStream;
     onError: (error: string) => void;
-};
-
-type State = {
     isRecording: boolean;
 };
+
+type State = {};
 
 export class Recorder extends Component<Props, State> {
     static defaultProps = {
@@ -23,27 +22,27 @@ export class Recorder extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {
-            isRecording: false
-        };
 
         this.mediaRecorder = null;
         this.recordedBlobs = [];
         this.videoRef = null;
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps: Props) {
         this.videoRef!.srcObject = this.props.stream;
+
+        if (this.props.isRecording !== prevProps.isRecording) {
+            this.toggleRecording();
+        }
     }
 
     toggleRecording = () => {
-        const isRecording = this.state.isRecording;
-        if (!isRecording) {
+        const isRecording = this.props.isRecording;
+        if (isRecording) {
             this.startRecording();
         } else {
             this.stopRecording();
         }
-        this.setState({ isRecording: !isRecording });
     };
 
     startRecording = () => {
@@ -65,7 +64,9 @@ export class Recorder extends Component<Props, State> {
         } catch (e) {
             console.error("Exception while creating MediaRecorder: " + e);
             if (this.props.onError) {
-                return this.props.onError("Exception while creating MediaRecorder: " + e)
+                return this.props.onError(
+                    "Exception while creating MediaRecorder: " + e
+                );
             }
             return;
         }
@@ -101,14 +102,6 @@ export class Recorder extends Component<Props, State> {
                     autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}
                 />
-                <div>
-                    <button id="record" onClick={this.toggleRecording}>
-                        {this.state.isRecording && <span>Stop Recording</span>}
-                        {!this.state.isRecording && (
-                            <span>Start Recording</span>
-                        )}
-                    </button>
-                </div>
             </div>
         );
     }
