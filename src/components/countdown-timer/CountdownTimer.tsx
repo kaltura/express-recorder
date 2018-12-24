@@ -1,4 +1,5 @@
 import { Component, h } from "preact";
+import Timer = NodeJS.Timer;
 const styles = require("./style.scss");
 
 type Props = {
@@ -16,7 +17,7 @@ export class CountdownTimer extends Component<Props, State> {
         radius: 44
     };
 
-    interval: number | undefined;
+    interval: Timer | undefined;
     circleRef: HTMLElement | undefined;
 
     constructor(props: Props) {
@@ -41,7 +42,7 @@ export class CountdownTimer extends Component<Props, State> {
 
         if (countdown <= 1) {
             // countdown done
-            this.interval && window.clearInterval(this.interval);
+            this.interval && clearInterval(this.interval);
             onCountdownComplete();
         }
 
