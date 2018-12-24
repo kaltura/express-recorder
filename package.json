@@ -46,10 +46,10 @@
     "typescript": "^3.2.1"
   },
   "dependencies": {
+    "kaltura-typescript-client": "file:libs/kaltura-typescript-client-6.4.2-v20181223-153243.tgz",
     "preact": "^8.2.5",
     "preact-habitat": "^3.1.0",
-    "preact-router": "^2.5.7",
-    "kaltura-typescript-client": "file:libs/kaltura-typescript-client-6.4.2-v20181202-125634.tgz"
+    "preact-router": "^2.5.7"
   },
   "jest": {
     "verbose": true,
