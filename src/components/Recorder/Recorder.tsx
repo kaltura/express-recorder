@@ -4,6 +4,7 @@ type Props = {
     video: boolean;
     audio: boolean;
     stream: MediaStream;
+    handleUpload?: (blobs: Blob[]) => void;
 };
 
 type State = {
@@ -17,7 +18,7 @@ export class Recorder extends Component<Props, State> {
     };
 
     mediaRecorder: any;
-    recordedBlobs: any[];
+    recordedBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
 
     constructor(props: Props) {
@@ -30,7 +31,7 @@ export class Recorder extends Component<Props, State> {
         this.recordedBlobs = [];
         this.videoRef = null;
     }
-    
+
     componentDidUpdate() {
         this.videoRef!.srcObject = this.props.stream;
     }
@@ -91,6 +92,12 @@ export class Recorder extends Component<Props, State> {
         }
     };
 
+    handleUpload = () => {
+      if (this.props.handleUpload) {
+          this.props.handleUpload(this.recordedBlobs);
+      }
+    };
+
     render(props: Props) {
         return (
             <div>
@@ -108,6 +115,7 @@ export class Recorder extends Component<Props, State> {
                             <span>Start Recording</span>
                         )}
                     </button>
+                    <button onClick={this.handleUpload}>Use This</button>
                 </div>
             </div>
         );
