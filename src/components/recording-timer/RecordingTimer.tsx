@@ -1,5 +1,7 @@
 import {Component, h} from "preact";
+
 const styles = require('./style.scss');
+const iconStyles  = require( '../../styles.scss');
 
 type Props = {
     onButtonClick: () => void;
@@ -49,9 +51,12 @@ export class RecordingTimer extends Component<Props, State>{
     render(props:Props, state:State) {
         const {currentTime} = state;
         return (
-            <div class={`timer ${styles['timer']}`}>
+            <div className={`timer ${styles['timer']}`}>
                 <button type={"button"} class={`timer-button ${styles['timer-button']}`} onClick={this.clickHandler}>
-                <i class={`icon-stop ${styles['icon-stop']}`} />
+                <span className={iconStyles['icon-stop']}>
+                    <span className={iconStyles['path1']}></span>
+                    <span className={iconStyles['path2']}></span>
+                </span>
                     {currentTime}
                 </button>
             </div>
