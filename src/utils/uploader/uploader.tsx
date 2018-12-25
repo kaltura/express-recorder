@@ -4,11 +4,16 @@ import {
     KalturaMediaEntry,
     KalturaMediaType,
     KalturaUploadedFileTokenResource,
+    KalturaUploadToken,
     MediaAddAction,
     UploadTokenAddAction,
     UploadTokenUploadAction
 } from "kaltura-typescript-client/api/types";
-import { KalturaClient, KalturaMultiRequest } from "kaltura-typescript-client";
+import {
+    KalturaClient,
+    KalturaMultiRequest,
+    KalturaMultiResponse
+} from "kaltura-typescript-client";
 
 export class Uploader {
     client: KalturaClient = new KalturaClient();
@@ -34,8 +39,7 @@ export class Uploader {
         recordedBlobs: Blob[],
         entryName: string
     ) {
-
-        let requests: KalturaMultiRequest = new KalturaMultiRequest();
+        const requests: KalturaMultiRequest = new KalturaMultiRequest();
 
         const entry = new KalturaMediaEntry();
         entry.name = entryName;
@@ -62,12 +66,13 @@ export class Uploader {
         this.client
             .multiRequest(requests)
             .then(
-                (data: any) => {
-                    if (!data!.hasErrors()) {
-                        console.log(
-                            "Media entry has been created successfully"
+                (data: KalturaMultiResponse | null) => {
+                    if (data && !data.hasErrors()) {
+                        this.addMedia(
+                            recordedBlobs,
+                            data![1].result.id,
+                            entryName
                         );
-                        this.addMedia(recordedBlobs, data![1].result.id, entryName);
                     } else {
                         console.log(
                             "Failed to create media entry: " +
@@ -75,17 +80,17 @@ export class Uploader {
                         );
                     }
                 },
-                (err: any) => {
+                (err: Error) => {
                     console.log("Failed to create media entry: " + err);
                 }
             )
-            .catch((err: any) => {
+            .catch((err: Error) => {
                 console.log("Failed to create media entry: " + err);
             });
     }
 
     addMedia(recordedBlobs: Blob[], tokenId: string, entryName: string) {
-        const file = new File(recordedBlobs, entryName + '.mp4');
+        const file = new File(recordedBlobs, entryName + ".mp4");
         const request = new UploadTokenUploadAction({
             uploadTokenId: tokenId,
             fileData: file,
@@ -95,12 +100,12 @@ export class Uploader {
         });
 
         this.client.request(request).then(
-            (data: any) => {
+            (data: KalturaUploadToken | null) => {
                 if (data) {
                     console.log("done upload media");
                 }
             },
-            (err: any) => {
+            (err: Error) => {
                 console.log("failed to upload media: " + err);
             }
         );
