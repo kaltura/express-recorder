@@ -56,10 +56,8 @@ class LoadData extends Component {
         });
     };
 
-    handleDataAvailable = event => {
-        if (event.data && event.data.size > 0) {
-            this.recordedBlobs.push(event.data);
-        }
+    handleRecordingEnd = (recordedBlobs) => {
+    	this.recordedBlobs = recordedBlobs;
     };
 
     render() {
@@ -78,7 +76,7 @@ class LoadData extends Component {
                 },
                 {
                     ks:
-                        "djJ8MjMyNjgyMXzWAZO0pKZ5_CNbLyYK3QaJbNPx0ZtgyLDY5UXFMtzibXOIs22KO45MCiYKYUdBLHvQH2uRCPDIa78w5dWAVuLoaBN4a6AQA-bh-Rh3TkDRyhGf2L7jZ95kqlcdT9WKFYiNgZuZeAPLTHd-ghGL1rFoCZpxGvtsRHR5RAfCUGe1cw=="
+                        "djJ8MjMyNjgyMXwOp0MjNVPV81WTsVIZx6E0Ni1gunBPTqFviwysIuW3CS6GsyBfh7sgFktui6ZTmH3SRMo65gAnwgJj_Elyo7vgtqulaMoH7-s8FQ4nq_SirNNGxCPqad69Hv71aFP1zrXw1xeL4y0Wo_DMEGbdqSnfm_rHKNZJvOHwYeRcR2CvKA=="
                 }
             );
             uploader.upload(
@@ -98,7 +96,7 @@ class LoadData extends Component {
                     video={true}
                     audio={true}
                     stream={this.state.stream}
-                    onDataAvailable={this.handleDataAvailable}
+					onRecordingEnd={this.handleRecordingEnd}
                     doRecording={this.state.doRecording}
                 />
                 <button id="startRecord" onClick={this.toggleRecording}>

@@ -6,7 +6,7 @@ type Props = {
     stream: MediaStream;
     onError?: (error: string) => void;
     doRecording: boolean;
-    onDataAvailable: (event: any) => void;
+    onRecordingEnd: (recorderBlobs: Blob[]) => void;
 };
 
 type State = {};
@@ -19,6 +19,7 @@ export class Recorder extends Component<Props, State> {
     };
 
     mediaRecorder: any;
+    recordedBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
 
     constructor(props: Props) {
@@ -26,6 +27,7 @@ export class Recorder extends Component<Props, State> {
 
         this.mediaRecorder = null;
         this.videoRef = null;
+        this.recordedBlobs = [];
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -35,7 +37,6 @@ export class Recorder extends Component<Props, State> {
         if (doRecording !== prevProps.doRecording) {
             this.toggleRecording();
         }
-
     }
 
     toggleRecording = () => {
@@ -70,12 +71,21 @@ export class Recorder extends Component<Props, State> {
             return;
         }
 
-        this.mediaRecorder.ondataavailable = this.props.onDataAvailable;
+        this.mediaRecorder.ondataavailable = this.handleDataAvailable;
         this.mediaRecorder.start(10); // collect 10ms of data
     };
 
     stopRecording = () => {
         this.mediaRecorder.stop();
+        if (this.props.onRecordingEnd) {
+            this.props.onRecordingEnd(this.recordedBlobs);
+        }
+    };
+
+    handleDataAvailable = (event: any) => {
+        if (event.data && event.data.size > 0) {
+            this.recordedBlobs.push(event.data);
+        }
     };
 
     render(props: Props) {
