@@ -17,14 +17,14 @@ import {
 
 export class Uploader {
     client: KalturaClient = new KalturaClient();
-    entryId: number = 0;
+    entryId: string = "";
 
     upload(
         client: KalturaClient,
         mediaType: KalturaMediaType,
         recordedBlobs: Blob[],
         entryName: string,
-        callback: (entryId: number) => void
+        callback: (entryId: string) => void
     ) {
         this.client = client;
         this.createEntry(mediaType, recordedBlobs, entryName, callback);
@@ -41,7 +41,7 @@ export class Uploader {
         mediaType: KalturaMediaType,
         recordedBlobs: Blob[],
         entryName: string,
-        callback: (entryId: number) => void
+        callback: (entryId: string) => void
     ) {
         const requests: KalturaMultiRequest = new KalturaMultiRequest();
 
@@ -99,7 +99,7 @@ export class Uploader {
         recordedBlobs: Blob[],
         tokenId: string,
         entryName: string,
-        callback: (entryId: number) => void
+        callback: (entryId: string) => void
     ) {
         const file = new File(recordedBlobs, entryName);
         const request = new UploadTokenUploadAction({
