@@ -80,7 +80,8 @@ class LoadData extends Component {
                 kClient,
 				KalturaMediaType.video,
                 this.recordedBlobs,
-				"Uploader test"
+				"Uploader test",
+				(entryId) => {console.log("done upload media. entryId: " + entryId)}
             );
         }
 
