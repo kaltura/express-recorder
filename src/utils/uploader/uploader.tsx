@@ -16,8 +16,8 @@ import {
 } from "kaltura-typescript-client";
 
 export class Uploader {
-    client: KalturaClient = new KalturaClient();
-    entryId: string = "";
+    client: KalturaClient | undefined;
+    entryId: string | undefined;
 
     upload(
         client: KalturaClient,
@@ -67,22 +67,22 @@ export class Uploader {
             }).setDependency(["entryId", 0, "id"])
         );
 
-        this.client
+        this.client!
             .multiRequest(requests)
             .then(
                 (data: KalturaMultiResponse | null) => {
-                    if (data && !data.hasErrors()) {
+                    if (!data || data.hasErrors()) {
+                        console.log(
+                            "Failed to create media entry: " +
+                            + (data || data!.getFirstError())
+                        );
+                    } else {
                         this.entryId = data[0].result.id;
                         this.addMedia(
                             recordedBlobs,
                             data![1].result.id,
                             entryName,
                             callback
-                        );
-                    } else {
-                        console.log(
-                            "Failed to create media entry: " +
-                                +data!.hasErrors()
                         );
                     }
                 },
@@ -110,10 +110,10 @@ export class Uploader {
             finalChunk: true
         });
 
-        this.client.request(request).then(
+        this.client!.request(request).then(
             (data: KalturaUploadToken | null) => {
                 if (data) {
-                    callback(this.entryId);
+                    callback(this.entryId!);
                 }
             },
             (err: Error) => {
