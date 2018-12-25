@@ -20,6 +20,13 @@ module.exports = {
           exclude: path.resolve(__dirname, "../node_modules")
         },
         {
+          test: /\.(svg|woff2?|ttf|eot|jpe?g|png|gif|mp4|mov|ogg|webm)(\?.*)?$/i,
+          include: path.resolve(__dirname, "../src"),
+          use: [
+            {loader: 'file-loader' }
+            ]
+        },
+        {
           test: /\.(css|less|s[ac]ss|styl)$/,
           include: path.resolve(__dirname, "../src"),
 
