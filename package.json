@@ -13,7 +13,8 @@
     "serve": "npm run build && preact serve",
     "dev": "preact watch --template src/index.ejs",
     "dist": "microbundle --entry src/components/hello-world/index.tsx",
-    "storybook": "start-storybook -p 9001 -c .storybook"
+    "storybook": "start-storybook -p 9001 -c .storybook -s ./src/public/assets",
+    "storybook-build": "build-storybook -c .storybook -s ./src/public/assets"
   },
   "keywords": [],
   "author": "Kaltura",
@@ -24,6 +25,7 @@
     "awesome-typescript-loader": "^5.2.1",
     "css-loader": "^2.0.0",
     "eslint": "^4.5.0",
+    "file-loader": "^3.0.1",
     "identity-obj-proxy": "^3.0.0",
     "if-env": "^1.0.0",
     "jest": "^21.2.1",
