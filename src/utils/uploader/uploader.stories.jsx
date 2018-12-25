@@ -1,6 +1,6 @@
 import { h, Component } from "preact";
 import { storiesOf } from "@storybook/react";
-import { Recorder } from "../recorder/recorder";
+import { Recorder } from "../../components/recorder/recorder";
 import { Uploader } from "./uploader";
 import { react } from "preact";
 import { KalturaClient } from "kaltura-typescript-client";
