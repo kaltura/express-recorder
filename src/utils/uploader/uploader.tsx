@@ -17,15 +17,17 @@ import {
 
 export class Uploader {
     client: KalturaClient = new KalturaClient();
+    entryId: number = 0;
 
     upload(
         client: KalturaClient,
         mediaType: KalturaMediaType,
         recordedBlobs: Blob[],
-        entryName: string
+        entryName: string,
+        callback: (entryId: number) => void
     ) {
         this.client = client;
-        this.createEntry(mediaType, recordedBlobs, entryName);
+        this.createEntry(mediaType, recordedBlobs, entryName, callback);
     }
 
     /**
@@ -33,11 +35,13 @@ export class Uploader {
      * @param {KalturaMediaType} mediaType
      * @param {Blob[]} recordedBlobs
      * @param {string} entryName
+     * @param {(entryId: number) => void} callback
      */
     createEntry(
         mediaType: KalturaMediaType,
         recordedBlobs: Blob[],
-        entryName: string
+        entryName: string,
+        callback: (entryId: number) => void
     ) {
         const requests: KalturaMultiRequest = new KalturaMultiRequest();
 
@@ -68,10 +72,12 @@ export class Uploader {
             .then(
                 (data: KalturaMultiResponse | null) => {
                     if (data && !data.hasErrors()) {
+                        this.entryId = data[0].result.id;
                         this.addMedia(
                             recordedBlobs,
                             data![1].result.id,
-                            entryName
+                            entryName,
+                            callback
                         );
                     } else {
                         console.log(
@@ -89,8 +95,13 @@ export class Uploader {
             });
     }
 
-    addMedia(recordedBlobs: Blob[], tokenId: string, entryName: string) {
-        const file = new File(recordedBlobs, entryName + ".mp4");
+    addMedia(
+        recordedBlobs: Blob[],
+        tokenId: string,
+        entryName: string,
+        callback: (entryId: number) => void
+    ) {
+        const file = new File(recordedBlobs, entryName);
         const request = new UploadTokenUploadAction({
             uploadTokenId: tokenId,
             fileData: file,
@@ -102,7 +113,7 @@ export class Uploader {
         this.client.request(request).then(
             (data: KalturaUploadToken | null) => {
                 if (data) {
-                    console.log("done upload media");
+                    callback(this.entryId);
                 }
             },
             (err: Error) => {
