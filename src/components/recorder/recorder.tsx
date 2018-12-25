@@ -4,9 +4,9 @@ type Props = {
     video: boolean;
     audio: boolean;
     stream: MediaStream;
-    onError: (error: string) => void;
+    onError?: (error: string) => void;
     doRecording: boolean;
-    handleUpload?: (blobs: Blob[]) => void;
+    onDataAvailable: (event: any) => void;
 };
 
 type State = {};
@@ -37,6 +37,7 @@ export class Recorder extends Component<Props, State> {
         if (doRecording !== prevProps.doRecording) {
             this.toggleRecording();
         }
+
     }
 
     toggleRecording = () => {
@@ -71,24 +72,12 @@ export class Recorder extends Component<Props, State> {
             return;
         }
 
-        this.mediaRecorder.ondataavailable = this.handleDataAvailable;
+        this.mediaRecorder.ondataavailable = this.props.onDataAvailable;
         this.mediaRecorder.start(10); // collect 10ms of data
     };
 
     stopRecording = () => {
         this.mediaRecorder.stop();
-    };
-
-    handleDataAvailable = (event: any) => {
-        if (event.data && event.data.size > 0) {
-            this.recordedBlobs.push(event.data);
-        }
-    };
-
-    handleUpload = () => {
-        if (this.props.handleUpload) {
-            this.props.handleUpload(this.recordedBlobs);
-        }
     };
 
     render(props: Props) {
@@ -100,7 +89,6 @@ export class Recorder extends Component<Props, State> {
                     autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}
                 />
-                <button onClick={this.handleUpload}>Use This</button>
             </div>
         );
     }

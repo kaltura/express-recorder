@@ -10,10 +10,10 @@ class LoadData extends Component {
     state = {
         stream: null,
         uploadMedia: false,
-		doRecording: false
+        doRecording: false
     };
 
-    recordedBlobs;
+    recordedBlobs = [];
 
     constructor(props) {
         super(props);
@@ -46,42 +46,49 @@ class LoadData extends Component {
         console.log("handleError : " + error);
     };
 
-    handleUpload = recorderBlobs => {
-        this.recordedBlobs = recorderBlobs;
+    handleUpload = () => {
         this.setState({ uploadMedia: true });
     };
 
-	toggleRecording = () => {
-		this.setState(prevState => {
-			return { doRecording: !prevState.doRecording };
-		});
-	};
+    toggleRecording = () => {
+        this.setState(prevState => {
+            return { doRecording: !prevState.doRecording };
+        });
+    };
+
+    handleDataAvailable = event => {
+        if (event.data && event.data.size > 0) {
+            this.recordedBlobs.push(event.data);
+        }
+    };
 
     render() {
         if (this.state.uploadMedia) {
-        	if (this.executed)
-			{
-				throw new Error("already executed");
-			}
+            if (this.executed) {
+                throw new Error("already executed");
+            }
 
-        	this.executed = true;
+            this.executed = true;
 
             const uploader = new Uploader();
             const kClient = new KalturaClient(
-				{
-					endpointUrl: "https://www.kaltura.com",
-					clientTag: "kms_client"
-				},
                 {
-                    ks: "djJ8MjMyNjgyMXzWAZO0pKZ5_CNbLyYK3QaJbNPx0ZtgyLDY5UXFMtzibXOIs22KO45MCiYKYUdBLHvQH2uRCPDIa78w5dWAVuLoaBN4a6AQA-bh-Rh3TkDRyhGf2L7jZ95kqlcdT9WKFYiNgZuZeAPLTHd-ghGL1rFoCZpxGvtsRHR5RAfCUGe1cw=="
+                    endpointUrl: "https://www.kaltura.com",
+                    clientTag: "kms_client"
+                },
+                {
+                    ks:
+                        "djJ8MjMyNjgyMXzWAZO0pKZ5_CNbLyYK3QaJbNPx0ZtgyLDY5UXFMtzibXOIs22KO45MCiYKYUdBLHvQH2uRCPDIa78w5dWAVuLoaBN4a6AQA-bh-Rh3TkDRyhGf2L7jZ95kqlcdT9WKFYiNgZuZeAPLTHd-ghGL1rFoCZpxGvtsRHR5RAfCUGe1cw=="
                 }
             );
             uploader.upload(
                 kClient,
-				KalturaMediaType.video,
+                KalturaMediaType.video,
                 this.recordedBlobs,
-				"Uploader test",
-				(entryId) => {console.log("done upload media. entryId: " + entryId)}
+                "Uploader test",
+                entryId => {
+                    console.log("done upload media. entryId: " + entryId);
+                }
             );
         }
 
@@ -91,15 +98,14 @@ class LoadData extends Component {
                     video={true}
                     audio={true}
                     stream={this.state.stream}
-                    handleUpload={this.handleUpload}
-					doRecording={this.state.doRecording}
+                    onDataAvailable={this.handleDataAvailable}
+                    doRecording={this.state.doRecording}
                 />
-				<button id="startRecord" onClick={this.toggleRecording}>
-					{this.state.doRecording && <span>Stop Recording</span>}
-					{!this.state.doRecording && (
-						<span>Start Recording</span>
-					)}
-				</button>
+                <button id="startRecord" onClick={this.toggleRecording}>
+                    {this.state.doRecording && <span>Stop Recording</span>}
+                    {!this.state.doRecording && <span>Start Recording</span>}
+                </button>
+                <button onClick={this.handleUpload}>Use This</button>
             </div>
         );
     }
