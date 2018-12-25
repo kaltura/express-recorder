@@ -5,5 +5,5 @@ import {RecordingTimer} from "./RecordingTimer";
 storiesOf("Recording Timer", module)
     .addDecorator(story => <div style={{ backgroundColor: '#333', width: '100%', height:'300px' }}>{story()}</div>)
     .add("render a recording timer", () => {
-        return <RecordingTimer onCountdownComplete={() => console.log("done")}/>
+        return <RecordingTimer onButtonClick={() => console.log("clicked")}/>
     } );
