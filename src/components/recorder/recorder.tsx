@@ -19,14 +19,12 @@ export class Recorder extends Component<Props, State> {
     };
 
     mediaRecorder: any;
-    recordedBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
 
     constructor(props: Props) {
         super(props);
 
         this.mediaRecorder = null;
-        this.recordedBlobs = [];
         this.videoRef = null;
     }
 
