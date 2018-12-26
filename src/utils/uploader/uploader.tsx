@@ -124,7 +124,11 @@ export class Uploader {
             finalChunk: true
         });
 
-        this.client!.request(request).then(
+        if (!this.client) {
+            this.throwError(new Error("Missing client object"));
+            return;
+        }
+        this.client.request(request).then(
             (data: KalturaUploadToken | null) => {
                 if (data) {
                     if (!this.entryId) {
