@@ -4,8 +4,9 @@ type Props = {
     video: boolean;
     audio: boolean;
     stream: MediaStream;
-    onError: (error: string) => void;
+    onError?: (error: string) => void;
     doRecording: boolean;
+    onRecordingEnd: (recorderBlobs: Blob[]) => void;
 };
 
 type State = {};
@@ -25,8 +26,8 @@ export class Recorder extends Component<Props, State> {
         super(props);
 
         this.mediaRecorder = null;
-        this.recordedBlobs = [];
         this.videoRef = null;
+        this.recordedBlobs = [];
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -76,6 +77,9 @@ export class Recorder extends Component<Props, State> {
 
     stopRecording = () => {
         this.mediaRecorder.stop();
+        if (this.props.onRecordingEnd) {
+            this.props.onRecordingEnd(this.recordedBlobs);
+        }
     };
 
     handleDataAvailable = (event: any) => {
