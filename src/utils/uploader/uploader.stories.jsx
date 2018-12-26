@@ -86,7 +86,8 @@ class LoadData extends Component {
                 "Uploader test",
                 entryId => {
                     console.log("done upload media. entryId: " + entryId);
-                }
+                },
+				(e) => {console.log(e)}
             );
         }
 

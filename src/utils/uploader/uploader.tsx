@@ -14,19 +14,23 @@ import {
     KalturaMultiRequest,
     KalturaMultiResponse
 } from "kaltura-typescript-client";
+import { Error } from "tslint/lib/error";
 
 export class Uploader {
     client: KalturaClient | undefined;
     entryId: string | undefined;
+    onError: ((e: Error) => void) | undefined;
 
     upload(
         client: KalturaClient,
         mediaType: KalturaMediaType,
         recordedBlobs: Blob[],
         entryName: string,
-        callback: (entryId: string) => void
+        callback: (entryId: string) => void,
+        onError: (e: Error) => void
     ) {
         this.client = client;
+        this.onError = onError ? onError : undefined;
         this.createEntry(mediaType, recordedBlobs, entryName, callback);
     }
 
@@ -67,31 +71,42 @@ export class Uploader {
             }).setDependency(["entryId", 0, "id"])
         );
 
-        this.client!
+        if (!this.client) {
+            this.throwError(new Error("Missing client object"));
+            return;
+        }
+
+        this.client
             .multiRequest(requests)
             .then(
                 (data: KalturaMultiResponse | null) => {
                     if (!data || data.hasErrors()) {
-                        console.log(
-                            "Failed to create media entry: " +
-                            + (data || data!.getFirstError())
+                        this.throwError(
+                            new Error(
+                                "Failed to create media entry: " +
+                                    +(data || data!.getFirstError())
+                            )
                         );
                     } else {
                         this.entryId = data[0].result.id;
                         this.addMedia(
                             recordedBlobs,
-                            data![1].result.id,
+                            data[1].result.id,
                             entryName,
                             callback
                         );
                     }
                 },
                 (err: Error) => {
-                    console.log("Failed to create media entry: " + err);
+                    this.throwError(
+                        new Error("Failed to create media entry: " + err)
+                    );
                 }
             )
             .catch((err: Error) => {
-                console.log("Failed to create media entry: " + err);
+                this.throwError(
+                    new Error("Failed to create media entry: " + err)
+                );
             });
     }
 
@@ -113,12 +128,22 @@ export class Uploader {
         this.client!.request(request).then(
             (data: KalturaUploadToken | null) => {
                 if (data) {
-                    callback(this.entryId!);
+                    if (!this.entryId) {
+                        this.throwError(new Error("Failed to create entry"));
+                        return;
+                    }
+                    callback(this.entryId);
                 }
             },
             (err: Error) => {
-                console.log("failed to upload media: " + err);
+                this.throwError(new Error("failed to upload media: " + err));
             }
         );
+    }
+
+    throwError(error: Error) {
+        if (this.onError) {
+            this.onError(error);
+        }
     }
 }
