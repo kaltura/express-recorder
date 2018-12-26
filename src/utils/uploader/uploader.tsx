@@ -14,7 +14,6 @@ import {
     KalturaMultiRequest,
     KalturaMultiResponse
 } from "kaltura-typescript-client";
-import { Error } from "tslint/lib/error";
 
 export class Uploader {
     client: KalturaClient | undefined;
