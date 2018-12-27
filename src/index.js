@@ -1,17 +1,16 @@
 let poly = require("preact-cli/lib/lib/webpack/polyfills");
 import { h } from "preact";
 import habitat from "preact-habitat";
-import './styles.scss';
+import "./styles.scss";
 
-import Widget from "./components/app";
+import { ExpressRecorder } from "./components/app/ExpressRecorder";
 
-let _habitat = habitat(Widget);
+let _habitat = habitat(ExpressRecorder);
 
 _habitat.render({
-	selector: '[data-widget-host="habitat"]',
-	clean: true
+    selector: '[data-widget-host="habitat"]',
+    clean: true
 });
-
 
 /*type Config = {
     ks: string;

@@ -24,7 +24,7 @@ type State = {
 
 export class ExpressRecorder extends Component<Props, State> {
 
-    defaultProps = {
+    static defaultProps = {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
         allowAudio: true
