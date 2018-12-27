@@ -5,14 +5,14 @@
   "main": "dist/index.js",
   "umd:main": "dist/index.umd.js",
   "module": "dist/index.m.js",
-  "source": "components/hello-world/index.tsx",
+  "source": "components/app/index.tsx",
   "scripts": {
     "test": "NODE_ENV=test jest",
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
     "build": "preact build --no-prerender --clean --template src/index.ejs --service-worker false",
     "serve": "npm run build && preact serve",
     "dev": "preact watch --template src/index.ejs",
-    "dist": "microbundle --entry src/components/hello-world/index.tsx",
+    "dist": "microbundle --entry src/components/app/index.tsx",
     "storybook": "start-storybook -p 9001 -c .storybook -s ./src/public/assets",
     "storybook-build": "build-storybook -c .storybook -s ./src/public/assets"
   },
@@ -50,7 +50,7 @@
   "dependencies": {
     "kaltura-typescript-client": "file:libs/kaltura-typescript-client-6.4.2-v20181223-153243.tgz",
     "preact": "^8.2.5",
-    "preact-habitat": "^3.1.0",
+    "preact-habitat": "^3.2.2",
     "preact-router": "^2.5.7"
   },
   "jest": {

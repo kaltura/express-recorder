@@ -4,7 +4,7 @@ import { Recorder } from "../../components/recorder/recorder";
 import { Uploader } from "./uploader";
 import { react } from "preact";
 import { KalturaClient } from "kaltura-typescript-client";
-import { KalturaMediaType } from "kaltura-typescript-client/api/types/index";
+import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
 
 class LoadData extends Component {
     state = {

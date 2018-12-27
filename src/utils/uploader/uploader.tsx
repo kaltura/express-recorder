@@ -1,14 +1,12 @@
 import { h } from "preact";
-import {
-    BaseEntryUpdateContentAction,
-    KalturaMediaEntry,
-    KalturaMediaType,
-    KalturaUploadedFileTokenResource,
-    KalturaUploadToken,
-    MediaAddAction,
-    UploadTokenAddAction,
-    UploadTokenUploadAction
-} from "kaltura-typescript-client/api/types";
+import { BaseEntryUpdateContentAction } from 'kaltura-typescript-client/api/types/BaseEntryUpdateContentAction';
+import { KalturaMediaEntry } from 'kaltura-typescript-client/api/types/KalturaMediaEntry';
+import { KalturaMediaType } from 'kaltura-typescript-client/api/types/KalturaMediaType';
+import { KalturaUploadedFileTokenResource } from 'kaltura-typescript-client/api/types/KalturaUploadedFileTokenResource';
+import { KalturaUploadToken } from 'kaltura-typescript-client/api/types/KalturaUploadToken';
+import { MediaAddAction } from 'kaltura-typescript-client/api/types/MediaAddAction';
+import { UploadTokenAddAction } from 'kaltura-typescript-client/api/types/UploadTokenAddAction';
+import { UploadTokenUploadAction } from 'kaltura-typescript-client/api/types/UploadTokenUploadAction';
 import {
     KalturaClient,
     KalturaMultiRequest,
