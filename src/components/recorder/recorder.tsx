@@ -7,6 +7,7 @@ type Props = {
     onError?: (error: string) => void;
     doRecording: boolean;
     onRecordingEnd: (recorderBlobs: Blob[]) => void;
+    discard?: boolean;
 };
 
 type State = {};
@@ -15,7 +16,8 @@ export class Recorder extends Component<Props, State> {
     static defaultProps = {
         video: true,
         audio: true,
-        doRecording: false
+        doRecording: false,
+        discard: false
     };
 
     mediaRecorder: any;
@@ -31,11 +33,15 @@ export class Recorder extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { stream, doRecording } = this.props;
+        const { stream, doRecording, discard } = this.props;
         this.videoRef!.srcObject = stream;
 
         if (doRecording !== prevProps.doRecording) {
             this.toggleRecording();
+        }
+
+        if (discard) {
+            this.recordedBlobs = [];
         }
     }
 
