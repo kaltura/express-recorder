@@ -20,6 +20,8 @@ svg {
     right: 0;
     width: 88px;
     height: 88px;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 50%;
     transform: rotateY(-180deg) rotateZ(-90deg);
 }
 
@@ -30,7 +32,6 @@ svg {
     stroke-width: 4px;
     stroke: white;
     fill: transparent;
-    //fill-opacity: 0.5;
     animation: countdown-anim 3s linear forwards;
 }
 
