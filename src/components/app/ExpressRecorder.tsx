@@ -6,7 +6,6 @@ import { Uploader } from "../../utils/uploader/uploader";
 import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/CountdownTimer";
 import { RecordingTimer } from "../recording-timer/RecordingTimer";
-import { Playback } from "../playback/playback";
 const styles = require("./style.scss");
 
 type Props = {
@@ -17,7 +16,6 @@ type Props = {
     entryName?: string;
     allowVideo?: boolean;
     allowAudio?: boolean;
-    doRecording?: boolean;
     partnerId: number;
     uiConfId: number;
 };
@@ -46,9 +44,7 @@ export class ExpressRecorder extends Component<Props, State> {
         this.state = {
             stream: new MediaStream(),
             doUpload: false,
-            doRecording: this.props.doRecording
-                ? this.props.doRecording
-                : false,
+            doRecording: false,
             doCountdown: false,
             recordedBlobs: [],
             doPlayback: false
