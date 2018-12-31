@@ -12,6 +12,8 @@
     display: inline-block;
     line-height: 88px;
     font-size: 48px;
+    z-index: 2;
+    position: relative;
 }
 
 svg {
@@ -33,6 +35,8 @@ svg {
     stroke: white;
     fill: transparent;
     animation: countdown-anim 3s linear forwards;
+    position: relative;
+    z-index: 1;
 }
 
 @keyframes countdown-anim {
