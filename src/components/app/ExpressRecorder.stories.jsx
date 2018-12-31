@@ -6,9 +6,11 @@ storiesOf("Main App", module).add("widget default", () => {
     return (
         <div>
             <ExpressRecorder
-                ks={"djJ8MjMyNjgyMXznryAkEePj9KuhgxVcBuMNb8GYsz1RpKupB08hpTuONZ6nc3f76aSiVKTWvxjS83TFPJYDzuvR6S-FXaYyqAIIf77LpyvSrS2DLijqRWBztBCvim4nA1wD_OwWBVuWvjQLdjWrMRxt89Gcxjg9o_k7vIWbmr93zjyeqzVFkrHq1A=="}
+                ks={"djJ8MjMyNjgyMXzwsnEk0vMaZxYsD2BEWT9v6Pxf3sGZQ-noaOCqnI9zr5rl43-52azXLkBA2-EQrBzDTAzLFP9y1F_qgUdt5zdJO_ge0yevZmwHvlJnbrnC8l1k4cyeQloByVm_kM2KHoBhzma_tjmXcSOOnfrvWnPW11Qr-f2YxiOv1gF4IjLllg=="}
 				app={"kms_client"}
                 serviceUrl={"https://www.kaltura.com"}
+				partnerId={346151}
+				uiConfId={43398481}
             />
         </div>
     );
