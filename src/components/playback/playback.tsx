@@ -62,7 +62,7 @@ export class Playback extends Component<Props, State> {
         }
     }
 
-    render(props: Props) {
+    render() {
         return (
             <div
                 id={"player-wrap_" + this.uniqueId}
