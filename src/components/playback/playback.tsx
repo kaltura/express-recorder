@@ -9,15 +9,14 @@ type Props = {
 };
 
 type State = {};
+let uniqueId: number = 0;
 
 export class Playback extends Component<Props, State> {
     kalturaPlayer: any;
-    uniqueId: number = 0;
 
     componentDidMount(): void {
         this.embedPlayer();
-
-        this.uniqueId++;
+        uniqueId++;
     }
 
     componentDidUpdate(
@@ -50,7 +49,7 @@ export class Playback extends Component<Props, State> {
         const { media, partnerId, uiconfId } = this.props;
         try {
             this.kalturaPlayer = KalturaPlayer.setup({
-                targetId: "player-wrap_" + this.uniqueId,
+                targetId: "player-wrap_" + uniqueId,
                 provider: {
                     partnerId: partnerId,
                     uiConfId: uiconfId
@@ -65,7 +64,7 @@ export class Playback extends Component<Props, State> {
     render() {
         return (
             <div
-                id={"player-wrap_" + this.uniqueId}
+                id={"player-wrap_" + uniqueId}
                 class={`player-wrap ${styles["player-wrap"]}`}
             />
         );
