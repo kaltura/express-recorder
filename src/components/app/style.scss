@@ -1,12 +1,13 @@
 .express-recorder {
     text-align: center;
+    text-align: -webkit-center;
 }
 .controls__start {
     height: 72px;
     width: 72px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FB4D59 0%, #E91E26 100%);
-    border: 1px solid #FB4D59;
+    background: linear-gradient(135deg, #fb4d59 0%, #e91e26 100%);
+    border: 1px solid #fb4d59;
 }
 .express-recorder__controls {
     position: relative;
@@ -22,30 +23,32 @@
 }
 .controls__cancel {
     padding: 12px 17px;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 3px;
-    background-color: rgba(0,0,0,0.5);
-    color: #FFFFFF;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
     font-size: 15px;
     font-weight: 500;
-    outline:none;
+    outline: none;
     margin-top: 200px;
 }
 .bottom__btn {
     height: 36px;
     width: 120px;
-    border-radius: 5px;
+    border-radius: 3px;
     position: relative;
-    margin-top: 120px;
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
 }
 .btn__save {
     background-color: #008297;
     border: 1px solid #ccc;
     color: white;
+    margin-left: 24px;
 }
 .btn__reset {
-    background-color: #ffffff;
-    border: 1px solid #666666;
-    color: #666666;
-    margin-right: 24px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
 }
