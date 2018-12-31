@@ -86,8 +86,8 @@ export class ExpressRecorder extends Component<Props, State> {
         this.setState({ stream: stream });
     };
 
-    handleError = (error: MediaStreamError) => {
-        console.log("handleError : " + error);
+    handleError = (error: MediaStreamError | Error) => {
+        console.log("Failed : " + error);
     };
 
     handleUpload = () => {
@@ -130,7 +130,7 @@ export class ExpressRecorder extends Component<Props, State> {
                 console.log("done upload media. entryId: " + entryId);
             },
             (e: Error) => {
-                console.log(e);
+                this.handleError(e);
             }
         );
 
