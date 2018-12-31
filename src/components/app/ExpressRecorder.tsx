@@ -6,6 +6,7 @@ import { Uploader } from "../../utils/uploader/uploader";
 import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/CountdownTimer";
 import { RecordingTimer } from "../recording-timer/RecordingTimer";
+import { ErrorScreen } from "../error-screen/error-screen";
 const styles = require("./style.scss");
 
 type Props = {
@@ -27,6 +28,7 @@ type State = {
     doCountdown: boolean;
     doPlayback: boolean;
     recordedBlobs: Blob[];
+    error: string | undefined;
 };
 
 export class ExpressRecorder extends Component<Props, State> {
@@ -47,7 +49,8 @@ export class ExpressRecorder extends Component<Props, State> {
             doRecording: false,
             doCountdown: false,
             recordedBlobs: [],
-            doPlayback: false
+            doPlayback: false,
+            error: undefined
         };
 
         // load player lib
@@ -82,12 +85,13 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     handleSuccess = (stream: MediaStream) => {
-        console.log("getUserMedia() got stream: ", stream);
         this.setState({ stream: stream });
     };
 
     handleError = (error: MediaStreamError | Error) => {
-        console.log("Failed : " + error);
+        this.setState({
+            error: "Failed: " + error.name + ": " + error.message
+        });
     };
 
     handleUpload = () => {
@@ -134,7 +138,7 @@ export class ExpressRecorder extends Component<Props, State> {
             }
         );
 
-        this.setState({doUpload: false})
+        this.setState({ doUpload: false });
     };
 
     handleStartClick = () => {
@@ -168,7 +172,8 @@ export class ExpressRecorder extends Component<Props, State> {
             stream,
             doRecording,
             recordedBlobs,
-            doPlayback
+            doPlayback,
+            error
         } = this.state;
 
         if (doUpload) {
@@ -176,6 +181,13 @@ export class ExpressRecorder extends Component<Props, State> {
             this.uploadMedia();
         }
 
+        if (error) {
+            return (
+                <div class={`express-recorder ${styles["express-recorder"]}`}>
+                    {error && <ErrorScreen text={error} />}
+                </div>
+            );
+        }
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
                 <div>
