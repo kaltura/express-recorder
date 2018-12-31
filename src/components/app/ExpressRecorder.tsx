@@ -6,6 +6,7 @@ import { Uploader } from "../../utils/uploader/uploader";
 import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/CountdownTimer";
 import { RecordingTimer } from "../recording-timer/RecordingTimer";
+import { Playback } from "../playback/playback";
 const styles = require("./style.scss");
 
 type Props = {
@@ -17,13 +18,16 @@ type Props = {
     allowVideo?: boolean;
     allowAudio?: boolean;
     doRecording?: boolean;
+    partnerId: number;
+    uiConfId: number;
 };
 
 type State = {
     stream: MediaStream;
-    uploadMedia: boolean;
+    doUpload: boolean;
     doRecording: boolean;
-    showCountdown: boolean;
+    doCountdown: boolean;
+    doPlayback: boolean;
     recordedBlobs: Blob[];
 };
 
@@ -41,13 +45,23 @@ export class ExpressRecorder extends Component<Props, State> {
 
         this.state = {
             stream: new MediaStream(),
-            uploadMedia: false,
+            doUpload: false,
             doRecording: this.props.doRecording
                 ? this.props.doRecording
                 : false,
-            showCountdown: false,
-            recordedBlobs: []
+            doCountdown: false,
+            recordedBlobs: [],
+            doPlayback: false
         };
+
+        // load player lib
+        const tag = document.createElement("script");
+        tag.async = true;
+        tag.src = `https://cdnapisec.kaltura.com/p/${
+            props.partnerId
+        }/embedPlaykitJs/uiconf_id/${props.uiConfId}`;
+        tag.type = "text/javascript";
+        document.body.appendChild(tag);
 
         this.handleSuccess = this.handleSuccess.bind(this);
         this.handleError = this.handleError.bind(this);
@@ -81,15 +95,24 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     handleUpload = () => {
-        this.setState({ uploadMedia: true });
+        this.setState({ doUpload: true });
     };
 
     handleRecordingEnd = (recordedBlobs: Blob[]) => {
         this.setState({ recordedBlobs: recordedBlobs });
     };
 
+    getDefaultEntryName() {
+        const { allowVideo } = this.props;
+        if (allowVideo) {
+            return "Video Recording - " + new Date();
+        } else {
+            return "Audio Recording - " + new Date();
+        }
+    }
+
     uploadMedia = () => {
-        const { ks, serviceUrl, app } = this.props;
+        const { ks, serviceUrl, app, entryName } = this.props;
         const { recordedBlobs } = this.state;
         const uploader = new Uploader();
         const kClient = new KalturaClient(
@@ -106,7 +129,7 @@ export class ExpressRecorder extends Component<Props, State> {
             kClient,
             KalturaMediaType.video,
             recordedBlobs,
-            "Uploader test",
+            entryName ? entryName : this.getDefaultEntryName(),
             (entryId: string) => {
                 console.log("done upload media. entryId: " + entryId);
             },
@@ -114,40 +137,45 @@ export class ExpressRecorder extends Component<Props, State> {
                 console.log(e);
             }
         );
+
+        this.setState({doUpload: false})
     };
 
     handleStartClick = () => {
-        this.setState({ showCountdown: true });
+        this.setState({ doCountdown: true });
     };
     handleStopClick = () => {
-        this.setState({ doRecording: false });
+        this.setState({ doRecording: false, doPlayback: true });
     };
     handleCancelClick = () => {
-        this.setState({ showCountdown: false });
+        this.setState({ doCountdown: false });
     };
     handleResetClick = () => {
-        this.setState({recordedBlobs: [], showCountdown: true})
+        this.uploadedOnce = false;
+        this.setState({
+            recordedBlobs: [],
+            doCountdown: true,
+            doPlayback: false
+        });
     };
     handleCountdownComplete = () => {
-        if (this.state.showCountdown) {
-            this.setState({ showCountdown: false, doRecording: true });
+        if (this.state.doCountdown) {
+            this.setState({ doCountdown: false, doRecording: true });
         }
     };
 
     render() {
-        const { entryName } = this.props;
+        const { partnerId, uiConfId } = this.props;
         const {
-            showCountdown,
-            uploadMedia,
+            doCountdown,
+            doUpload,
             stream,
             doRecording,
-            recordedBlobs
+            recordedBlobs,
+            doPlayback
         } = this.state;
 
-        if (uploadMedia) {
-            if (this.uploadedOnce) {
-                throw new Error("already executed");
-            }
+        if (doUpload) {
             this.uploadedOnce = true;
             this.uploadMedia();
         }
@@ -161,10 +189,13 @@ export class ExpressRecorder extends Component<Props, State> {
                         stream={stream}
                         onRecordingEnd={this.handleRecordingEnd}
                         doRecording={doRecording}
-                        discard={showCountdown}
+                        discard={doCountdown}
+                        doPlayback={doPlayback}
+                        partnerId={partnerId}
+                        uiConfId={uiConfId}
                     />
                 </div>
-                {showCountdown && (
+                {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
                         <CountdownTimer
                             initialValue={3}
@@ -173,52 +204,58 @@ export class ExpressRecorder extends Component<Props, State> {
                     </div>
                 )}
                 <div className={styles["express-recorder__controls"]}>
-                    {!doRecording && !showCountdown && recordedBlobs.length === 0 && (
-                        <button
-                            className={styles["controls__start"]}
-                            id="startRecord"
-                            onClick={this.handleStartClick}
-                            label={"Start Recording"}
-                            aria-label="Start Recording"
-                        />
-                    )}
+                    {!doRecording &&
+                        !doCountdown &&
+                        recordedBlobs.length === 0 && (
+                            <button
+                                className={styles["controls__start"]}
+                                id="startRecord"
+                                onClick={this.handleStartClick}
+                                label={"Start Recording"}
+                                aria-label="Start Recording"
+                            />
+                        )}
                     {doRecording && (
                         <RecordingTimer onButtonClick={this.handleStopClick} />
                     )}
-                    {showCountdown && (
+                    {doCountdown && (
                         <button
                             className={`controls__cancel ${
                                 styles["controls__cancel"]
                             }`}
                             onClick={this.handleCancelClick}
-                            aria-lable="Cancel"
+                            aria-label="Cancel"
                         >
                             Cancel
                         </button>
                     )}
+                    {!doRecording && recordedBlobs.length > 0 && (
+                        <div
+                            className={`${styles["express-recorder__bottom"]}`}
+                        >
+                            <button
+                                className={`${styles["bottom__btn"]} ${
+                                    styles["btn__reset"]
+                                }`}
+                                onClick={this.handleResetClick}
+                                aria-label="Record Again"
+                            >
+                                Record Again
+                            </button>
+                            {!this.uploadedOnce && (
+                                <button
+                                    className={`${styles["bottom__btn"]} ${
+                                        styles["btn__save"]
+                                    }`}
+                                    onClick={this.handleUpload}
+                                    aria-label="Use This"
+                                >
+                                    Use This
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
-                {!doRecording && recordedBlobs.length > 0 && (
-                    <div className={`${styles["express-recorder__bottom"]}`}>
-                        <button
-                            className={`${styles["bottom__btn"]} ${
-                                styles["btn__reset"]
-                            }`}
-                            onClick={this.handleResetClick}
-                            aria-lable="Record Again"
-                        >
-                            Record Again
-                        </button>
-                        <button
-                            className={`${styles["bottom__btn"]} ${
-                                styles["btn__save"]
-                            }`}
-                            onClick={this.handleUpload}
-                            aria-label="Use This"
-                        >
-                            Use This
-                        </button>
-                    </div>
-                )}
             </div>
         );
     }
