@@ -141,6 +141,7 @@ export class ExpressRecorder extends Component<Props, State> {
             recordedBlobs,
             entryName ? entryName : this.getDefaultEntryName(),
             (entryId: string) => {
+                // TODO - export entryId when exposed api is ready
                 console.log("done upload media. entryId: " + entryId);
             },
             (e: Error) => {
