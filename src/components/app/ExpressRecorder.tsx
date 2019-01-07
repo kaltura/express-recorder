@@ -42,6 +42,7 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
+    kClient: KalturaClient | undefined;
 
     constructor(props: Props) {
         super(props);
@@ -72,12 +73,27 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     componentDidMount() {
-        const { allowVideo, allowAudio } = this.props;
+        const { allowVideo, allowAudio, serviceUrl, app, ks } = this.props;
 
         const constraints = {
             audio: allowAudio,
             video: allowVideo
         };
+
+        //create client for uploading
+        this.kClient = new KalturaClient(
+            {
+                endpointUrl: serviceUrl,
+                clientTag: app
+            },
+            {
+                ks: ks
+            }
+        );
+
+        if (!this.kClient) {
+            this.setState({ error: "Cannot connect to Kaltura server" });
+        }
 
         return navigator.mediaDevices
             .getUserMedia(constraints)
@@ -115,27 +131,12 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     uploadMedia = () => {
-        const {
-            ks,
-            serviceUrl,
-            app,
-            entryName,
-            conversionProfileId
-        } = this.props;
+        const { entryName, conversionProfileId } = this.props;
         const { recordedBlobs } = this.state;
         const uploader = new Uploader();
-        const kClient = new KalturaClient(
-            {
-                endpointUrl: serviceUrl,
-                clientTag: app
-            },
-            {
-                ks: ks
-            }
-        );
 
         uploader.upload(
-            kClient,
+            this.kClient!,
             KalturaMediaType.video,
             recordedBlobs,
             entryName ? entryName : this.getDefaultEntryName(),
