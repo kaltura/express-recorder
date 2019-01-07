@@ -195,7 +195,7 @@ export class ExpressRecorder extends Component<Props, State> {
 
         if (error) {
             return (
-                <div class={`express-recorder ${styles["express-recorder"]}`}>
+                <div className={`express-recorder ${styles["express-recorder"]}`}>
                     {error && <ErrorScreen text={error} />}
                 </div>
             );
@@ -233,8 +233,7 @@ export class ExpressRecorder extends Component<Props, State> {
                                 }`}
                                 id="startRecord"
                                 onClick={this.handleStartClick}
-                                label={"Start Recording"}
-                                aria-label="Start Recording"
+                                aria-label={"Start Recording"}
                                 tabIndex={0}
                             />
                         )}
@@ -247,7 +246,6 @@ export class ExpressRecorder extends Component<Props, State> {
                                 styles["controls__cancel"]
                             }`}
                             onClick={this.handleCancelClick}
-                            aria-label="Cancel"
                             tabIndex={0}
                         >
                             Cancel
@@ -262,7 +260,6 @@ export class ExpressRecorder extends Component<Props, State> {
                                     styles["bottom__btn"]
                                 } ${styles["btn__reset"]}`}
                                 onClick={this.handleResetClick}
-                                aria-label="Record Again"
                                 tabIndex={0}
                             >
                                 Record Again
@@ -273,7 +270,6 @@ export class ExpressRecorder extends Component<Props, State> {
                                         styles["bottom__btn"]
                                     } ${styles["btn__save"]}`}
                                     onClick={this.handleUpload}
-                                    aria-label="Use This"
                                     tabIndex={0}
                                 >
                                     Use This
