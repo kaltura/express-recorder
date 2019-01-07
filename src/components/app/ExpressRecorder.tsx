@@ -12,17 +12,17 @@ const styles = require("./style.scss");
 type Props = {
     ks: string;
     serviceUrl: string;
-    app: string;
-    conversionProfileId?: number;
-    entryName?: string;
-    allowVideo?: boolean;
-    allowAudio?: boolean;
+    app: string; // parent app for client creation
     partnerId: number;
-    uiConfId: number;
+    uiConfId: number; // playerId for playback
+    conversionProfileId?: number; // conversion profile for media upload
+    entryName?: string;
+    allowVideo?: boolean; // whether to enable video recording
+    allowAudio?: boolean; // whether to enable audio recording
 };
 
 type State = {
-    stream: MediaStream;
+    stream: MediaStream | undefined;
     doUpload: boolean;
     doRecording: boolean;
     doCountdown: boolean;
@@ -31,6 +31,9 @@ type State = {
     error: string | undefined;
 };
 
+/**
+ * This is the main component of the widget - contains the main flow.
+ */
 export class ExpressRecorder extends Component<Props, State> {
     static defaultProps = {
         conversionProfileId: KalturaConversionProfileType.media,
@@ -42,8 +45,9 @@ export class ExpressRecorder extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
+
         this.state = {
-            stream: new MediaStream(),
+            stream: undefined,
             doUpload: false,
             doRecording: false,
             doCountdown: false,
@@ -200,7 +204,7 @@ export class ExpressRecorder extends Component<Props, State> {
                     <Recorder
                         video={true}
                         audio={true}
-                        stream={stream}
+                        stream={stream!}
                         onRecordingEnd={this.handleRecordingEnd}
                         doRecording={doRecording}
                         discard={doCountdown}
