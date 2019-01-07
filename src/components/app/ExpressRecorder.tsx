@@ -41,7 +41,7 @@ export class ExpressRecorder extends Component<Props, State> {
         allowAudio: true
     };
 
-    uploadedOnce: boolean = false;
+    uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
 
     constructor(props: Props) {
         super(props);
