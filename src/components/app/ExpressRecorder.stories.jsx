@@ -6,12 +6,14 @@ storiesOf("Main App", module).add("widget default", () => {
     return (
         <div>
             <ExpressRecorder
-                ks={"djJ8MjMyNjgyMXzwsnEk0vMaZxYsD2BEWT9v6Pxf3sGZQ-noaOCqnI9zr5rl43-52azXLkBA2-EQrBzDTAzLFP9y1F_qgUdt5zdJO_ge0yevZmwHvlJnbrnC8l1k4cyeQloByVm_kM2KHoBhzma_tjmXcSOOnfrvWnPW11Qr-f2YxiOv1gF4IjLllg=="}
+                ks={"djJ8MjMyNjgyMXwrU0-ndW2_CwVtklE1M6VLu3aShSDY6TZ56UusuapKyCT5u1Zd0CCKbD0p_e2cW09PxuSFdlfmrOa4xPwj5chke9LwTlfRy0BYWNXxTGpDld8DgzrdVD3_yvKHM83NTbyzs8eFu0Bdh2M52ewlQ1Cjd2rjUgYCsRI3CPwst-gyiQ=="}
 				app={"kms_client"}
                 serviceUrl={"https://www.kaltura.com"}
 				partnerId={346151}
 				uiConfId={43398481}
+				playerUrl={"https://cdnapisec.kaltura.com"}
             />
         </div>
     );
 });
+

@@ -13,6 +13,7 @@ type Props = {
     ks: string;
     serviceUrl: string;
     app: string; // parent app for client creation
+    playerUrl: string;
     partnerId: number;
     uiConfId: number; // playerId for playback
     conversionProfileId?: number; // conversion profile for media upload
@@ -57,15 +58,6 @@ export class ExpressRecorder extends Component<Props, State> {
             error: undefined
         };
 
-        // load player lib
-        const tag = document.createElement("script");
-        tag.async = true;
-        tag.src = `https://cdnapisec.kaltura.com/p/${
-            props.partnerId
-        }/embedPlaykitJs/uiconf_id/${props.uiConfId}`;
-        tag.type = "text/javascript";
-        document.body.appendChild(tag);
-
         this.handleSuccess = this.handleSuccess.bind(this);
         this.handleError = this.handleError.bind(this);
         this.handleUpload = this.handleUpload.bind(this);
@@ -73,7 +65,16 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     componentDidMount() {
-        const { allowVideo, allowAudio, serviceUrl, app, ks } = this.props;
+        const {
+            allowVideo,
+            allowAudio,
+            serviceUrl,
+            app,
+            ks,
+            playerUrl,
+            uiConfId,
+            partnerId
+        } = this.props;
 
         const constraints = {
             audio: allowAudio,
@@ -94,6 +95,14 @@ export class ExpressRecorder extends Component<Props, State> {
         if (!this.kClient) {
             this.setState({ error: "Cannot connect to Kaltura server" });
         }
+
+        // load player lib
+        const tag = document.createElement("script");
+        tag.async = true;
+        tag.src =
+            playerUrl + `/p/${partnerId}/embedPlaykitJs/uiconf_id/${uiConfId}`;
+        tag.type = "text/javascript";
+        document.body.appendChild(tag);
 
         return navigator.mediaDevices
             .getUserMedia(constraints)
@@ -195,7 +204,9 @@ export class ExpressRecorder extends Component<Props, State> {
 
         if (error) {
             return (
-                <div className={`express-recorder ${styles["express-recorder"]}`}>
+                <div
+                    className={`express-recorder ${styles["express-recorder"]}`}
+                >
                     {error && <ErrorScreen text={error} />}
                 </div>
             );
