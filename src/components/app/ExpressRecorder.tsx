@@ -13,7 +13,7 @@ type Props = {
     ks: string;
     serviceUrl: string;
     app: string;
-    conversionProfileId?: KalturaConversionProfileType;
+    conversionProfileId?: number;
     entryName?: string;
     allowVideo?: boolean;
     allowAudio?: boolean;
@@ -112,7 +112,7 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     uploadMedia = () => {
-        const { ks, serviceUrl, app, entryName } = this.props;
+        const { ks, serviceUrl, app, entryName, conversionProfileId } = this.props;
         const { recordedBlobs } = this.state;
         const uploader = new Uploader();
         const kClient = new KalturaClient(
@@ -135,7 +135,8 @@ export class ExpressRecorder extends Component<Props, State> {
             },
             (e: Error) => {
                 this.handleError(e);
-            }
+            },
+            conversionProfileId
         );
 
         this.setState({ doUpload: false });

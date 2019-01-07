@@ -24,11 +24,12 @@ export class Uploader {
         recordedBlobs: Blob[],
         entryName: string,
         callback: (entryId: string) => void,
-        onError: (e: Error) => void
+        onError: (e: Error) => void,
+        conversionProfileId?: number
     ) {
         this.client = client;
         this.onError = onError ? onError : undefined;
-        this.createEntry(mediaType, recordedBlobs, entryName, callback);
+        this.createEntry(mediaType, recordedBlobs, entryName, callback, conversionProfileId);
     }
 
     /**
@@ -37,12 +38,14 @@ export class Uploader {
      * @param {Blob[]} recordedBlobs
      * @param {string} entryName
      * @param {(entryId: number) => void} callback
+     * @param {number} conversionProfileId
      */
     createEntry(
         mediaType: KalturaMediaType,
         recordedBlobs: Blob[],
         entryName: string,
-        callback: (entryId: string) => void
+        callback: (entryId: string) => void,
+        conversionProfileId?: number
     ) {
         const requests: KalturaMultiRequest = new KalturaMultiRequest();
 
@@ -64,7 +67,8 @@ export class Uploader {
         requests.requests.push(
             new BaseEntryUpdateContentAction({
                 entryId: "",
-                resource: resource
+                resource: resource,
+                conversionProfileId: conversionProfileId
             }).setDependency(["entryId", 0, "id"])
         );
 
