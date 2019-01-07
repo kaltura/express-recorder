@@ -11,6 +11,9 @@ type State = {
     countdown: number;
 };
 
+/**
+ * Component to show countdown from X to 0. uses for delay between clicking on start recording to the actual recording
+ */
 export class CountdownTimer extends Component<Props, State> {
     static defaultProps = {
         radius: 44
