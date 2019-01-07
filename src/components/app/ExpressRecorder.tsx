@@ -221,6 +221,7 @@ export class ExpressRecorder extends Component<Props, State> {
                                 onClick={this.handleStartClick}
                                 label={"Start Recording"}
                                 aria-label="Start Recording"
+                                tabIndex={0}
                             />
                         )}
                     {doRecording && (
@@ -233,6 +234,7 @@ export class ExpressRecorder extends Component<Props, State> {
                             }`}
                             onClick={this.handleCancelClick}
                             aria-label="Cancel"
+                            tabIndex={0}
                         >
                             Cancel
                         </button>
@@ -247,6 +249,7 @@ export class ExpressRecorder extends Component<Props, State> {
                                 }`}
                                 onClick={this.handleResetClick}
                                 aria-label="Record Again"
+                                tabIndex={0}
                             >
                                 Record Again
                             </button>
@@ -257,6 +260,7 @@ export class ExpressRecorder extends Component<Props, State> {
                                     }`}
                                     onClick={this.handleUpload}
                                     aria-label="Use This"
+                                    tabIndex={0}
                                 >
                                     Use This
                                 </button>

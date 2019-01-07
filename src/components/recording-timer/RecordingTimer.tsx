@@ -53,6 +53,7 @@ export class RecordingTimer extends Component<Props, State> {
                     type={"button"}
                     class={`timer-button ${styles["timer-button"]}`}
                     onClick={this.clickHandler}
+                    tabIndex={0}
                 >
                     <span className={iconStyles["icon-stop"]}>
                         <span className={iconStyles["path1"]} />
