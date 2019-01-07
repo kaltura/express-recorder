@@ -29,10 +29,10 @@ export class CountdownTimer extends Component<Props, State> {
 
     componentDidMount() {
         const { initialValue } = this.props;
-        const int: any = setInterval(() => {
+        const id: any = setInterval(() => {
             this.update();
         }, 1000);
-        this.interval = int as number;
+        this.interval = id as number;
 
         if (this.circleRef) {
             this.circleRef.style.animationDuration = initialValue + "s";
