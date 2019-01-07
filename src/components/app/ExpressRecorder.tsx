@@ -42,7 +42,6 @@ export class ExpressRecorder extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-
         this.state = {
             stream: new MediaStream(),
             doUpload: false,
@@ -112,7 +111,13 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     uploadMedia = () => {
-        const { ks, serviceUrl, app, entryName, conversionProfileId } = this.props;
+        const {
+            ks,
+            serviceUrl,
+            app,
+            entryName,
+            conversionProfileId
+        } = this.props;
         const { recordedBlobs } = this.state;
         const uploader = new Uploader();
         const kClient = new KalturaClient(
@@ -217,7 +222,9 @@ export class ExpressRecorder extends Component<Props, State> {
                         !doCountdown &&
                         recordedBlobs.length === 0 && (
                             <button
-                                className={styles["controls__start"]}
+                                className={`controls__start ${
+                                    styles["controls__start"]
+                                }`}
                                 id="startRecord"
                                 onClick={this.handleStartClick}
                                 label={"Start Recording"}
@@ -245,9 +252,9 @@ export class ExpressRecorder extends Component<Props, State> {
                             className={`${styles["express-recorder__bottom"]}`}
                         >
                             <button
-                                className={`${styles["bottom__btn"]} ${
-                                    styles["btn__reset"]
-                                }`}
+                                className={`btn__reset ${
+                                    styles["bottom__btn"]
+                                } ${styles["btn__reset"]}`}
                                 onClick={this.handleResetClick}
                                 aria-label="Record Again"
                                 tabIndex={0}
@@ -256,9 +263,9 @@ export class ExpressRecorder extends Component<Props, State> {
                             </button>
                             {!this.uploadedOnce && (
                                 <button
-                                    className={`${styles["bottom__btn"]} ${
-                                        styles["btn__save"]
-                                    }`}
+                                    className={`btn__save ${
+                                        styles["bottom__btn"]
+                                    } ${styles["btn__save"]}`}
                                     onClick={this.handleUpload}
                                     aria-label="Use This"
                                     tabIndex={0}
