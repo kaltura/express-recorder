@@ -62,6 +62,7 @@ export class ExpressRecorder extends Component<Props, State> {
         this.handleError = this.handleError.bind(this);
         this.handleUpload = this.handleUpload.bind(this);
         this.handleStartClick = this.handleStartClick.bind(this);
+        this.checkProps = this.checkProps.bind(this);
     }
 
     componentDidMount() {
@@ -76,9 +77,7 @@ export class ExpressRecorder extends Component<Props, State> {
             partnerId
         } = this.props;
 
-        if (!serviceUrl || !app || !ks || !playerUrl || !uiConfId || !partnerId) {
-            this.setState({error: "Missing parameters"});
-        }
+        this.checkProps();
 
         const constraints = {
             audio: allowAudio,
@@ -116,6 +115,27 @@ export class ExpressRecorder extends Component<Props, State> {
             .catch(this.handleError);
     }
 
+    checkProps = () => {
+        const {
+            serviceUrl,
+            app,
+            ks,
+            playerUrl,
+            uiConfId,
+            partnerId
+        } = this.props;
+
+        if (!serviceUrl || !app || !ks || !playerUrl || !uiConfId || !partnerId) {
+            let message = "Missing props: ";
+            message += !serviceUrl ? "serviceUrl; " : "";
+            message += !app ? "app; " : "";
+            message += !ks ? "ks; " : "";
+            message += !playerUrl ? "playerUrl; " : "";
+            message += !uiConfId ? "uiConfId; " : "";
+            message += !partnerId ? "partnerId; " : "";
+            this.setState({error: message});
+        }
+    };
     handleSuccess = (stream: MediaStream) => {
         this.setState({ stream: stream });
     };
