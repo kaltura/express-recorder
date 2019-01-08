@@ -52,7 +52,7 @@ export class Uploader {
         const entry = new KalturaMediaEntry();
         entry.name = entryName;
         entry.mediaType = mediaType;
-        entry.adminTags = "expressrecorder";
+        //entry.adminTags = "expressrecorder";
         requests.requests.push(
             new MediaAddAction({
                 entry: entry
