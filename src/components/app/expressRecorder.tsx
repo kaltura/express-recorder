@@ -7,6 +7,7 @@ import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
+const DetectRTC = require("../../../node_modules/detectrtc");
 const styles = require("./style.scss");
 
 type Props = {
@@ -79,6 +80,11 @@ export class ExpressRecorder extends Component<Props, State> {
 
         this.checkProps();
 
+        if (!DetectRTC.isWebRTCSupported) {
+            this.setState({error: "Browser is not webRTC supported"});
+            return;
+        }
+
         const constraints = {
             audio: allowAudio,
             video: allowVideo
@@ -125,7 +131,14 @@ export class ExpressRecorder extends Component<Props, State> {
             partnerId
         } = this.props;
 
-        if (!serviceUrl || !app || !ks || !playerUrl || !uiConfId || !partnerId) {
+        if (
+            !serviceUrl ||
+            !app ||
+            !ks ||
+            !playerUrl ||
+            !uiConfId ||
+            !partnerId
+        ) {
             let message = "Missing props: ";
             message += !serviceUrl ? "serviceUrl; " : "";
             message += !app ? "app; " : "";
@@ -133,7 +146,7 @@ export class ExpressRecorder extends Component<Props, State> {
             message += !playerUrl ? "playerUrl; " : "";
             message += !uiConfId ? "uiConfId; " : "";
             message += !partnerId ? "partnerId; " : "";
-            this.setState({error: message});
+            this.setState({ error: message });
         }
     };
     handleSuccess = (stream: MediaStream) => {
@@ -168,13 +181,18 @@ export class ExpressRecorder extends Component<Props, State> {
         const { recordedBlobs } = this.state;
         const uploader = new Uploader();
 
+        const eventStart = new CustomEvent("mediaUploadStarted");
+        window.dispatchEvent(eventStart);
+
         uploader.upload(
             this.kClient!,
             KalturaMediaType.video,
             recordedBlobs,
             entryName ? entryName : this.getDefaultEntryName(),
             (entryId: string) => {
-                const event = new CustomEvent("mediaUpload", {detail: {entryId: entryId}});
+                const event = new CustomEvent("mediaUploadEnded", {
+                    detail: { entryId: entryId }
+                });
                 window.dispatchEvent(event);
             },
             (e: Error) => {
