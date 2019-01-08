@@ -1,6 +1,6 @@
  import { h } from "preact";
 import { storiesOf } from "@storybook/react";
-import {ErrorScreen} from "./error-screen";
+import {ErrorScreen} from "./errorScreen";
 
 
 storiesOf("Error Screen", module)

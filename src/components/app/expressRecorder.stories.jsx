@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { storiesOf } from "@storybook/react";
-import { ExpressRecorder } from "./ExpressRecorder";
+import { ExpressRecorder } from "./expressRecorder";
 
 storiesOf("Main App", module).add("widget default", () => {
     return (

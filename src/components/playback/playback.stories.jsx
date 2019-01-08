@@ -2,7 +2,7 @@ import { h, Component } from "preact";
 import { storiesOf } from "@storybook/react";
 import { Playback } from "./playback";
 import { KalturaClient } from "kaltura-typescript-client";
-import { Recorder } from "../../components/recorder/recorder";
+import { Recorder } from "../recorder/recorder";
 
 class LoadData extends Component {
     state = {

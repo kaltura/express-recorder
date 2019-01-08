@@ -4,9 +4,9 @@ import { KalturaConversionProfileType } from "kaltura-typescript-client/api/type
 import { KalturaClient } from "kaltura-typescript-client";
 import { Uploader } from "../../utils/uploader/uploader";
 import { Recorder } from "../recorder/recorder";
-import { CountdownTimer } from "../countdown-timer/CountdownTimer";
-import { RecordingTimer } from "../recording-timer/RecordingTimer";
-import { ErrorScreen } from "../error-screen/error-screen";
+import { CountdownTimer } from "../countdown-timer/countdownTimer";
+import { RecordingTimer } from "../recording-timer/recordingTimer";
+import { ErrorScreen } from "../error-screen/errorScreen";
 const styles = require("./style.scss");
 
 type Props = {

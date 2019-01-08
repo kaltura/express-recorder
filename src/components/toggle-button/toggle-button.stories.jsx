@@ -1,6 +1,6 @@
  import { h } from "preact";
 import { storiesOf } from "@storybook/react";
-import {ToggleButton} from "./toggle-button";
+import {ToggleButton} from "./toggleButton";
 
 
 storiesOf("Toggle Button", module)
