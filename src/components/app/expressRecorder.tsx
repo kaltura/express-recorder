@@ -174,7 +174,7 @@ export class ExpressRecorder extends Component<Props, State> {
             recordedBlobs,
             entryName ? entryName : this.getDefaultEntryName(),
             (entryId: string) => {
-                const event = new CustomEvent("mediaUpload", {detail: entryId});
+                const event = new CustomEvent("mediaUpload", {detail: {entryId: entryId}});
                 window.dispatchEvent(event);
             },
             (e: Error) => {
