@@ -59,10 +59,10 @@ export class CountdownTimer extends Component<Props, State> {
 
         return (
             <div class={`countdown ${styles["countdown"]}`}>
-                <div class={`countdown-number ${styles["countdown-number"]}`}>{countdown}</div>
-                <svg class={styles["svg"]}>
+                <div className={`countdown-number ${styles["countdown-number"]}`}>{countdown}</div>
+                <svg className={styles["svg"]}>
                     <circle
-                        class={styles["circle"]}
+                        className={styles["circle"]}
                         ref={circle => (this.circleRef = circle as HTMLElement)}
                         r={radius! - 2}
                         cx={radius}
