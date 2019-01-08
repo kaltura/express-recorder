@@ -76,6 +76,10 @@ export class ExpressRecorder extends Component<Props, State> {
             partnerId
         } = this.props;
 
+        if (!serviceUrl || !app || !ks || !playerUrl || !uiConfId || !partnerId) {
+            this.setState({error: "Missing parameters"});
+        }
+
         const constraints = {
             audio: allowAudio,
             video: allowVideo
@@ -118,7 +122,7 @@ export class ExpressRecorder extends Component<Props, State> {
 
     handleError = (error: MediaStreamError | Error) => {
         this.setState({
-            error: "Failed: " + error.name + ": " + error.message
+            error: error.name + ": " + (error.message ? error.message : "")
         });
     };
 
