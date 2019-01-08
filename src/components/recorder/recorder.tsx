@@ -1,4 +1,6 @@
 import { h, Component } from "preact";
+import { Playback } from "../playback/playback";
+const styles = require("./style.scss");
 
 type Props = {
     video: boolean;
@@ -7,15 +9,24 @@ type Props = {
     onError?: (error: string) => void;
     doRecording: boolean;
     onRecordingEnd: (recorderBlobs: Blob[]) => void;
+    discard?: boolean;
+    doPlayback: boolean;
+    partnerId: number;
+    uiConfId: number;
 };
 
 type State = {};
 
+/**
+ * Handle the actual recording with given stream. Gather all blob data and handle start/stop.
+ */
 export class Recorder extends Component<Props, State> {
     static defaultProps = {
         video: true,
         audio: true,
-        doRecording: false
+        doRecording: false,
+        discard: false,
+        doPlayback: false
     };
 
     mediaRecorder: any;
@@ -31,11 +42,18 @@ export class Recorder extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { stream, doRecording } = this.props;
-        this.videoRef!.srcObject = stream;
+        const { stream, doRecording, discard, doPlayback } = this.props;
+
+        if (!doPlayback) {
+            this.videoRef!.srcObject = stream;
+        }
 
         if (doRecording !== prevProps.doRecording) {
             this.toggleRecording();
+        }
+
+        if (discard) {
+            this.recordedBlobs = [];
         }
     }
 
@@ -89,10 +107,30 @@ export class Recorder extends Component<Props, State> {
     };
 
     render(props: Props) {
+        const { doPlayback, partnerId, uiConfId } = this.props;
+
+        if (doPlayback && this.recordedBlobs.length > 0) {
+            const media = {
+                blob: new Blob(this.recordedBlobs, { type: "video/webm" }),
+                mimeType: "video/webm"
+            };
+
+            return (
+                <div className={styles["express-recorder__playback"]}>
+                    <Playback
+                        partnerId={partnerId}
+                        uiconfId={uiConfId}
+                        media={media}
+                    />
+                </div>
+            );
+        }
+
         return (
             <div>
                 <video
-                    id="recorded"
+                    id="recorder"
+                    className={`express-recorder__recorder ${styles["express-recorder__recorder"]}`}
                     muted={true}
                     autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}

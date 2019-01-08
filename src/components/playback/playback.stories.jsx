@@ -1,16 +1,15 @@
 import { h, Component } from "preact";
 import { storiesOf } from "@storybook/react";
-import { Recorder } from "../../components/recorder/recorder";
-import { Uploader } from "./uploader";
-import { react } from "preact";
+import { Playback } from "./playback";
 import { KalturaClient } from "kaltura-typescript-client";
-import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
+import { Recorder } from "../recorder/recorder";
 
 class LoadData extends Component {
     state = {
         stream: null,
         uploadMedia: false,
-        doRecording: false
+        doRecording: false,
+        doPlayback: false
     };
 
     recordedBlobs = [];
@@ -38,7 +37,6 @@ class LoadData extends Component {
     }
 
     handleSuccess = s => {
-        console.log("getUserMedia() got stream: ", s);
         this.setState({ stream: s });
     };
 
@@ -56,48 +54,35 @@ class LoadData extends Component {
         });
     };
 
-    handleRecordingEnd = (recordedBlobs) => {
-    	this.recordedBlobs = recordedBlobs;
+    handleRecordingEnd = recordedBlobs => {
+        this.recordedBlobs = recordedBlobs;
+    };
+
+    handlePlayback = () => {
+        this.setState({ doPlayback: true });
     };
 
     render() {
-        if (this.state.uploadMedia) {
-            if (this.executed) {
-                throw new Error("already executed");
-            }
-
-            this.executed = true;
-
-            const uploader = new Uploader();
-            const kClient = new KalturaClient(
-                {
-                    endpointUrl: "https://www.kaltura.com",
-                    clientTag: "kms_client"
-                },
-                {
-                    ks:
-                        "djJ8MjMyNjgyMXwOp0MjNVPV81WTsVIZx6E0Ni1gunBPTqFviwysIuW3CS6GsyBfh7sgFktui6ZTmH3SRMo65gAnwgJj_Elyo7vgtqulaMoH7-s8FQ4nq_SirNNGxCPqad69Hv71aFP1zrXw1xeL4y0Wo_DMEGbdqSnfm_rHKNZJvOHwYeRcR2CvKA=="
-                }
-            );
-            uploader.upload(
-                kClient,
-                KalturaMediaType.video,
-                this.recordedBlobs,
-                "Uploader test",
-                entryId => {
-                    console.log("done upload media. entryId: " + entryId);
-                },
-				(e) => {console.log(e)}
+        if (this.state.doPlayback) {
+            const media = {
+                blob: new Blob(this.recordedBlobs, { type: "video/webm" }),
+                mimeType: "video/webm"
+            };
+            return (
+                <Playback
+                    partnerId={346151}
+                    uiconfId={43398481}
+                    media={media}
+                />
             );
         }
-
         return (
             <div>
                 <Recorder
                     video={true}
                     audio={true}
                     stream={this.state.stream}
-					onRecordingEnd={this.handleRecordingEnd}
+                    onRecordingEnd={this.handleRecordingEnd}
                     doRecording={this.state.doRecording}
                 />
                 <button id="startRecord" onClick={this.toggleRecording}>
@@ -105,9 +90,29 @@ class LoadData extends Component {
                     {!this.state.doRecording && <span>Start Recording</span>}
                 </button>
                 <button onClick={this.handleUpload}>Use This</button>
+                <button onClick={this.handlePlayback}>Playback</button>
             </div>
         );
     }
 }
 
-storiesOf("Uploader", module).add("upload recorded", () => <LoadData />);
+//TODO load script first, only on callback create the element
+storiesOf("Playback", module)
+    .addDecorator(story => {
+        return (
+            <div>
+                <script
+                    type="text/javascript"
+                    src="https://cdnapisec.kaltura.com/p/346151/embedPlaykitJs/uiconf_id/43398481"
+                />
+                {story()}
+            </div>
+        );
+    })
+    .add("render a playback component", () => {
+        return (
+            <div>
+                <LoadData />
+            </div>
+        );
+    });
