@@ -10,7 +10,7 @@ import { ExpressRecorder } from "./components/app/ExpressRecorder";
 let _habitat = habitat(ExpressRecorder);
 
 _habitat.render({
-    selector: '[data-widget-host="habitat"]',
+    inline: true,
     clean: true
 });
 
