@@ -12,6 +12,9 @@ type State = {
     clickedOnce: boolean;
 };
 
+/**
+ * Handle the timer button while recording
+ */
 export class RecordingTimer extends Component<Props, State> {
     interval: number | undefined;
 
@@ -51,7 +54,7 @@ export class RecordingTimer extends Component<Props, State> {
             <div className={`timer ${styles["timer"]}`}>
                 <button
                     type={"button"}
-                    class={`timer-button ${styles["timer-button"]}`}
+                    className={`timer-button ${styles["timer-button"]}`}
                     onClick={this.clickHandler}
                     tabIndex={0}
                 >

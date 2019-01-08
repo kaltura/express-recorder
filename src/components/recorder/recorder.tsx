@@ -17,6 +17,9 @@ type Props = {
 
 type State = {};
 
+/**
+ * Handle the actual recording with given stream. Gather all blob data and handle start/stop.
+ */
 export class Recorder extends Component<Props, State> {
     static defaultProps = {
         video: true,
@@ -113,7 +116,7 @@ export class Recorder extends Component<Props, State> {
             };
 
             return (
-                <div class={styles["express-recorder__playback"]}>
+                <div className={styles["express-recorder__playback"]}>
                     <Playback
                         partnerId={partnerId}
                         uiconfId={uiConfId}
@@ -127,7 +130,7 @@ export class Recorder extends Component<Props, State> {
             <div>
                 <video
                     id="recorder"
-                    class={`express-recorder__recorder ${styles["express-recorder__recorder"]}`}
+                    className={`express-recorder__recorder ${styles["express-recorder__recorder"]}`}
                     muted={true}
                     autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}

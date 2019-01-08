@@ -3,14 +3,17 @@ const styles = require("./style.scss");
 declare var KalturaPlayer: any;
 
 type Props = {
-    media: { blob: Blob; mimeType: string };
+    media: { blob: Blob; mimeType: string }; // the actual recorded media
     partnerId: number;
-    uiconfId: number;
+    uiconfId: number; // must be v3
 };
 
 type State = {};
 let uniqueId: number = 0;
 
+/**
+ * Component to play the recorded record, uses v3 player.
+ */
 export class Playback extends Component<Props, State> {
     kalturaPlayer: any;
 
@@ -65,7 +68,7 @@ export class Playback extends Component<Props, State> {
         return (
             <div
                 id={"player-wrap_" + uniqueId}
-                class={`player-wrap ${styles["player-wrap"]}`}
+                className={`player-wrap ${styles["player-wrap"]}`}
             />
         );
     }

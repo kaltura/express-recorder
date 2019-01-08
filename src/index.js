@@ -1,7 +1,5 @@
 let poly = require("preact-cli/lib/lib/webpack/polyfills");
 import { h, render } from "preact";
-//import * as preact from 'preact';
-//import preact from 'react';
 import habitat from "preact-habitat";
 import "./styles.scss";
 
