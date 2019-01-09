@@ -15,6 +15,5 @@ npm start
 
 ## Embedding into html page
 <script type="text/props">{
-    <!-- list of props for expressRecorder components in form of "<prop>": "<vale>",... -->
-</script>
-<script async src="<path to bundle.js>"> </script>
+    < list of props for expressRecorder components in form of 'prop': 'value',... >
+}</script></br><script async src="<path to bundle.js>"> </script>
