@@ -81,7 +81,7 @@ export class ExpressRecorder extends Component<Props, State> {
         this.checkProps();
 
         if (!DetectRTC.isWebRTCSupported) {
-            this.setState({error: "Browser is not webRTC supported"});
+            this.setState({ error: "Browser is not webRTC supported" });
             return;
         }
 
@@ -276,7 +276,11 @@ export class ExpressRecorder extends Component<Props, State> {
                         />
                     </div>
                 )}
-                <div className={styles["express-recorder__controls"]}>
+                <div
+                    className={`express-recorder__controls ${
+                        styles["express-recorder__controls"]
+                    }`}
+                >
                     {!doRecording &&
                         !doCountdown &&
                         recordedBlobs.length === 0 && (
@@ -309,7 +313,7 @@ export class ExpressRecorder extends Component<Props, State> {
                             className={`${styles["express-recorder__bottom"]}`}
                         >
                             <button
-                                className={`btn__reset ${
+                                className={`btn btn__reset ${
                                     styles["bottom__btn"]
                                 } ${styles["btn__reset"]}`}
                                 onClick={this.handleResetClick}
@@ -319,7 +323,7 @@ export class ExpressRecorder extends Component<Props, State> {
                             </button>
                             {!this.uploadedOnce && (
                                 <button
-                                    className={`btn__save ${
+                                    className={`btn btn-primary btn__save ${
                                         styles["bottom__btn"]
                                     } ${styles["btn__save"]}`}
                                     onClick={this.handleUpload}
