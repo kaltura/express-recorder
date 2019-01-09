@@ -1,7 +1,6 @@
 import { Component, h } from "preact";
 
 const styles = require("./style.scss");
-const iconStyles = require("../../styles.scss");
 
 type Props = {
     onButtonClick: () => void;
@@ -58,11 +57,8 @@ export class RecordingTimer extends Component<Props, State> {
                     onClick={this.clickHandler}
                     tabIndex={0}
                 >
-                    <span className={iconStyles["icon-stop"]}>
-                        <span className={iconStyles["path1"]} />
-                        <span className={iconStyles["path2"]} />
-                    </span>
-                    {currentTime}
+                    <span className={styles["square"]} />
+                    <span>{currentTime}</span>
                 </button>
             </div>
         );
