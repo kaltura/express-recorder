@@ -2,12 +2,11 @@ import { Component, h } from "preact";
 import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
 import { KalturaConversionProfileType } from "kaltura-typescript-client/api/types/KalturaConversionProfileType";
 import { KalturaClient } from "kaltura-typescript-client";
-import { Uploader } from "../../utils/uploader/uploader";
+import { Uploader } from "../uploader/uploader";
 import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
-import { ProgressBar } from "../progress-bar/progressBar";
 const DetectRTC = require("../../../node_modules/detectrtc");
 const styles = require("./style.scss");
 
@@ -184,37 +183,6 @@ export class ExpressRecorder extends Component<Props, State> {
         }
     }
 
-    uploadMedia = () => {
-        const { entryName, conversionProfileId, serviceUrl, ks } = this.props;
-        const { recordedBlobs } = this.state;
-        const uploader = new Uploader();
-
-        const eventStart = new CustomEvent("mediaUploadStarted");
-        window.dispatchEvent(eventStart);
-
-        uploader.upload(
-            this.kClient!,
-            KalturaMediaType.video,
-            recordedBlobs,
-            entryName ? entryName : this.getDefaultEntryName(),
-            (entryId: string) => {
-                const event = new CustomEvent("mediaUploadEnded", {
-                    detail: { entryId: entryId }
-                });
-                window.dispatchEvent(event);
-            },
-            (e: Error) => {
-                this.handleError(e);
-            },
-            (percentage: number) => {
-                this.setState({ percentage: percentage });
-            },
-            serviceUrl,
-            ks,
-            conversionProfileId
-        );
-    };
-
     handleStartClick = () => {
         this.setState({ doCountdown: true });
     };
@@ -238,7 +206,7 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     render() {
-        const { partnerId, uiConfId } = this.props;
+        const { partnerId, uiConfId, allowVideo, entryName, ks, serviceUrl } = this.props;
         const {
             doCountdown,
             doUpload,
@@ -251,7 +219,6 @@ export class ExpressRecorder extends Component<Props, State> {
 
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
-            this.uploadMedia();
         }
 
         if (error) {
@@ -352,7 +319,19 @@ export class ExpressRecorder extends Component<Props, State> {
                         <div
                             className={`progress-bar ${styles["progress-bar"]}`}
                         >
-                            <ProgressBar percentage={this.state.percentage} />
+                            <Uploader
+                                client={this.kClient}
+                                onError={this.handleError}
+                                mediaType={
+                                    allowVideo
+                                        ? KalturaMediaType.video
+                                        : KalturaMediaType.audio
+                                }
+                                recordedBlobs={recordedBlobs}
+                                entryName={entryName ? entryName : this.getDefaultEntryName()}
+                                serviceUrl={serviceUrl}
+                                ks={ks}
+                            />
                         </div>
                     )}
                 </div>
