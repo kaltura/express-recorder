@@ -1,5 +1,4 @@
 import { Component, h } from "preact";
-
 const styles = require("./style.scss");
 
 type Props = {
@@ -49,6 +48,13 @@ export class RecordingTimer extends Component<Props, State> {
 
     render(props: Props, state: State) {
         const { currentTime } = state;
+        const hours = Math.floor(currentTime / 3600);
+        const minutes = Math.floor((currentTime - hours * 3600) / 60);
+        const seconds = currentTime - hours * 3600 - minutes * 60;
+        let timeString = hours > 0 ? hours + ":" : "";
+        timeString += minutes < 10 ? "0" + minutes : minutes;
+        timeString += ":" + (seconds < 10 ? "0" + seconds : seconds);
+
         return (
             <div className={`timer ${styles["timer"]}`}>
                 <button
@@ -58,7 +64,7 @@ export class RecordingTimer extends Component<Props, State> {
                     tabIndex={0}
                 >
                     <span className={styles["square"]} />
-                    <span>{currentTime}</span>
+                    <span>{timeString}</span>
                 </button>
             </div>
         );
