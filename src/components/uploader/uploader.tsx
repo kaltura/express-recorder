@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { Component, h } from "preact";
 import { BaseEntryUpdateContentAction } from "kaltura-typescript-client/api/types/BaseEntryUpdateContentAction";
 import { KalturaMediaEntry } from "kaltura-typescript-client/api/types/KalturaMediaEntry";
 import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
@@ -10,40 +10,50 @@ import {
     KalturaMultiRequest,
     KalturaMultiResponse
 } from "kaltura-typescript-client";
+import { ProgressBar } from "../progress-bar/progressBar";
+const styles = require("./style.scss");
 
-export class Uploader {
+type Props = {
     client: KalturaClient | undefined;
-    entryId: string | undefined;
     onError: ((e: Error) => void) | undefined;
-    serviceUrl: string | undefined;
-    ks: string | undefined;
-    onEnd: ((entryId: string) => void) = (entryId: string) => {
-        return;
-    };
-    onProgress: (percent: number) => void = (percent: number) => {
-        return;
-    };
+    mediaType: KalturaMediaType;
+    recordedBlobs: Blob[];
+    entryName: string;
+    serviceUrl: string;
+    ks: string;
+    conversionProfileId?: number;
+};
 
-    upload(
-        client: KalturaClient,
-        mediaType: KalturaMediaType,
-        recordedBlobs: Blob[],
-        entryName: string,
-        onEnd: (entryId: string) => void,
-        onError: (e: Error) => void,
-        onProgress: (percent: number) => void,
-        serviceUrl: string,
-        ks: string,
-        conversionProfileId?: number
-    ) {
-        this.client = client;
-        this.onError = onError ? onError : undefined;
-        this.serviceUrl = serviceUrl;
-        this.ks = ks;
-        this.onEnd = onEnd;
-        this.onProgress = onProgress;
+type State = {
+    total: number;
+    loaded: number;
+};
 
+/**
+ * handle the upload of the recorder file including display of progress bar
+ */
+export class Uploader extends Component<Props, State> {
+    entryId: string;
+    oReq: XMLHttpRequest;
+
+    constructor(props: Props) {
+        super(props);
+        this.entryId = "";
+        this.oReq = new XMLHttpRequest();
         this.handleOnProgress = this.handleOnProgress.bind(this);
+    }
+
+    componentDidMount() {
+        this.upload();
+    }
+
+    upload() {
+        const {
+            mediaType,
+            recordedBlobs,
+            entryName,
+            conversionProfileId
+        } = this.props;
 
         this.createEntry(
             mediaType,
@@ -58,7 +68,6 @@ export class Uploader {
      * @param {KalturaMediaType} mediaType
      * @param {Blob[]} recordedBlobs
      * @param {string} entryName
-     * @param {(entryId: number) => void} onEnd
      * @param {number} conversionProfileId
      */
     createEntry(
@@ -67,6 +76,7 @@ export class Uploader {
         entryName: string,
         conversionProfileId?: number
     ) {
+        const { client } = this.props;
         const requests: KalturaMultiRequest = new KalturaMultiRequest();
 
         const entry = new KalturaMediaEntry();
@@ -92,12 +102,12 @@ export class Uploader {
             }).setDependency(["entryId", 0, "id"])
         );
 
-        if (!this.client) {
+        if (!client) {
             this.throwError(new Error("Missing client object"));
             return;
         }
 
-        this.client
+        client
             .multiRequest(requests)
             .then(
                 (data: KalturaMultiResponse | null) => {
@@ -110,11 +120,7 @@ export class Uploader {
                         );
                     } else {
                         this.entryId = data[0].result.id;
-                        this.addMedia(
-                            recordedBlobs,
-                            data[1].result.id,
-                            entryName
-                        );
+                        this.addMedia(data[1].result.id);
                     }
                 },
                 (err: Error) => {
@@ -130,21 +136,12 @@ export class Uploader {
             });
     }
 
-    addMedia(recordedBlobs: Blob[], tokenId: string, entryName: string) {
-        const oReq = new XMLHttpRequest();
-        const aaa = recordedBlobs.concat(
-            recordedBlobs,
-            recordedBlobs,
-            recordedBlobs,
-            recordedBlobs,
-            recordedBlobs,
-            recordedBlobs,
-            recordedBlobs
-        );
-        const blob = new Blob(aaa, { type: "video/webm" });
+    addMedia(tokenId: string) {
+        const { recordedBlobs, ks, serviceUrl } = this.props;
+        const blob = new Blob(recordedBlobs, { type: "video/webm" });
 
         const formData = new FormData();
-        formData.append("ks", this.ks!);
+        formData.append("ks", ks);
         formData.append("fileData", blob as File);
         formData.append("uploadTokenId", tokenId);
         formData.append("resume", "false");
@@ -152,40 +149,51 @@ export class Uploader {
         formData.append("finalChunk", "true");
 
         const requestUrl =
-            this.serviceUrl +
-            "/api_v3/?service=uploadToken&action=upload&format=1";
-        oReq.onloadend = this.handleOnEnd;
-        oReq.upload.onprogress = this.handleOnProgress;
-        oReq.open("POST", requestUrl, true);
-        oReq.send(formData);
+            serviceUrl + "/api_v3/?service=uploadToken&action=upload&format=1";
+        this.oReq.onloadend = this.handleOnEnd;
+        this.oReq.upload.onprogress = this.handleOnProgress;
+        this.oReq.upload.onloadstart = this.handleStart;
+        this.oReq.open("POST", requestUrl, true);
+        this.oReq.send(formData);
     }
 
     handleOnProgress = (event: ProgressEvent) => {
-        const loadedPercent = (event.loaded * 100) / event.total;
-        const loaded = this.bytesToSize(event.loaded);
-        const total = this.bytesToSize(event.total);
-        this.onProgress(loadedPercent);
+        this.setState({ loaded: event.loaded, total: event.total });
     };
 
     handleOnEnd = () => {
-        this.onEnd(this.entryId!);
+        const event = new CustomEvent("mediaUploadEnded", {
+            detail: { entryId: this.entryId! }
+        });
+        window.dispatchEvent(event);
     };
 
-    bytesToSize = (bytes: number) => {
-        const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-        if (bytes === 0) {
-            return "0 Bytes";
-        }
-        const i = Math.floor(Math.log(bytes) / Math.log(1024));
-        if (i === 0) {
-            return bytes + " " + sizes[i];
-        }
-        return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i];
+    handleStart = () => {
+        const eventStart = new CustomEvent("mediaUploadStarted");
+        window.dispatchEvent(eventStart);
     };
 
     throwError(error: Error) {
-        if (this.onError) {
-            this.onError(error);
+        if (this.props.onError) {
+            this.props.onError(error);
         }
+    }
+
+    handleCancel = () => {
+        this.oReq.abort();
+    };
+
+    render() {
+        const { total, loaded } = this.state;
+        return (
+            <div>
+                <span className={`progress-bar ${styles["progress-bar"]}`}>
+                    <ProgressBar loaded={loaded} total={total} />{" "}
+                </span>
+                <button className={`btn btn-cancel ${styles["btn"]}`} onClick={this.handleCancel}>
+                    Cancel
+                </button>
+            </div>
+        );
     }
 }
