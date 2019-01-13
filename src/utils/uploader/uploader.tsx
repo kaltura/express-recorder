@@ -1,12 +1,10 @@
 import { h } from "preact";
-import { BaseEntryUpdateContentAction } from 'kaltura-typescript-client/api/types/BaseEntryUpdateContentAction';
-import { KalturaMediaEntry } from 'kaltura-typescript-client/api/types/KalturaMediaEntry';
-import { KalturaMediaType } from 'kaltura-typescript-client/api/types/KalturaMediaType';
-import { KalturaUploadedFileTokenResource } from 'kaltura-typescript-client/api/types/KalturaUploadedFileTokenResource';
-import { KalturaUploadToken } from 'kaltura-typescript-client/api/types/KalturaUploadToken';
-import { MediaAddAction } from 'kaltura-typescript-client/api/types/MediaAddAction';
-import { UploadTokenAddAction } from 'kaltura-typescript-client/api/types/UploadTokenAddAction';
-import { UploadTokenUploadAction } from 'kaltura-typescript-client/api/types/UploadTokenUploadAction';
+import { BaseEntryUpdateContentAction } from "kaltura-typescript-client/api/types/BaseEntryUpdateContentAction";
+import { KalturaMediaEntry } from "kaltura-typescript-client/api/types/KalturaMediaEntry";
+import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
+import { KalturaUploadedFileTokenResource } from "kaltura-typescript-client/api/types/KalturaUploadedFileTokenResource";
+import { MediaAddAction } from "kaltura-typescript-client/api/types/MediaAddAction";
+import { UploadTokenAddAction } from "kaltura-typescript-client/api/types/UploadTokenAddAction";
 import {
     KalturaClient,
     KalturaMultiRequest,
@@ -17,19 +15,42 @@ export class Uploader {
     client: KalturaClient | undefined;
     entryId: string | undefined;
     onError: ((e: Error) => void) | undefined;
+    serviceUrl: string | undefined;
+    ks: string | undefined;
+    onEnd: ((entryId: string) => void) = (entryId: string) => {
+        return;
+    };
+    onProgress: (percent: number) => void = (percent: number) => {
+        return;
+    };
 
     upload(
         client: KalturaClient,
         mediaType: KalturaMediaType,
         recordedBlobs: Blob[],
         entryName: string,
-        callback: (entryId: string) => void,
+        onEnd: (entryId: string) => void,
         onError: (e: Error) => void,
+        onProgress: (percent: number) => void,
+        serviceUrl: string,
+        ks: string,
         conversionProfileId?: number
     ) {
         this.client = client;
         this.onError = onError ? onError : undefined;
-        this.createEntry(mediaType, recordedBlobs, entryName, callback, conversionProfileId);
+        this.serviceUrl = serviceUrl;
+        this.ks = ks;
+        this.onEnd = onEnd;
+        this.onProgress = onProgress;
+
+        this.handleOnProgress = this.handleOnProgress.bind(this);
+
+        this.createEntry(
+            mediaType,
+            recordedBlobs,
+            entryName,
+            conversionProfileId
+        );
     }
 
     /**
@@ -37,14 +58,13 @@ export class Uploader {
      * @param {KalturaMediaType} mediaType
      * @param {Blob[]} recordedBlobs
      * @param {string} entryName
-     * @param {(entryId: number) => void} callback
+     * @param {(entryId: number) => void} onEnd
      * @param {number} conversionProfileId
      */
     createEntry(
         mediaType: KalturaMediaType,
         recordedBlobs: Blob[],
         entryName: string,
-        callback: (entryId: string) => void,
         conversionProfileId?: number
     ) {
         const requests: KalturaMultiRequest = new KalturaMultiRequest();
@@ -93,8 +113,7 @@ export class Uploader {
                         this.addMedia(
                             recordedBlobs,
                             data[1].result.id,
-                            entryName,
-                            callback
+                            entryName
                         );
                     }
                 },
@@ -111,40 +130,58 @@ export class Uploader {
             });
     }
 
-    addMedia(
-        recordedBlobs: Blob[],
-        tokenId: string,
-        entryName: string,
-        callback: (entryId: string) => void
-    ) {
-        const file = new File(recordedBlobs, entryName);
-        const request = new UploadTokenUploadAction({
-            uploadTokenId: tokenId,
-            fileData: file,
-            resume: false,
-            resumeAt: undefined,
-            finalChunk: true
-        });
-
-        if (!this.client) {
-            this.throwError(new Error("Missing client object"));
-            return;
-        }
-        this.client.request(request).then(
-            (data: KalturaUploadToken | null) => {
-                if (data) {
-                    if (!this.entryId) {
-                        this.throwError(new Error("Failed to create entry"));
-                        return;
-                    }
-                    callback(this.entryId);
-                }
-            },
-            (err: Error) => {
-                this.throwError(new Error("failed to upload media: " + err));
-            }
+    addMedia(recordedBlobs: Blob[], tokenId: string, entryName: string) {
+        const oReq = new XMLHttpRequest();
+        const aaa = recordedBlobs.concat(
+            recordedBlobs,
+            recordedBlobs,
+            recordedBlobs,
+            recordedBlobs,
+            recordedBlobs,
+            recordedBlobs,
+            recordedBlobs
         );
+        const blob = new Blob(aaa, { type: "video/webm" });
+
+        const formData = new FormData();
+        formData.append("ks", this.ks!);
+        formData.append("fileData", blob as File);
+        formData.append("uploadTokenId", tokenId);
+        formData.append("resume", "false");
+        formData.append("resumeAt", "0");
+        formData.append("finalChunk", "true");
+
+        const requestUrl =
+            this.serviceUrl +
+            "/api_v3/?service=uploadToken&action=upload&format=1";
+        oReq.onloadend = this.handleOnEnd;
+        oReq.upload.onprogress = this.handleOnProgress;
+        oReq.open("POST", requestUrl, true);
+        oReq.send(formData);
     }
+
+    handleOnProgress = (event: ProgressEvent) => {
+        const loadedPercent = (event.loaded * 100) / event.total;
+        const loaded = this.bytesToSize(event.loaded);
+        const total = this.bytesToSize(event.total);
+        this.onProgress(loadedPercent);
+    };
+
+    handleOnEnd = () => {
+        this.onEnd(this.entryId!);
+    };
+
+    bytesToSize = (bytes: number) => {
+        const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+        if (bytes === 0) {
+            return "0 Bytes";
+        }
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        if (i === 0) {
+            return bytes + " " + sizes[i];
+        }
+        return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i];
+    };
 
     throwError(error: Error) {
         if (this.onError) {
