@@ -7,6 +7,7 @@ import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
+import { ProgressBar } from "../progress-bar/progressBar";
 const DetectRTC = require("../../../node_modules/detectrtc");
 const styles = require("./style.scss");
 
@@ -31,6 +32,12 @@ type State = {
     doPlayback: boolean;
     recordedBlobs: Blob[];
     error: string | undefined;
+    percentage: number;
+};
+
+type Constraints = {
+    video: object | boolean;
+    audio: boolean;
 };
 
 /**
@@ -56,7 +63,8 @@ export class ExpressRecorder extends Component<Props, State> {
             doCountdown: false,
             recordedBlobs: [],
             doPlayback: false,
-            error: undefined
+            error: undefined,
+            percentage: 0
         };
 
         this.handleSuccess = this.handleSuccess.bind(this);
@@ -85,9 +93,9 @@ export class ExpressRecorder extends Component<Props, State> {
             return;
         }
 
-        const constraints = {
-            audio: allowAudio,
-            video: allowVideo
+        const constraints: Constraints = {
+            audio: allowAudio ? true : false,
+            video: allowVideo ? { frameRate: "15" } : false
         };
 
         //create client for uploading
@@ -115,7 +123,7 @@ export class ExpressRecorder extends Component<Props, State> {
 
         return navigator.mediaDevices
             .getUserMedia(constraints)
-            .then(stream => {
+            .then((stream: MediaStream) => {
                 return this.handleSuccess(stream);
             })
             .catch(this.handleError);
@@ -177,7 +185,7 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     uploadMedia = () => {
-        const { entryName, conversionProfileId } = this.props;
+        const { entryName, conversionProfileId, serviceUrl, ks } = this.props;
         const { recordedBlobs } = this.state;
         const uploader = new Uploader();
 
@@ -198,10 +206,13 @@ export class ExpressRecorder extends Component<Props, State> {
             (e: Error) => {
                 this.handleError(e);
             },
+            (percentage: number) => {
+                this.setState({ percentage: percentage });
+            },
+            serviceUrl,
+            ks,
             conversionProfileId
         );
-
-        this.setState({ doUpload: false });
     };
 
     handleStartClick = () => {
@@ -214,7 +225,6 @@ export class ExpressRecorder extends Component<Props, State> {
         this.setState({ doCountdown: false });
     };
     handleResetClick = () => {
-        this.uploadedOnce = false;
         this.setState({
             recordedBlobs: [],
             doCountdown: true,
@@ -239,7 +249,7 @@ export class ExpressRecorder extends Component<Props, State> {
             error
         } = this.state;
 
-        if (doUpload) {
+        if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
             this.uploadMedia();
         }
@@ -308,30 +318,41 @@ export class ExpressRecorder extends Component<Props, State> {
                             Cancel
                         </button>
                     )}
-                    {!doRecording && recordedBlobs.length > 0 && (
-                        <div
-                            className={`${styles["express-recorder__bottom"]}`}
-                        >
-                            <button
-                                className={`btn btn__reset ${
-                                    styles["bottom__btn"]
-                                } ${styles["btn__reset"]}`}
-                                onClick={this.handleResetClick}
-                                tabIndex={0}
+                    {!doRecording &&
+                        recordedBlobs.length > 0 &&
+                        !this.uploadedOnce && (
+                            <div
+                                className={`${
+                                    styles["express-recorder__bottom"]
+                                }`}
                             >
-                                Record Again
-                            </button>
-                            {!this.uploadedOnce && (
                                 <button
-                                    className={`btn btn-primary btn__save ${
+                                    className={`btn btn__reset ${
                                         styles["bottom__btn"]
-                                    } ${styles["btn__save"]}`}
-                                    onClick={this.handleUpload}
+                                    } ${styles["btn__reset"]}`}
+                                    onClick={this.handleResetClick}
                                     tabIndex={0}
                                 >
-                                    Use This
+                                    Record Again
                                 </button>
-                            )}
+                                {!this.uploadedOnce && (
+                                    <button
+                                        className={`btn btn-primary btn__save ${
+                                            styles["bottom__btn"]
+                                        } ${styles["btn__save"]}`}
+                                        onClick={this.handleUpload}
+                                        tabIndex={0}
+                                    >
+                                        Use This
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    {doUpload && (
+                        <div
+                            className={`progress-bar ${styles["progress-bar"]}`}
+                        >
+                            <ProgressBar percentage={this.state.percentage} />
                         </div>
                     )}
                 </div>
