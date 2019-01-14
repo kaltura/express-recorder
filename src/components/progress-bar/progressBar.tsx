@@ -38,7 +38,7 @@ export class ProgressBar extends Component<Props, State> {
         const totalStr = this.bytesToSize(total);
         const percentage = (loaded * 100) / total;
         return (
-            <div className={`progress ${styles["progress"]}`}>
+            <div className={`progress ${styles["progress"]}`} style={"margin-top: 0;"}>
                 <div
                     className={`bar ${styles["bar"]}`}
                     style={`width: ${percentage}%;`}
