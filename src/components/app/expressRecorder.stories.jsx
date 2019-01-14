@@ -12,6 +12,7 @@ storiesOf("Main App", module).add("widget default", () => {
 				partnerId={346151}
 				uiConfId={43398481}
 				playerUrl={"https://cdnapisec.kaltura.com"}
+				maxRecordingTime={5}
             />
         </div>
     );

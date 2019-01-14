@@ -21,6 +21,7 @@ type Props = {
     entryName?: string;
     allowVideo?: boolean; // whether to enable video recording
     allowAudio?: boolean; // whether to enable audio recording
+    maxRecordingTime?: number;
 };
 
 type State = {
@@ -206,7 +207,7 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     render() {
-        const { partnerId, uiConfId, allowVideo, entryName, ks, serviceUrl } = this.props;
+        const { partnerId, uiConfId, allowVideo, entryName, ks, serviceUrl, maxRecordingTime } = this.props;
         const {
             doCountdown,
             doUpload,
@@ -272,7 +273,7 @@ export class ExpressRecorder extends Component<Props, State> {
                             />
                         )}
                     {doRecording && (
-                        <RecordingTimer onButtonClick={this.handleStopClick} />
+                        <RecordingTimer onButtonClick={this.handleStopClick} maxRecordingTime={maxRecordingTime}/>
                     )}
                     {doCountdown && (
                         <button
