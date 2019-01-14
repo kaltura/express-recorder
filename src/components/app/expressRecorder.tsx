@@ -46,8 +46,7 @@ export class ExpressRecorder extends Component<Props, State> {
     static defaultProps = {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
-        allowAudio: true,
-        maxRecordingTime: undefined
+        allowAudio: true
     };
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
