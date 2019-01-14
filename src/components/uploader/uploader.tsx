@@ -131,13 +131,13 @@ export class Uploader extends Component<Props, State> {
                 },
                 (err: Error) => {
                     this.throwError(
-                        new Error("Failed to create media entry: " + err)
+                        new Error("Failed to create media entry - reject request: " + err)
                     );
                 }
             )
             .catch((err: Error) => {
                 this.throwError(
-                    new Error("Failed to create media entry: " + err)
+                    new Error("Failed to create media entry - multirequest faild: " + err)
                 );
             });
     }
