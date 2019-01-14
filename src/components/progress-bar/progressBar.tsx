@@ -40,7 +40,6 @@ export class ProgressBar extends Component<Props, State> {
         return (
             <div
                 className={`progress ${styles["progress"]}`}
-                style="width: 100%;"
             >
                 <div
                     className={`bar ${styles["bar"]}`}
