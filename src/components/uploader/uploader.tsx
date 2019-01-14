@@ -77,23 +77,33 @@ export class Uploader extends Component<Props, State> {
         conversionProfileId?: number
     ) {
         const { client } = this.props;
+
+        if (!client) {
+            this.throwError(new Error("Missing client object"));
+            return;
+        }
+
         const requests: KalturaMultiRequest = new KalturaMultiRequest();
 
         const entry = new KalturaMediaEntry();
         entry.name = entryName;
         entry.mediaType = mediaType;
         //entry.adminTags = "expressrecorder";
+
+        // 1.Add entry
         requests.requests.push(
             new MediaAddAction({
                 entry: entry
             })
         );
 
+        // 2.Add uploadToken
         requests.requests.push(new UploadTokenAddAction());
 
         const resource = new KalturaUploadedFileTokenResource({
             token: ""
         }).setDependency(["token", 1, "id"]);
+        // 3.Attach media with token
         requests.requests.push(
             new BaseEntryUpdateContentAction({
                 entryId: "",
@@ -101,11 +111,6 @@ export class Uploader extends Component<Props, State> {
                 conversionProfileId: conversionProfileId
             }).setDependency(["entryId", 0, "id"])
         );
-
-        if (!client) {
-            this.throwError(new Error("Missing client object"));
-            return;
-        }
 
         client
             .multiRequest(requests)
@@ -119,6 +124,7 @@ export class Uploader extends Component<Props, State> {
                             )
                         );
                     } else {
+                        // 4.Upload token with media
                         this.entryId = data[0].result.id;
                         this.addMedia(data[1].result.id);
                     }
