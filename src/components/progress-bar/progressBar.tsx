@@ -38,14 +38,14 @@ export class ProgressBar extends Component<Props, State> {
         const totalStr = this.bytesToSize(total);
         const percentage = (loaded * 100) / total;
         return (
-            <div
-                className={`progress ${styles["progress"]}`}
-            >
+            <div className={`progress ${styles["progress"]}`}>
                 <div
                     className={`bar ${styles["bar"]}`}
                     style={`width: ${percentage}%;`}
                 >
-                    <span className={`status ${styles['status']}`}>{loadedStr} / {totalStr} </span>
+                    <span className={`status ${styles["status"]}`}>
+                        {loadedStr} / {totalStr}{" "}
+                    </span>
                 </div>
             </div>
         );
