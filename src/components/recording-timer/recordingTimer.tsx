@@ -3,6 +3,7 @@ const styles = require("./style.scss");
 
 type Props = {
     onButtonClick: () => void;
+    maxRecordingTime?: number;
 };
 
 type State = {
@@ -30,6 +31,11 @@ export class RecordingTimer extends Component<Props, State> {
     }
 
     update() {
+        const {maxRecordingTime} = this.props;
+        if (maxRecordingTime && maxRecordingTime <= this.state.currentTime) {
+            this.clickHandler();
+            return;
+        }
         this.setState({ currentTime: this.state.currentTime + 1 });
     }
 

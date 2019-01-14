@@ -2,7 +2,7 @@ import { Component, h } from "preact";
 import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
 import { KalturaConversionProfileType } from "kaltura-typescript-client/api/types/KalturaConversionProfileType";
 import { KalturaClient } from "kaltura-typescript-client";
-import { Uploader } from "../../utils/uploader/uploader";
+import { Uploader } from "../uploader/uploader";
 import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
@@ -21,6 +21,7 @@ type Props = {
     entryName?: string;
     allowVideo?: boolean; // whether to enable video recording
     allowAudio?: boolean; // whether to enable audio recording
+    maxRecordingTime?: number;
 };
 
 type State = {
@@ -30,7 +31,12 @@ type State = {
     doCountdown: boolean;
     doPlayback: boolean;
     recordedBlobs: Blob[];
-    error: string | undefined;
+    error: string;
+};
+
+type Constraints = {
+    video: object | boolean;
+    audio: boolean;
 };
 
 /**
@@ -56,7 +62,7 @@ export class ExpressRecorder extends Component<Props, State> {
             doCountdown: false,
             recordedBlobs: [],
             doPlayback: false,
-            error: undefined
+            error: "",
         };
 
         this.handleSuccess = this.handleSuccess.bind(this);
@@ -85,9 +91,9 @@ export class ExpressRecorder extends Component<Props, State> {
             return;
         }
 
-        const constraints = {
-            audio: allowAudio,
-            video: allowVideo
+        const constraints: Constraints = {
+            audio: allowAudio ? true : false,
+            video: allowVideo ? { frameRate: "15" } : false
         };
 
         //create client for uploading
@@ -115,7 +121,7 @@ export class ExpressRecorder extends Component<Props, State> {
 
         return navigator.mediaDevices
             .getUserMedia(constraints)
-            .then(stream => {
+            .then((stream: MediaStream) => {
                 return this.handleSuccess(stream);
             })
             .catch(this.handleError);
@@ -176,34 +182,6 @@ export class ExpressRecorder extends Component<Props, State> {
         }
     }
 
-    uploadMedia = () => {
-        const { entryName, conversionProfileId } = this.props;
-        const { recordedBlobs } = this.state;
-        const uploader = new Uploader();
-
-        const eventStart = new CustomEvent("mediaUploadStarted");
-        window.dispatchEvent(eventStart);
-
-        uploader.upload(
-            this.kClient!,
-            KalturaMediaType.video,
-            recordedBlobs,
-            entryName ? entryName : this.getDefaultEntryName(),
-            (entryId: string) => {
-                const event = new CustomEvent("mediaUploadEnded", {
-                    detail: { entryId: entryId }
-                });
-                window.dispatchEvent(event);
-            },
-            (e: Error) => {
-                this.handleError(e);
-            },
-            conversionProfileId
-        );
-
-        this.setState({ doUpload: false });
-    };
-
     handleStartClick = () => {
         this.setState({ doCountdown: true });
     };
@@ -214,7 +192,6 @@ export class ExpressRecorder extends Component<Props, State> {
         this.setState({ doCountdown: false });
     };
     handleResetClick = () => {
-        this.uploadedOnce = false;
         this.setState({
             recordedBlobs: [],
             doCountdown: true,
@@ -228,7 +205,7 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     render() {
-        const { partnerId, uiConfId } = this.props;
+        const { partnerId, uiConfId, allowVideo, entryName, ks, serviceUrl, maxRecordingTime } = this.props;
         const {
             doCountdown,
             doUpload,
@@ -239,12 +216,11 @@ export class ExpressRecorder extends Component<Props, State> {
             error
         } = this.state;
 
-        if (doUpload) {
+        if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
-            this.uploadMedia();
         }
 
-        if (error) {
+        if (error != "") {
             return (
                 <div
                     className={`express-recorder ${styles["express-recorder"]}`}
@@ -295,7 +271,7 @@ export class ExpressRecorder extends Component<Props, State> {
                             />
                         )}
                     {doRecording && (
-                        <RecordingTimer onButtonClick={this.handleStopClick} />
+                        <RecordingTimer onButtonClick={this.handleStopClick} maxRecordingTime={maxRecordingTime}/>
                     )}
                     {doCountdown && (
                         <button
@@ -308,30 +284,53 @@ export class ExpressRecorder extends Component<Props, State> {
                             Cancel
                         </button>
                     )}
-                    {!doRecording && recordedBlobs.length > 0 && (
-                        <div
-                            className={`${styles["express-recorder__bottom"]}`}
-                        >
-                            <button
-                                className={`btn btn__reset ${
-                                    styles["bottom__btn"]
-                                } ${styles["btn__reset"]}`}
-                                onClick={this.handleResetClick}
-                                tabIndex={0}
+                    {!doRecording &&
+                        recordedBlobs.length > 0 &&
+                        !this.uploadedOnce && (
+                            <div
+                                className={`${
+                                    styles["express-recorder__bottom"]
+                                }`}
                             >
-                                Record Again
-                            </button>
-                            {!this.uploadedOnce && (
                                 <button
-                                    className={`btn btn-primary btn__save ${
+                                    className={`btn btn__reset ${
                                         styles["bottom__btn"]
-                                    } ${styles["btn__save"]}`}
-                                    onClick={this.handleUpload}
+                                    } ${styles["btn__reset"]}`}
+                                    onClick={this.handleResetClick}
                                     tabIndex={0}
                                 >
-                                    Use This
+                                    Record Again
                                 </button>
-                            )}
+                                {!this.uploadedOnce && (
+                                    <button
+                                        className={`btn btn-primary btn__save ${
+                                            styles["bottom__btn"]
+                                        } ${styles["btn__save"]}`}
+                                        onClick={this.handleUpload}
+                                        tabIndex={0}
+                                    >
+                                        Use This
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    {doUpload && (
+                        <div
+                            className={`progress-bar ${styles["progress-bar"]}`}
+                        >
+                            <Uploader
+                                client={this.kClient}
+                                onError={this.handleError}
+                                mediaType={
+                                    allowVideo
+                                        ? KalturaMediaType.video
+                                        : KalturaMediaType.audio
+                                }
+                                recordedBlobs={recordedBlobs}
+                                entryName={entryName ? entryName : this.getDefaultEntryName()}
+                                serviceUrl={serviceUrl}
+                                ks={ks}
+                            />
                         </div>
                     )}
                 </div>
