@@ -32,7 +32,6 @@ type State = {
     doPlayback: boolean;
     recordedBlobs: Blob[];
     error: string | undefined;
-    percentage: number;
 };
 
 type Constraints = {
@@ -47,7 +46,8 @@ export class ExpressRecorder extends Component<Props, State> {
     static defaultProps = {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
-        allowAudio: true
+        allowAudio: true,
+        maxRecordingTime: undefined
     };
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
@@ -64,7 +64,6 @@ export class ExpressRecorder extends Component<Props, State> {
             recordedBlobs: [],
             doPlayback: false,
             error: undefined,
-            percentage: 0
         };
 
         this.handleSuccess = this.handleSuccess.bind(this);
