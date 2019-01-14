@@ -31,7 +31,7 @@ type State = {
     doCountdown: boolean;
     doPlayback: boolean;
     recordedBlobs: Blob[];
-    error: string | undefined;
+    error: string;
 };
 
 type Constraints = {
@@ -62,7 +62,7 @@ export class ExpressRecorder extends Component<Props, State> {
             doCountdown: false,
             recordedBlobs: [],
             doPlayback: false,
-            error: undefined,
+            error: "",
         };
 
         this.handleSuccess = this.handleSuccess.bind(this);
@@ -220,7 +220,7 @@ export class ExpressRecorder extends Component<Props, State> {
             this.uploadedOnce = true;
         }
 
-        if (error) {
+        if (error != "") {
             return (
                 <div
                     className={`express-recorder ${styles["express-recorder"]}`}
