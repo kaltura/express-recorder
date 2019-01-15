@@ -57,10 +57,11 @@ export class CountdownTimer extends Component<Props, State> {
         const { countdown } = state;
         const { radius } = props;
 
+
         return (
             <div class={`countdown ${styles["countdown"]}`}>
                 <div className={`countdown-number ${styles["countdown-number"]}`}>{countdown}</div>
-                <svg className={styles["svg"]}>
+                <svg className={styles["svg-countDownTimer"]}>
                     <circle
                         className={styles["circle"]}
                         ref={circle => (this.circleRef = circle as HTMLElement)}
