@@ -69,11 +69,11 @@ export class Recorder extends Component<Props, State> {
     startRecording = () => {
         const { stream } = this.props;
         let options = { mimeType: "video/webm;codecs=vp9" };
-        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        if (!MediaSource.isTypeSupported(options.mimeType)) {
             options = { mimeType: "video/webm;codecs=vp8" };
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            if (!MediaSource.isTypeSupported(options.mimeType)) {
                 options = { mimeType: "video/webm" };
-                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                if (!MediaSource.isTypeSupported(options.mimeType)) {
                     options = { mimeType: "" };
                 }
             }
