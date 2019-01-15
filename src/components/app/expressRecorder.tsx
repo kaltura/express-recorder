@@ -62,7 +62,7 @@ export class ExpressRecorder extends Component<Props, State> {
             doCountdown: false,
             recordedBlobs: [],
             doPlayback: false,
-            error: "",
+            error: ""
         };
 
         this.handleSuccess = this.handleSuccess.bind(this);
@@ -124,7 +124,7 @@ export class ExpressRecorder extends Component<Props, State> {
             .then((stream: MediaStream) => {
                 return this.handleSuccess(stream);
             })
-            .catch(this.handleError);
+            .catch((e) => this.handleError("Failed to allocate resource: " + e.message));
     }
 
     checkProps = () => {
@@ -159,10 +159,8 @@ export class ExpressRecorder extends Component<Props, State> {
         this.setState({ stream: stream });
     };
 
-    handleError = (error: MediaStreamError | Error) => {
-        this.setState({
-            error: error.name + ": " + (error.message ? error.message : "")
-        });
+    handleError = (error: string) => {
+        this.setState({ error: error });
     };
 
     handleUpload = () => {
@@ -205,7 +203,15 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     render() {
-        const { partnerId, uiConfId, allowVideo, entryName, ks, serviceUrl, maxRecordingTime } = this.props;
+        const {
+            partnerId,
+            uiConfId,
+            allowVideo,
+            entryName,
+            ks,
+            serviceUrl,
+            maxRecordingTime
+        } = this.props;
         const {
             doCountdown,
             doUpload,
@@ -220,7 +226,7 @@ export class ExpressRecorder extends Component<Props, State> {
             this.uploadedOnce = true;
         }
 
-        if (error != "") {
+        if (error !== "") {
             return (
                 <div
                     className={`express-recorder ${styles["express-recorder"]}`}
@@ -242,6 +248,7 @@ export class ExpressRecorder extends Component<Props, State> {
                         doPlayback={doPlayback}
                         partnerId={partnerId}
                         uiConfId={uiConfId}
+                        onError={this.handleError}
                     />
                 </div>
                 {doCountdown && (
@@ -271,7 +278,10 @@ export class ExpressRecorder extends Component<Props, State> {
                             />
                         )}
                     {doRecording && (
-                        <RecordingTimer onButtonClick={this.handleStopClick} maxRecordingTime={maxRecordingTime}/>
+                        <RecordingTimer
+                            onButtonClick={this.handleStopClick}
+                            maxRecordingTime={maxRecordingTime}
+                        />
                     )}
                     {doCountdown && (
                         <button
@@ -327,7 +337,11 @@ export class ExpressRecorder extends Component<Props, State> {
                                         : KalturaMediaType.audio
                                 }
                                 recordedBlobs={recordedBlobs}
-                                entryName={entryName ? entryName : this.getDefaultEntryName()}
+                                entryName={
+                                    entryName
+                                        ? entryName
+                                        : this.getDefaultEntryName()
+                                }
                                 serviceUrl={serviceUrl}
                                 ks={ks}
                             />
