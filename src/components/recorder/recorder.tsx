@@ -82,9 +82,7 @@ export class Recorder extends Component<Props, State> {
             this.mediaRecorder = new MediaRecorder(stream, options);
         } catch (e) {
             if (this.props.onError) {
-                return this.props.onError(
-                    "Exception while creating MediaRecorder: " + e
-                );
+                this.props.onError("Browser not supported: " + e.message);
             }
             return;
         }
