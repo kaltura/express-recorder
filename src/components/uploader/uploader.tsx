@@ -15,7 +15,7 @@ const styles = require("./style.scss");
 
 type Props = {
     client: KalturaClient | undefined;
-    onError: ((e: Error) => void) | undefined;
+    onError: ((e: string) => void) | undefined;
     mediaType: KalturaMediaType;
     recordedBlobs: Blob[];
     entryName: string;
@@ -79,7 +79,7 @@ export class Uploader extends Component<Props, State> {
         const { client } = this.props;
 
         if (!client) {
-            this.throwError(new Error("Missing client object"));
+            this.throwError(new Error("Cannot connect to Kaltura server"));
             return;
         }
 
@@ -181,7 +181,7 @@ export class Uploader extends Component<Props, State> {
 
     throwError(error: Error) {
         if (this.props.onError) {
-            this.props.onError(error);
+            this.props.onError(error.name + " : " + error.message);
         }
     }
 
