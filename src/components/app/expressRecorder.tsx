@@ -70,6 +70,7 @@ export class ExpressRecorder extends Component<Props, State> {
         this.handleUpload = this.handleUpload.bind(this);
         this.handleStartClick = this.handleStartClick.bind(this);
         this.checkProps = this.checkProps.bind(this);
+        this.isBrowserCompatible = this.isBrowserCompatible.bind(this);
     }
 
     componentDidMount() {
@@ -85,10 +86,8 @@ export class ExpressRecorder extends Component<Props, State> {
         } = this.props;
 
         this.checkProps();
-
-        if (!DetectRTC.isWebRTCSupported) {
-            this.setState({ error: "Browser is not webRTC supported" });
-            return;
+        if (!this.isBrowserCompatible()) {
+            return
         }
 
         const constraints: Constraints = {
@@ -154,6 +153,24 @@ export class ExpressRecorder extends Component<Props, State> {
             message += !partnerId ? "partnerId; " : "";
             this.setState({ error: message });
         }
+    };
+
+    isBrowserCompatible = () => {
+        const notSupportedError =
+            "<b>Browser is not webRTC supported</b><br /><a href='https://webrtc.org/'>Click Here</a> to learn about supported browsers";
+        if (!DetectRTC.isWebRTCSupported) {
+            this.setState({ error: notSupportedError });
+            return false;
+        }
+
+        try {
+            const temp = MediaRecorder.isTypeSupported({ mimeType: "video/webm" });
+        } catch (e) {
+            this.setState({ error: notSupportedError });
+            return false
+        }
+
+        return true
     };
     handleSuccess = (stream: MediaStream) => {
         this.setState({ stream: stream });
