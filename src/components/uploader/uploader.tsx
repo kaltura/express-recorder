@@ -47,7 +47,7 @@ export class Uploader extends Component<Props, State> {
 
         this.state = {
             loaded: 0,
-            total: 0
+            abort: false
         };
 
         this.entryId = "";
