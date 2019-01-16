@@ -167,15 +167,21 @@ export class Uploader extends Component<Props, State> {
             });
     }
 
+    // Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
     addMedia(tokenId: string) {
         const { client } = this.props;
         if (!client) {
             this.throwError(new Error("Missing client object"));
             return;
         }
+        if (this.state.abort) {
+            return;
+        }
 
         const blob = new Blob(this.props.recordedBlobs, { type: "video/webm" });
         const file = new File([blob], "name");
+
+        // keep request so it can be canceled
         this.addMediaRequest = new UploadTokenUploadAction({
             uploadTokenId: tokenId,
             fileData: file
@@ -186,7 +192,7 @@ export class Uploader extends Component<Props, State> {
                 this.addMediaRequest.setProgress(
                     (loaded: number, total: number) => {
                         if (!this.state.abort) {
-                            this.setState({ loaded: loaded });
+                            this.setState({ loaded: loaded }); // loaded bytes until know
                         }
                     }
                 )
@@ -214,6 +220,7 @@ export class Uploader extends Component<Props, State> {
 
         this.setState({ abort: true });
 
+        // Cancel request if not finished yet
         if (this.addMediaRequest) {
             client
                 .request(this.addMediaRequest)
@@ -227,6 +234,8 @@ export class Uploader extends Component<Props, State> {
                 )
                 .cancel();
         }
+
+        // Delete created entry if exists
         this.deleteEntry();
     };
 
@@ -238,7 +247,6 @@ export class Uploader extends Component<Props, State> {
                     entryId: this.entryId
                 });
                 client.request(request).catch((e: Error) => {
-
                     this.throwError(e);
                 });
             }
