@@ -38,6 +38,12 @@ export class Uploader extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
+
+        this.state = {
+            loaded: 0,
+            total: 0
+        };
+
         this.entryId = "";
         this.oReq = new XMLHttpRequest();
         this.handleOnProgress = this.handleOnProgress.bind(this);
