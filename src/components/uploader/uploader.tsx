@@ -95,6 +95,9 @@ export class Uploader extends Component<Props, State> {
             this.throwError(new Error("Missing client object"));
             return;
         }
+        if (this.state.abort) {
+            return;
+        }
 
         const requests: KalturaMultiRequest = new KalturaMultiRequest();
 
