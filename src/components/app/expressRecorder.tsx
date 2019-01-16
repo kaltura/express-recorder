@@ -87,7 +87,7 @@ export class ExpressRecorder extends Component<Props, State> {
         this.checkProps();
 
         if (!DetectRTC.isWebRTCSupported) {
-            this.setState({ error: "Browser is not webRTC supported" });
+            this.setState({ error: "<b>Browser is not webRTC supported</b><br /><a href='https://webrtc.org/'>Click Here</a> to learn about supported browsers" });
             return;
         }
 
