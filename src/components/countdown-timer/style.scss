@@ -16,7 +16,7 @@
     position: relative;
 }
 
-svg {
+.svg-countDownTimer {
     position: absolute;
     top: 0;
     right: 0;
@@ -27,7 +27,7 @@ svg {
     transform: rotateY(-180deg) rotateZ(-90deg);
 }
 
-.svg .circle {
+.svg-countDownTimer .circle {
     stroke-dasharray: 264px;
     stroke-dashoffset: 0;
     stroke-linecap: round;
