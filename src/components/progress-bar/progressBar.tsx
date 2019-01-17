@@ -42,7 +42,7 @@ export class ProgressBar extends Component<Props, State> {
                     className={`bar ${styles["bar"]}`}
                     style={`width: ${percentage}%;`}
                 >
-                    <div className={`status ${styles["status"]}`}>
+                    <div className={`upload-status ${styles["upload-status"]}`}>
                         {loadedStr} / {totalStr}{" "}
                     </div>
                 </div>
