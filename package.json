@@ -31,7 +31,7 @@
     "jest": "^21.2.1",
     "microbundle": "^0.6.0",
     "node-sass": "^4.11.0",
-    "preact-cli": "^2.0.2",
+    "preact-cli": "^2.2.1",
     "preact-compat": "^3.18.4",
     "preact-render-to-string": "^3.7.0",
     "preact-widget-scripts": "^0.6.0",

@@ -4,6 +4,8 @@ import { KalturaMediaEntry } from "kaltura-typescript-client/api/types/KalturaMe
 import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
 import { KalturaUploadedFileTokenResource } from "kaltura-typescript-client/api/types/KalturaUploadedFileTokenResource";
 import { MediaAddAction } from "kaltura-typescript-client/api/types/MediaAddAction";
+import { BaseEntryDeleteAction } from "kaltura-typescript-client/api/types/BaseEntryDeleteAction";
+import { UploadTokenUploadAction } from "kaltura-typescript-client/api/types/UploadTokenUploadAction";
 import { UploadTokenAddAction } from "kaltura-typescript-client/api/types/UploadTokenAddAction";
 import {
     KalturaClient,
@@ -11,10 +13,6 @@ import {
     KalturaMultiResponse
 } from "kaltura-typescript-client";
 import { ProgressBar } from "../progress-bar/progressBar";
-import {
-    BaseEntryDeleteAction,
-    UploadTokenUploadAction
-} from "kaltura-typescript-client/api/types";
 const styles = require("./style.scss");
 
 type Props = {
