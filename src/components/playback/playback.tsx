@@ -43,7 +43,7 @@ export class Playback extends Component<Props, State> {
                         mimetype: media.mimeType
                     }
                 ],
-                type: "Vod"
+                type: this.kalturaPlayer.MediaType.VOD
 
             },
             plugins: {}
