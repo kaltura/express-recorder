@@ -1,3 +1,6 @@
+/*
+Copied from: https://github.com/yusitnikov/fix-webm-duration
+ */
 
 (function (name, definition) {
     if (typeof define === 'function' && define.amd) { // RequireJS / AMD

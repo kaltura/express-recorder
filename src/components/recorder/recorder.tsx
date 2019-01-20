@@ -107,6 +107,9 @@ export class Recorder extends Component<Props, State> {
     stopRecording = () => {
         this.mediaRecorder.stop();
         if (this.props.onRecordingEnd) {
+
+            //since there a known issue with video/webm mime type where there is no duration tag resulting in LIVE displayed in the player and no seek bar,
+            //(see https://github.com/muaz-khan/RecordRTC/issues/145) a fix that adds this tag is used here.
             this.duration = (new Date().getTime() - this.startTime);
             const blob = new Blob(this.recordedBlobs, { type: "video/webm" });
             fixVid(blob, this.duration, this.handleFixedBlob);
@@ -119,6 +122,9 @@ export class Recorder extends Component<Props, State> {
         }
     };
 
+    /*
+    Called by the webm fixer once the fix is ready.
+     */
     handleFixedBlob = (blob: any) => {
         this.props.onRecordingEnd(this.recordedBlobs);
         this.fixedBlob = blob;
