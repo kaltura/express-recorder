@@ -16,7 +16,7 @@ type Props = {
 };
 
 type State = {
-    blob: any
+    blobFixReady: boolean
 };
 
 /**
@@ -32,16 +32,23 @@ export class Recorder extends Component<Props, State> {
     };
 
     mediaRecorder: any;
+    startTime: number;
+    duration: number;
     recordedBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
+    fixedBlob:any;
+
 
     constructor(props: Props) {
         super(props);
-
+        this.startTime = 0;
+        this.duration = 0;
         this.mediaRecorder = null;
         this.videoRef = null;
         this.recordedBlobs = [];
-        this.state.blob = null;
+        this.fixedBlob = null;
+
+        this.state = { blobFixReady: false };
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -72,11 +79,11 @@ export class Recorder extends Component<Props, State> {
     startRecording = () => {
         const { stream } = this.props;
         let options = { mimeType: "video/webm;codecs=vp9" };
-        if (!MediaSource.isTypeSupported(options.mimeType)) {
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
             options = { mimeType: "video/webm;codecs=vp8" };
-            if (!MediaSource.isTypeSupported(options.mimeType)) {
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
                 options = { mimeType: "video/webm" };
-                if (!MediaSource.isTypeSupported(options.mimeType)) {
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
                     options = { mimeType: "" };
                 }
             }
@@ -92,12 +99,19 @@ export class Recorder extends Component<Props, State> {
 
         this.mediaRecorder.ondataavailable = this.handleDataAvailable;
         this.mediaRecorder.start(10); // collect 10ms of data
+        this.startTime = new Date().getTime();
+        this.fixedBlob = null;
+        this.setState({blobFixReady: false});
     };
 
     stopRecording = () => {
         this.mediaRecorder.stop();
         if (this.props.onRecordingEnd) {
-            this.props.onRecordingEnd(this.recordedBlobs);
+            this.duration = (new Date().getTime() - this.startTime);
+            const blob = new Blob(this.recordedBlobs, { type: "video/webm" });
+            fixVid(blob, this.duration, this.handleFixedBlob);
+
+
         }
     };
 
@@ -108,7 +122,9 @@ export class Recorder extends Component<Props, State> {
     };
 
     handleFixedBlob = (blob: any) => {
-        this.setState({blob: blob});
+        this.props.onRecordingEnd(this.recordedBlobs);
+        this.fixedBlob = blob;
+        this.setState({blobFixReady: true});
     };
 
     render(props: Props) {
@@ -117,27 +133,22 @@ export class Recorder extends Component<Props, State> {
         if (doPlayback && this.recordedBlobs.length > 0) {
             let blob = null;
 
-            if (this.state.blob) {
-                blob = this.state.blob;
-            } else {
-                blob = new Blob(this.recordedBlobs, { type: "video/webm" });
-                fixVid(blob, 30000, this.handleFixedBlob);
+            if (this.state.blobFixReady) {
+                const media = {
+                    blob: this.fixedBlob,
+                    mimeType: "video/webm"
+                };
+
+                return (
+                    <div className={styles["express-recorder__playback"]}>
+                        <Playback
+                            partnerId={partnerId}
+                            uiconfId={uiConfId}
+                            media={media}
+                        />
+                    </div>
+                );
             }
-
-            const media = {
-                blob: blob,
-                mimeType: "video/webm"
-            };
-
-            return (
-                <div className={styles["express-recorder__playback"]}>
-                    <Playback
-                        partnerId={partnerId}
-                        uiconfId={uiConfId}
-                        media={media}
-                    />
-                </div>
-            );
         }
 
         return (

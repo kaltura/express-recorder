@@ -14,10 +14,6 @@ type State = {};
 export class ProgressBar extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
-
-        this.state = {
-            percentage: 50
-        };
     }
 
     bytesToSize = (bytes: number) => {
@@ -38,14 +34,17 @@ export class ProgressBar extends Component<Props, State> {
         const totalStr = this.bytesToSize(total);
         const percentage = (loaded * 100) / total;
         return (
-            <div className={`progress ${styles["progress"]}`} style={"margin-top: 0;"}>
+            <div
+                className={`progress ${styles["progress"]}`}
+                style={"margin-top: 0;"}
+            >
                 <div
                     className={`bar ${styles["bar"]}`}
                     style={`width: ${percentage}%;`}
                 >
-                    <span className={`status ${styles["status"]}`}>
+                    <div className={`upload-status ${styles["upload-status"]}`}>
                         {loadedStr} / {totalStr}{" "}
-                    </span>
+                    </div>
                 </div>
             </div>
         );
