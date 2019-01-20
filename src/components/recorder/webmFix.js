@@ -466,7 +466,7 @@
         return new Blob([ this.source.buffer ], { type: 'video/webm' });
     };
 
-    return function(blob, duration) {
+    return function(blob, duration, callback) {
         try {
             var reader = new FileReader();
             reader.onloadend = function() {
