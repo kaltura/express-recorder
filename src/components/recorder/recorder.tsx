@@ -1,7 +1,7 @@
 import { h, Component } from "preact";
 import { Playback } from "../playback/playback";
 const styles = require("./style.scss");
-
+const fixVid = require("./webmFix.js");
 type Props = {
     video: boolean;
     audio: boolean;
@@ -108,8 +108,10 @@ export class Recorder extends Component<Props, State> {
         const { doPlayback, partnerId, uiConfId } = this.props;
 
         if (doPlayback && this.recordedBlobs.length > 0) {
+            let blob = new Blob(this.recordedBlobs, { type: "video/webm" });
+
             const media = {
-                blob: new Blob(this.recordedBlobs, { type: "video/webm" }),
+                blob: blob,
                 mimeType: "video/webm"
             };
 
