@@ -42,7 +42,9 @@ export class Playback extends Component<Props, State> {
                         url: window.URL.createObjectURL(media.blob),
                         mimetype: media.mimeType
                     }
-                ]
+                ],
+                type: this.kalturaPlayer.MediaType.VOD
+
             },
             plugins: {}
         });

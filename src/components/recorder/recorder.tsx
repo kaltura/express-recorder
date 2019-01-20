@@ -1,7 +1,7 @@
 import { h, Component } from "preact";
 import { Playback } from "../playback/playback";
 const styles = require("./style.scss");
-
+const fixVid = require("./webmFix.js");
 type Props = {
     video: boolean;
     audio: boolean;
@@ -15,7 +15,9 @@ type Props = {
     uiConfId: number;
 };
 
-type State = {};
+type State = {
+    blobFixReady: boolean
+};
 
 /**
  * Handle the actual recording with given stream. Gather all blob data and handle start/stop.
@@ -30,15 +32,23 @@ export class Recorder extends Component<Props, State> {
     };
 
     mediaRecorder: any;
+    startTime: number;
+    duration: number;
     recordedBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
+    fixedBlob:any;
+
 
     constructor(props: Props) {
         super(props);
-
+        this.startTime = 0;
+        this.duration = 0;
         this.mediaRecorder = null;
         this.videoRef = null;
         this.recordedBlobs = [];
+        this.fixedBlob = null;
+
+        this.state = { blobFixReady: false };
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -89,12 +99,20 @@ export class Recorder extends Component<Props, State> {
 
         this.mediaRecorder.ondataavailable = this.handleDataAvailable;
         this.mediaRecorder.start(10); // collect 10ms of data
+        this.startTime = new Date().getTime();
+        this.fixedBlob = null;
+        this.setState({blobFixReady: false});
     };
 
     stopRecording = () => {
         this.mediaRecorder.stop();
         if (this.props.onRecordingEnd) {
-            this.props.onRecordingEnd(this.recordedBlobs);
+
+            //since there a known issue with video/webm mime type where there is no duration tag resulting in LIVE displayed in the player and no seek bar,
+            //(see https://github.com/muaz-khan/RecordRTC/issues/145) a fix that adds this tag is used here.
+            this.duration = (new Date().getTime() - this.startTime);
+            const blob = new Blob(this.recordedBlobs, { type: "video/webm" });
+            fixVid(blob, this.duration, this.handleFixedBlob);
         }
     };
 
@@ -104,24 +122,35 @@ export class Recorder extends Component<Props, State> {
         }
     };
 
+    /*
+    Called by the webm fixer once the fix is ready.
+     */
+    handleFixedBlob = (blob: any) => {
+        this.props.onRecordingEnd(this.recordedBlobs);
+        this.fixedBlob = blob;
+        this.setState({blobFixReady: true});
+    };
+
     render(props: Props) {
         const { doPlayback, partnerId, uiConfId } = this.props;
 
         if (doPlayback && this.recordedBlobs.length > 0) {
-            const media = {
-                blob: new Blob(this.recordedBlobs, { type: "video/webm" }),
-                mimeType: "video/webm"
-            };
+            if (this.state.blobFixReady) {
+                const media = {
+                    blob: this.fixedBlob,
+                    mimeType: "video/webm"
+                };
 
-            return (
-                <div className={styles["express-recorder__playback"]}>
-                    <Playback
-                        partnerId={partnerId}
-                        uiconfId={uiConfId}
-                        media={media}
-                    />
-                </div>
-            );
+                return (
+                    <div className={styles["express-recorder__playback"]}>
+                        <Playback
+                            partnerId={partnerId}
+                            uiconfId={uiConfId}
+                            media={media}
+                        />
+                    </div>
+                );
+            }
         }
 
         return (
