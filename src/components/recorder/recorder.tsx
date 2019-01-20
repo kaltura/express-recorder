@@ -15,7 +15,9 @@ type Props = {
     uiConfId: number;
 };
 
-type State = {};
+type State = {
+    blob: any
+};
 
 /**
  * Handle the actual recording with given stream. Gather all blob data and handle start/stop.
@@ -39,6 +41,7 @@ export class Recorder extends Component<Props, State> {
         this.mediaRecorder = null;
         this.videoRef = null;
         this.recordedBlobs = [];
+        this.state.blob = null;
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -104,11 +107,22 @@ export class Recorder extends Component<Props, State> {
         }
     };
 
+    handleFixedBlob = (blob: any) => {
+        this.setState({blob: blob});
+    };
+
     render(props: Props) {
         const { doPlayback, partnerId, uiConfId } = this.props;
 
         if (doPlayback && this.recordedBlobs.length > 0) {
-            let blob = new Blob(this.recordedBlobs, { type: "video/webm" });
+            let blob = null;
+
+            if (this.state.blob) {
+                blob = this.state.blob;
+            } else {
+                blob = new Blob(this.recordedBlobs, { type: "video/webm" });
+                fixVid(blob, 30000, this.handleFixedBlob);
+            }
 
             const media = {
                 blob: blob,
