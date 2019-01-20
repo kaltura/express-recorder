@@ -110,8 +110,6 @@ export class Recorder extends Component<Props, State> {
             this.duration = (new Date().getTime() - this.startTime);
             const blob = new Blob(this.recordedBlobs, { type: "video/webm" });
             fixVid(blob, this.duration, this.handleFixedBlob);
-
-
         }
     };
 
@@ -131,8 +129,6 @@ export class Recorder extends Component<Props, State> {
         const { doPlayback, partnerId, uiConfId } = this.props;
 
         if (doPlayback && this.recordedBlobs.length > 0) {
-            let blob = null;
-
             if (this.state.blobFixReady) {
                 const media = {
                     blob: this.fixedBlob,
