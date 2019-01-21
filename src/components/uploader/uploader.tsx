@@ -244,6 +244,9 @@ export class Uploader extends Component<Props, State> {
 
         // Delete created entry if exists
         this.deleteEntry();
+        const event = new CustomEvent("mediaUploadCanceled");
+        window.dispatchEvent(event);
+
     };
 
     deleteEntry = () => {
