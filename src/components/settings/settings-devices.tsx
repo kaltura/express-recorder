@@ -68,7 +68,7 @@ export class SettingsDevices extends Component<Props, State> {
             );
         });
         return (
-            <div className={styles["settings-devices__box"]}>
+            <div>
                 <div
                     className={styles["arrow-left"]}
                     onClick={this.handleClose}
