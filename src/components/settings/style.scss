@@ -1,0 +1,71 @@
+.wheel {
+    display: inline-block;
+    vertical-align: text-top;
+    height: 16px;
+    width: 16px;
+    float: right;
+    background: url("../../assets/icons/Stop.svg") no-repeat center;
+}
+.settings {
+    position: absolute;
+}
+.resources-list,
+.devices-list {
+    list-style-type: none;
+    padding: 0;
+}
+.resources-list div {
+    width: 135px;
+    display: inline-block;
+    vertical-align: bottom;
+    i {
+        margin-left: 30px;
+    }
+}
+.arrow-right {
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+.settings-box {
+    text-align: left;
+    background: rgba(0, 0, 0, 0.5);
+    margin-top: 19px;
+    padding: 0px 20px;
+    font-size: 16px;
+    line-height: 35px;
+    width: 280px;
+    position: absolute;
+    right: 0;
+}
+.settings-line {
+    height: 1px;
+    opacity: 0.15;
+    background-color: #ffffff;
+}
+.resource-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.selected-device {
+    display: list-item;
+    list-style-type: disc;
+    list-style-position: inside;
+}
+.not-selected-device {
+    padding-left: 21px;
+}
+.arrow-left {
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+    vertical-align: -webkit-baseline-middle;
+    margin-right: 13px;
+}
