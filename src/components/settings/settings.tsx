@@ -197,12 +197,12 @@ export class Settings extends Component<Props, State> {
                 {isOpen && (
                     <div className={styles["settings-box"]}>
                         {!showCameraSettings && !showAudioSettings && (
-                            <ul
+                            <div
                                 className={styles["resources-list"]}
                                 role="menu"
                                 aria-labelledby="dropdownMenu"
                             >
-                                <li>
+                                <div className={styles["resources-item"]}>
                                     <div>Camera</div>
                                     <div className={styles["resource-label"]}>
                                         {selectedCamera
@@ -220,8 +220,8 @@ export class Settings extends Component<Props, State> {
                                     >
                                         <i className={styles["arrow-right"]} />
                                     </a>
-                                </li>
-                                <li>
+                                </div>
+                                <div className={styles["resources-item"]}>
                                     <div>Audio</div>
                                     <div className={styles["resource-label"]}>
                                         {selectedAudio
@@ -239,8 +239,8 @@ export class Settings extends Component<Props, State> {
                                     >
                                         <i className={styles["arrow-right"]} />
                                     </a>
-                                </li>
-                            </ul>
+                                </div>
+                            </div>
                         )}
                         {devicesSettings}
                     </div>

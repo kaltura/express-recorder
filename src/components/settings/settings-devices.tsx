@@ -56,7 +56,7 @@ export class SettingsDevices extends Component<Props, State> {
                 selectedClass = "selected-device";
             }
             return (
-                <li
+                <div
                     key={index.toString()}
                     onClick={() => this.handleItemClick(item)}
                     className={
@@ -64,7 +64,7 @@ export class SettingsDevices extends Component<Props, State> {
                     }
                 >
                     <span>{item.label}</span>
-                </li>
+                </div>
             );
         });
         return (
@@ -80,7 +80,7 @@ export class SettingsDevices extends Component<Props, State> {
                     isToggleOn={isOn}
                 />
                 <hr className={styles["settings-line"]} />
-                <ul className={styles["devices-list"]}>{resourcesList}</ul>
+                <div className={styles["devices-list"]}>{resourcesList}</div>
             </div>
         );
     }

@@ -9,14 +9,19 @@
 .settings {
     position: absolute;
 }
+.resources-item {
+    display: flex;
+}
 .resources-list,
 .devices-list {
     list-style-type: none;
     padding: 0;
 }
+.resources-list {
+    padding: 10px 0;
+}
 .resources-list div {
-    width: 135px;
-    display: inline-block;
+    width: 280px;
     vertical-align: bottom;
     i {
         margin-left: 30px;
@@ -34,7 +39,7 @@
     text-align: left;
     background: rgba(0, 0, 0, 0.5);
     margin-top: 19px;
-    padding: 0px 20px;
+    padding: 4px 20px;
     font-size: 16px;
     line-height: 35px;
     width: 280px;
