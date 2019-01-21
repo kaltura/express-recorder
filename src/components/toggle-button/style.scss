@@ -5,8 +5,10 @@
 }
 
 .toggle-button {
+    display: inline;
     .toggle-button__label {
         display:inline;
+        vertical-align: -webkit-baseline-middle;
     }
     .toggle-button__checkbox {
         top: auto;
@@ -75,5 +77,6 @@
     .toggle-button__button {
         display: inline-block;
         margin-top: 5px;
+        float: right;
     }
 }
