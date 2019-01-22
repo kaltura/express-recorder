@@ -22,6 +22,8 @@ export class ToggleButton extends Component<Props, State> {
         this.state = {
             isToggleOn: props.isToggleOn
         };
+
+        this.handleClick = this.handleClick.bind(this);
     }
     handleClick = () => {
         const { isToggleOn } = this.state;
