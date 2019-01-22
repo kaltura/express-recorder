@@ -31,8 +31,9 @@ export class SettingsDevices extends Component<Props, State> {
     }
 
     handleItemClick = (item: any) => {
-        this.props.onChooseDevice(item);
-        this.setState({ selectedDevice: item });
+        this.setState({ selectedDevice: item }, () => {
+            this.props.onChooseDevice(item);
+        });
     };
 
     handleToggleClick = (isOn: boolean) => {
