@@ -4,8 +4,8 @@ const styles = require("./style.scss");
 
 type Props = {
     resourceName: string;
-    devices: object[];
-    onChooseDevice: (device: object) => void;
+    devices: object[]; // MediaDeviceInfo[]
+    onChooseDevice: (device: object) => void; // device: MediaDeviceInfo
     isOn: boolean;
     selected: any;
     onClose: () => void;

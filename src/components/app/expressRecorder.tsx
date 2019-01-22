@@ -41,7 +41,7 @@ export type Constraints = {
     audio: any | boolean;
 };
 
-const VIDEO_CONSTRANT = {
+const VIDEO_CONSTRAINT = {
     frameRate: { max: "20" },
     height: "483",
     width: "858"
@@ -75,7 +75,7 @@ export class ExpressRecorder extends Component<Props, State> {
                 video:
                     props.allowVideo !== false
                         ? {
-                            ...VIDEO_CONSTRANT
+                            ...VIDEO_CONSTRAINT
                           }
                         : false,
                 audio: props.allowAudio !== false
@@ -245,7 +245,7 @@ export class ExpressRecorder extends Component<Props, State> {
         if (selectedCamera) {
             newConstraints.video = {
                 deviceId: selectedCamera.deviceId,
-                ...VIDEO_CONSTRANT
+                ...VIDEO_CONSTRAINT
             };
         }
         if (selectedAudio) {
