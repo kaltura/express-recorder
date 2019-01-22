@@ -14,6 +14,7 @@ type State = {
     isToggleOn: boolean;
 };
 
+// show toggle button. used in settings box to turn on/off resource
 export class ToggleButton extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -68,6 +69,7 @@ export class ToggleButton extends Component<Props, State> {
                             } ${styles["screenreader-only"]}`}
                             onClick={this.handleClick}
                             checked={isToggleOn}
+                            tabIndex={0}
                         />
                         <label
                             for={id}
