@@ -110,19 +110,24 @@ export class Settings extends Component<Props, State> {
     };
 
     handleClose = () => {
-        this.setState({
-            isOpen: false,
-            showAudioSettings: false,
-            showCameraSettings: false
-        }, () => {
-            if (this.props.onSettingsChanged) {
-                const camera = this.state.cameraOn
-                    ? this.state.selectedCamera
-                    : false;
-                const audio = this.state.audioOn ? this.state.selectedAudio : false;
-                this.props.onSettingsChanged(camera, audio);
+        this.setState(
+            {
+                isOpen: false,
+                showAudioSettings: false,
+                showCameraSettings: false
+            },
+            () => {
+                if (this.props.onSettingsChanged) {
+                    const camera = this.state.cameraOn
+                        ? this.state.selectedCamera
+                        : false;
+                    const audio = this.state.audioOn
+                        ? this.state.selectedAudio
+                        : false;
+                    this.props.onSettingsChanged(camera, audio);
+                }
             }
-        });
+        );
     };
 
     handleToggleChange = (isOn: boolean, type: ResourceTypes) => {
@@ -132,6 +137,7 @@ export class Settings extends Component<Props, State> {
             audioOn: type === ResourceTypes.AUDIO ? isOn : audioOn
         });
     };
+
     handleBack = () => {
         this.setState({
             showAudioSettings: false,
@@ -171,9 +177,7 @@ export class Settings extends Component<Props, State> {
                     onClose={() => {
                         this.handleBack();
                     }}
-                    onChooseDevice={(device: any) => {
-                        this.handleChooseDevice(device);
-                    }}
+                    onChooseDevice={this.handleChooseDevice}
                     onToggleChange={(isOn: boolean) => {
                         this.handleToggleChange(
                             isOn,
