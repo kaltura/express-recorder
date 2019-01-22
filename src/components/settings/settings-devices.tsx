@@ -18,7 +18,7 @@ type State = {
 };
 
 /**
- * Component to display devices for on resource (camera / audio)
+ * Component to display devices for one resource (camera / audio)
  */
 export class SettingsDevices extends Component<Props, State> {
     constructor(props: Props) {
