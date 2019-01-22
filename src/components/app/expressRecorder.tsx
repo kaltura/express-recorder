@@ -37,8 +37,8 @@ type State = {
 };
 
 export type Constraints = {
-    video: object | boolean;
-    audio: object | boolean;
+    video: any | boolean;
+    audio: any | boolean;
 };
 
 /**
@@ -222,9 +222,24 @@ export class ExpressRecorder extends Component<Props, State> {
         }
     };
     handleSettingsChange = (selectedCamera: any, selectedAudio: any) => {
-        let constraints: Constraints = { video: false, audio: false };
+        // check if something has been changed
+        const { constraints } = this.state;
+        if (
+            ((selectedCamera && constraints.video) ||
+                (!selectedCamera && !constraints.video)) &&
+            ((selectedAudio && constraints.audio) ||
+                (!selectedAudio && !constraints.audio)) &&
+            (!selectedCamera ||
+                selectedCamera.deviceId === constraints.video.deviceId) &&
+            (!selectedAudio ||
+                selectedAudio.deviceId === constraints.audio.deviceId)
+        ) {
+            return;
+        }
+
+        let newConstraints: Constraints = { video: false, audio: false };
         if (selectedCamera) {
-            constraints.video = {
+            newConstraints.video = {
                 deviceId: selectedCamera.deviceId,
                 frameRate: { max: "20" },
                 height: "483",
@@ -232,11 +247,11 @@ export class ExpressRecorder extends Component<Props, State> {
             };
         }
         if (selectedAudio) {
-            constraints.audio = { deviceId: selectedAudio.deviceId };
+            newConstraints.audio = { deviceId: selectedAudio.deviceId };
         }
 
-        this.createStream(constraints);
-        this.setState({constraints: constraints});
+        this.createStream(newConstraints);
+        this.setState({ constraints: newConstraints });
     };
 
     createStream = (constraints: Constraints) => {
