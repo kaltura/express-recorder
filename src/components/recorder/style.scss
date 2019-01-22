@@ -1,4 +1,16 @@
-.express-recorder__recorder, .express-recorder__playback {
+.express-recorder__recorder,
+.express-recorder__playback {
     height: 483px;
     width: 858px;
+}
+.express-recorder__recorder__no-video {
+    height: 483px;
+    width: 858px;
+    border-radius: 4px;
+    background-color: #555555;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(67, 67, 67, 0.3) 100%
+    );
 }

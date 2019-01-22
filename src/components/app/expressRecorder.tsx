@@ -316,8 +316,7 @@ export class ExpressRecorder extends Component<Props, State> {
                 </div>
                 <div>
                     <Recorder
-                        video={true}
-                        audio={true}
+                        video={constraints.video !== false}
                         stream={stream!}
                         onRecordingEnd={this.handleRecordingEnd}
                         doRecording={doRecording}
