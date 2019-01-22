@@ -26,7 +26,7 @@ export enum ResourceTypes {
 }
 
 /**
- * Component to play the recorded record, uses v3 player.
+ * Component to handle settings menu for resources and devices
  */
 export class Settings extends Component<Props, State> {
     cameraDevicesInfo: object[];
