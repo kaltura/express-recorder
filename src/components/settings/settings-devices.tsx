@@ -18,7 +18,7 @@ type State = {
 };
 
 /**
- * Component to play the recorded record, uses v3 player.
+ * Component to display devices for on resource (camera / audio)
  */
 export class SettingsDevices extends Component<Props, State> {
     constructor(props: Props) {
