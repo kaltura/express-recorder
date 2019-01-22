@@ -127,7 +127,7 @@ export class Recorder extends Component<Props, State> {
                 <video
                     id="recorder"
                     className={`express-recorder__recorder ${
-                        styles["express-recorder__recorder" + (noVideoClass ? noVideoClass : "")]
+                        styles["express-recorder__recorder" + (noVideoClass)]
                     }`}
                     muted={true}
                     autoPlay={true}
