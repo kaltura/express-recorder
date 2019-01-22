@@ -110,17 +110,18 @@ export class Settings extends Component<Props, State> {
     };
 
     handleClose = () => {
-        if (this.props.onSettingsChanged) {
-            const camera = this.state.cameraOn
-                ? this.state.selectedCamera
-                : false;
-            const audio = this.state.audioOn ? this.state.selectedAudio : false;
-            this.props.onSettingsChanged(camera, audio);
-        }
         this.setState({
             isOpen: false,
             showAudioSettings: false,
             showCameraSettings: false
+        }, () => {
+            if (this.props.onSettingsChanged) {
+                const camera = this.state.cameraOn
+                    ? this.state.selectedCamera
+                    : false;
+                const audio = this.state.audioOn ? this.state.selectedAudio : false;
+                this.props.onSettingsChanged(camera, audio);
+            }
         });
     };
 
