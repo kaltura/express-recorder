@@ -113,8 +113,8 @@ export class Settings extends Component<Props, State> {
         if (this.props.onSettingsChanged) {
             const camera = this.state.cameraOn
                 ? this.state.selectedCamera
-                : null;
-            const audio = this.state.audioOn ? this.state.selectedAudio : null;
+                : false;
+            const audio = this.state.audioOn ? this.state.selectedAudio : false;
             this.props.onSettingsChanged(camera, audio);
         }
         this.setState({
