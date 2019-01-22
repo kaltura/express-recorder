@@ -1,22 +1,41 @@
-import {Component, h} from "preact";
-const styles = require('./style.scss');
+import { Component, h } from "preact";
+const styles = require("./style.scss");
 
 type Props = {
     id: string;
     name?: string;
     text: string;
     screenReaderText?: string;
-}
+    onClick?: (isOn: boolean) => void;
+    isToggleOn: boolean;
+};
 
 type State = {
+    isToggleOn: boolean;
+};
 
-}
+// show toggle button. used in settings box to turn on/off resource
+export class ToggleButton extends Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
 
+        this.state = {
+            isToggleOn: props.isToggleOn
+        };
 
-export class ToggleButton extends Component<Props, State>{
+        this.handleClick = this.handleClick.bind(this);
+    }
+    handleClick = () => {
+        const { isToggleOn } = this.state;
+        if (this.props.onClick) {
+            this.props.onClick(!isToggleOn);
+        }
+        this.setState({ isToggleOn: !isToggleOn });
+    };
 
-    render(props:Props) {
-        const { text, id, name, screenReaderText} = props;
+    render(props: Props) {
+        const { text, id, name, screenReaderText } = props;
+        const {isToggleOn} = this.state;
 
         let sName = name;
         if (!sName) {
@@ -29,25 +48,44 @@ export class ToggleButton extends Component<Props, State>{
         }
 
         return (
-<div class={`toggle-button ${styles['toggle-button']}`}>
-    <div class={`toggle-button__label ${styles['toggle-button__label']}`}>
-        {text}
-    </div>
-    <div class={`toggle-button__button ${styles['toggle-button__button']}`}>
-        <div>
-            <input
-                type={"checkbox"}
-                name={sName}
-                id={id}
-                class={`toggle-button__checkbox ${styles['toggle-button__checkbox']} ${styles['screenreader-only']}`}
-            />
-            <label for={id} class={`toggle-button__checkbox-label ${styles['toggle-button__checkbox-label']}`}>
-                <span class={styles['screenreader-only']}>{srText}</span>
-            </label>
-        </div>
-    </div>
-</div>
-);
-
+            <div class={`toggle-button ${styles["toggle-button"]}`}>
+                <div
+                    class={`toggle-button__label ${
+                        styles["toggle-button__label"]
+                    }`}
+                >
+                    {text}
+                </div>
+                <div
+                    class={`toggle-button__button ${
+                        styles["toggle-button__button"]
+                    }`}
+                >
+                    <div>
+                        <input
+                            type={"checkbox"}
+                            name={sName}
+                            id={id}
+                            class={`toggle-button__checkbox ${
+                                styles["toggle-button__checkbox"]
+                            } ${styles["screenreader-only"]}`}
+                            onClick={this.handleClick}
+                            checked={isToggleOn}
+                            tabIndex={0}
+                        />
+                        <label
+                            for={id}
+                            class={`toggle-button__checkbox-label ${
+                                styles["toggle-button__checkbox-label"]
+                            }`}
+                        >
+                            <span class={styles["screenreader-only"]}>
+                                {srText}
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        );
     }
 }

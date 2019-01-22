@@ -4,7 +4,6 @@ const styles = require("./style.scss");
 const fixVid = require("./webmFix.js");
 type Props = {
     video: boolean;
-    audio: boolean;
     stream: MediaStream;
     onError?: (error: string) => void;
     doRecording: boolean;
@@ -24,8 +23,6 @@ type State = {
  */
 export class Recorder extends Component<Props, State> {
     static defaultProps = {
-        video: true,
-        audio: true,
         doRecording: false,
         discard: false,
         doPlayback: false
@@ -132,7 +129,8 @@ export class Recorder extends Component<Props, State> {
     };
 
     render(props: Props) {
-        const { doPlayback, partnerId, uiConfId } = this.props;
+        const { doPlayback, partnerId, uiConfId, video } = this.props;
+        let noVideoClass = !video ? "__no-video" : "";
 
         if (doPlayback && this.recordedBlobs.length > 0) {
             if (this.state.blobFixReady) {
@@ -157,7 +155,9 @@ export class Recorder extends Component<Props, State> {
             <div>
                 <video
                     id="recorder"
-                    className={`express-recorder__recorder ${styles["express-recorder__recorder"]}`}
+                    className={`express-recorder__recorder ${
+                        styles["express-recorder__recorder" + (noVideoClass)]
+                    }`}
                     muted={true}
                     autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}

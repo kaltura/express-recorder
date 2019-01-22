@@ -7,6 +7,7 @@ import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
+import { Settings } from "../settings/settings";
 const DetectRTC = require("../../../node_modules/detectrtc");
 const styles = require("./style.scss");
 
@@ -32,11 +33,18 @@ type State = {
     doPlayback: boolean;
     recordedBlobs: Blob[];
     error: string;
+    constraints: Constraints;
 };
 
-type Constraints = {
-    video: object | boolean;
-    audio: boolean;
+export type Constraints = {
+    video: any | boolean;
+    audio: any | boolean;
+};
+
+const VIDEO_CONSTRAINT = {
+    frameRate: { max: "20" },
+    height: "483",
+    width: "858"
 };
 
 /**
@@ -62,7 +70,16 @@ export class ExpressRecorder extends Component<Props, State> {
             doCountdown: false,
             recordedBlobs: [],
             doPlayback: false,
-            error: ""
+            error: "",
+            constraints: {
+                video:
+                    props.allowVideo !== false
+                        ? {
+                            ...VIDEO_CONSTRAINT
+                          }
+                        : false,
+                audio: props.allowAudio !== false
+            }
         };
 
         this.handleSuccess = this.handleSuccess.bind(this);
@@ -75,8 +92,6 @@ export class ExpressRecorder extends Component<Props, State> {
 
     componentDidMount() {
         const {
-            allowVideo,
-            allowAudio,
             serviceUrl,
             app,
             ks,
@@ -87,13 +102,8 @@ export class ExpressRecorder extends Component<Props, State> {
 
         this.checkProps();
         if (!this.isBrowserCompatible()) {
-            return
+            return;
         }
-
-        const constraints: Constraints = {
-            audio: allowAudio ? true : false,
-            video: allowVideo ? { frameRate: "15" } : false
-        };
 
         //create client for uploading
         this.kClient = new KalturaClient(
@@ -118,12 +128,7 @@ export class ExpressRecorder extends Component<Props, State> {
         tag.type = "text/javascript";
         document.body.appendChild(tag);
 
-        return navigator.mediaDevices
-            .getUserMedia(constraints)
-            .then((stream: MediaStream) => {
-                return this.handleSuccess(stream);
-            })
-            .catch((e) => this.handleError("Failed to allocate resource: " + e.message));
+        this.createStream(this.state.constraints);
     }
 
     checkProps = () => {
@@ -164,13 +169,15 @@ export class ExpressRecorder extends Component<Props, State> {
         }
 
         try {
-            const temp = MediaRecorder.isTypeSupported({ mimeType: "video/webm" });
+            const temp = MediaRecorder.isTypeSupported({
+                mimeType: "video/webm"
+            });
         } catch (e) {
             this.setState({ error: notSupportedError });
-            return false
+            return false;
         }
 
-        return true
+        return true;
     };
     handleSuccess = (stream: MediaStream) => {
         this.setState({ stream: stream });
@@ -218,6 +225,47 @@ export class ExpressRecorder extends Component<Props, State> {
             this.setState({ doCountdown: false, doRecording: true });
         }
     };
+    handleSettingsChange = (selectedCamera: any, selectedAudio: any) => {
+        // check if something has been changed
+        const { constraints } = this.state;
+        if (
+            ((selectedCamera && constraints.video) || // check if video was turn on/off
+                (!selectedCamera && !constraints.video)) &&
+            ((selectedAudio && constraints.audio) ||  // check if audio was turn on/off
+                (!selectedAudio && !constraints.audio)) &&
+            (!selectedCamera ||  // check if have different device IDs
+                selectedCamera.deviceId === constraints.video.deviceId) &&
+            (!selectedAudio ||  // check if have different device IDs
+                selectedAudio.deviceId === constraints.audio.deviceId)
+        ) {
+            return;
+        }
+
+        let newConstraints: Constraints = { video: false, audio: false };
+        if (selectedCamera) {
+            newConstraints.video = {
+                deviceId: selectedCamera.deviceId,
+                ...VIDEO_CONSTRAINT
+            };
+        }
+        if (selectedAudio) {
+            newConstraints.audio = { deviceId: selectedAudio.deviceId };
+        }
+
+        this.createStream(newConstraints);
+        this.setState({ constraints: newConstraints });
+    };
+
+    createStream = (constraints: Constraints) => {
+        navigator.mediaDevices
+            .getUserMedia(constraints)
+            .then((stream: MediaStream) => {
+                return this.handleSuccess(stream);
+            })
+            .catch(e =>
+                this.handleError("Failed to allocate resource: " + e.message)
+            );
+    };
 
     render() {
         const {
@@ -236,7 +284,8 @@ export class ExpressRecorder extends Component<Props, State> {
             doRecording,
             recordedBlobs,
             doPlayback,
-            error
+            error,
+            constraints
         } = this.state;
 
         if (doUpload && !this.uploadedOnce) {
@@ -254,10 +303,22 @@ export class ExpressRecorder extends Component<Props, State> {
         }
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
+                <div className={styles["settings-wrap"]}>
+                    <Settings
+                        selectedCamera={
+                            stream ? stream.getVideoTracks()[0] : undefined
+                        }
+                        selectedAudio={
+                            stream ? stream.getAudioTracks()[0] : undefined
+                        }
+                        allowVideo={constraints.video !== false}
+                        allowAudio={constraints.audio !== false}
+                        onSettingsChanged={this.handleSettingsChange}
+                    />
+                </div>
                 <div>
                     <Recorder
-                        video={true}
-                        audio={true}
+                        video={constraints.video !== false}
                         stream={stream!}
                         onRecordingEnd={this.handleRecordingEnd}
                         doRecording={doRecording}

@@ -12,7 +12,7 @@ type State = {};
 let uniqueId: number = 0;
 
 /**
- * Component to play the recorded record, uses v3 player.
+ * Component to play the recorded media, uses v3 player.
  */
 export class Playback extends Component<Props, State> {
     kalturaPlayer: any;

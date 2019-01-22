@@ -1,12 +1,13 @@
-
 .screenreader-only {
     position: absolute !important;
     left: -9999px !important;
 }
 
 .toggle-button {
+    display: inline;
     .toggle-button__label {
-        display:inline;
+        display: inline;
+        vertical-align: -webkit-baseline-middle;
     }
     .toggle-button__checkbox {
         top: auto;
@@ -19,9 +20,10 @@
         position: relative;
         min-height: 20px;
         padding-left: 36px;
+        display: inline;
 
         &:before {
-            content: '';
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
@@ -33,7 +35,7 @@
         }
 
         &:after {
-            content: '';
+            content: "";
             position: absolute;
             top: 2px;
             left: 2px;
@@ -75,5 +77,6 @@
     .toggle-button__button {
         display: inline-block;
         margin-top: 5px;
+        float: right;
     }
 }
