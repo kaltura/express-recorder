@@ -41,6 +41,12 @@ export type Constraints = {
     audio: any | boolean;
 };
 
+const VIDEO_CONSTRANT = {
+    frameRate: { max: "20" },
+    height: "483",
+    width: "858"
+};
+
 /**
  * This is the main component of the widget - contains the main flow.
  */
@@ -69,9 +75,7 @@ export class ExpressRecorder extends Component<Props, State> {
                 video:
                     props.allowVideo !== false
                         ? {
-                              frameRate: { max: "20" },
-                              height: "483",
-                              width: "858"
+                            ...VIDEO_CONSTRANT
                           }
                         : false,
                 audio: props.allowAudio !== false
@@ -241,9 +245,7 @@ export class ExpressRecorder extends Component<Props, State> {
         if (selectedCamera) {
             newConstraints.video = {
                 deviceId: selectedCamera.deviceId,
-                frameRate: { max: "20" },
-                height: "483",
-                width: "858"
+                ...VIDEO_CONSTRANT
             };
         }
         if (selectedAudio) {
