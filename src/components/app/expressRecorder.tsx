@@ -229,13 +229,13 @@ export class ExpressRecorder extends Component<Props, State> {
         // check if something has been changed
         const { constraints } = this.state;
         if (
-            ((selectedCamera && constraints.video) ||
+            ((selectedCamera && constraints.video) || // check if video was turn on/off
                 (!selectedCamera && !constraints.video)) &&
-            ((selectedAudio && constraints.audio) ||
+            ((selectedAudio && constraints.audio) ||  // check if audio was turn on/off
                 (!selectedAudio && !constraints.audio)) &&
-            (!selectedCamera ||
+            (!selectedCamera ||  // check if have different device IDs
                 selectedCamera.deviceId === constraints.video.deviceId) &&
-            (!selectedAudio ||
+            (!selectedAudio ||  // check if have different device IDs
                 selectedAudio.deviceId === constraints.audio.deviceId)
         ) {
             return;
