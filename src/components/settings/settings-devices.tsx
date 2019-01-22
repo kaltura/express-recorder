@@ -37,10 +37,11 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     handleToggleClick = (isOn: boolean) => {
-        if (this.props.onToggleChange) {
-            this.props.onToggleChange(isOn);
-        }
-        this.setState({ isOn: isOn });
+        this.setState({ isOn: isOn }, () => {
+            if (this.props.onToggleChange) {
+                this.props.onToggleChange(isOn);
+            }
+        });
     };
 
     handleClose = () => {
