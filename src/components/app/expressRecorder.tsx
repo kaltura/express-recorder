@@ -325,17 +325,19 @@ export class ExpressRecorder extends Component<Props, State> {
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
                 <div className={styles["settings-wrap"]}>
-                    <Settings
-                        selectedCamera={
-                            stream ? stream.getVideoTracks()[0] : undefined
-                        }
-                        selectedAudio={
-                            stream ? stream.getAudioTracks()[0] : undefined
-                        }
-                        allowVideo={constraints.video !== false}
-                        allowAudio={constraints.audio !== false}
-                        onSettingsChanged={this.handleSettingsChange}
-                    />
+                    {!doUpload && !doPlayback && !doRecording && (
+                        <Settings
+                            selectedCamera={
+                                stream ? stream.getVideoTracks()[0] : undefined
+                            }
+                            selectedAudio={
+                                stream ? stream.getAudioTracks()[0] : undefined
+                            }
+                            allowVideo={constraints.video !== false}
+                            allowAudio={constraints.audio !== false}
+                            onSettingsChanged={this.handleSettingsChange}
+                        />
+                    )}
                 </div>
                 <div>
                     <Recorder
