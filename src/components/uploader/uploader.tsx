@@ -270,15 +270,16 @@ export class Uploader extends Component<Props, State> {
     }
 
     render() {
-        const { loaded } = this.state;
+        const { loaded, abort } = this.state;
         return (
             <div>
                 <span className={`progress-bar ${styles["progress-bar"]}`}>
                     <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
                 </span>
                 <button
-                    className={`btn btn-cancel ${styles["btn"]}`}
+                    className={`btn btn-cancel ${styles["btn"]} ${abort ? styles["cancel-btn--disabled"] : ""}`}
                     onClick={this.handleCancel}
+                    disabled={abort}
                 >
                     Cancel
                 </button>
