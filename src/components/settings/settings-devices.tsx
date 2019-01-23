@@ -54,13 +54,19 @@ export class SettingsDevices extends Component<Props, State> {
 
         const resourcesList = devices.map((item: any, index: number) => {
             let selectedClass = "not-selected-device";
+            let isSelected = false;
             if (selectedDevice && item.label === selectedDevice.label) {
                 selectedClass = "selected-device";
+                isSelected = true;
             }
             return (
                 <div
                     key={index.toString()}
-                    onClick={() => this.handleItemClick(item)}
+                    onClick={
+                        !isSelected
+                            ? () => this.handleItemClick(item)
+                            : undefined
+                    }
                     className={
                         styles[selectedClass] + " " + styles["resource-label"]
                     }
