@@ -41,7 +41,7 @@ export type Constraints = {
 };
 
 const VIDEO_CONSTRAINT = {
-    frameRate: { max: "20" },
+    frameRate: "15",
     height: "483",
     width: "858"
 };
