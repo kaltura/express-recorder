@@ -38,14 +38,13 @@ export class ProgressBar extends Component<Props, State> {
                 className={`progress ${styles["progress"]}`}
                 style={"margin-top: 0;"}
             >
+                <div className={`upload-status ${styles["upload-status"]}`}>
+                    {loadedStr} / {totalStr}{" "}
+                </div>
                 <div
                     className={`bar ${styles["bar"]}`}
                     style={`width: ${percentage}%;`}
-                >
-                    <div className={`upload-status ${styles["upload-status"]}`}>
-                        {loadedStr} / {totalStr}{" "}
-                    </div>
-                </div>
+                />
             </div>
         );
     }
