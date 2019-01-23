@@ -257,6 +257,10 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     createStream = (constraints: Constraints) => {
+        if (!constraints.video && !constraints.audio) {
+            this.setState({error: "Video and audio are disabled, at least one of them must be enabled."});
+            return;
+        }
         navigator.mediaDevices
             .getUserMedia(constraints)
             .then((stream: MediaStream) => {
