@@ -213,8 +213,8 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     getDefaultEntryName() {
-        const { allowVideo } = this.props;
-        if (allowVideo) {
+        const { constraints } = this.state;
+        if (constraints.video) {
             return "Video Recording - " + new Date();
         } else {
             return "Audio Recording - " + new Date();
@@ -275,7 +275,10 @@ export class ExpressRecorder extends Component<Props, State> {
 
     createStream = (constraints: Constraints) => {
         if (!constraints.video && !constraints.audio) {
-            this.setState({error: "Video and audio are disabled, at least one of them must be enabled."});
+            this.setState({
+                error:
+                    "Video and audio are disabled, at least one of them must be enabled."
+            });
             return;
         }
         navigator.mediaDevices
@@ -292,7 +295,6 @@ export class ExpressRecorder extends Component<Props, State> {
         const {
             partnerId,
             uiConfId,
-            allowVideo,
             entryName,
             ks,
             serviceUrl,
@@ -433,7 +435,7 @@ export class ExpressRecorder extends Component<Props, State> {
                                 client={this.kClient}
                                 onError={this.handleError}
                                 mediaType={
-                                    allowVideo
+                                    constraints.video
                                         ? KalturaMediaType.video
                                         : KalturaMediaType.audio
                                 }
