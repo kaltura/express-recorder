@@ -1,9 +1,10 @@
-.wheel {
-    display: inline-block;
-    vertical-align: text-top;
-    height: 16px;
-    width: 16px;
-    float: right;
+.settings-icon-wrap {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 3px;
+    svg {
+        vertical-align: middle;
+    }
 }
 .settings {
     position: absolute;
@@ -37,7 +38,7 @@
 .settings-box {
     text-align: left;
     background: rgba(0, 0, 0, 0.5);
-    margin-top: 19px;
+    margin-top: 4px;
     padding: 4px 20px;
     font-size: 16px;
     line-height: 35px;
