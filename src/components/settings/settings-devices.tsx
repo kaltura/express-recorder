@@ -4,8 +4,8 @@ const styles = require("./style.scss");
 
 type Props = {
     resourceName: string;
-    devices: object[];
-    onChooseDevice: (device: object) => void;
+    devices: object[]; // MediaDeviceInfo[]
+    onChooseDevice: (device: object) => void; // device: MediaDeviceInfo
     isOn: boolean;
     selected: any;
     onClose: () => void;
@@ -18,7 +18,7 @@ type State = {
 };
 
 /**
- * Component to display devices for on resource (camera / audio)
+ * Component to display devices for one resource (camera / audio)
  */
 export class SettingsDevices extends Component<Props, State> {
     constructor(props: Props) {

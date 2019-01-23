@@ -48,7 +48,6 @@
     "typescript": "^3.2.1"
   },
   "dependencies": {
-    "detectrtc": "^1.3.8",
     "kaltura-typescript-client": "file:libs/kaltura-typescript-client-6.4.2-v20181223-153243.tgz",
     "preact": "^8.2.5",
     "preact-habitat": "^3.2.2",

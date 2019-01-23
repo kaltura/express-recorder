@@ -8,7 +8,6 @@ import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
 import { Settings } from "../settings/settings";
-const DetectRTC = require("../../../node_modules/detectrtc");
 const styles = require("./style.scss");
 
 type Props = {
@@ -41,7 +40,7 @@ export type Constraints = {
     audio: any | boolean;
 };
 
-const VIDEO_CONSTRANT = {
+const VIDEO_CONSTRAINT = {
     frameRate: { max: "20" },
     height: "483",
     width: "858"
@@ -75,7 +74,7 @@ export class ExpressRecorder extends Component<Props, State> {
                 video:
                     props.allowVideo !== false
                         ? {
-                            ...VIDEO_CONSTRANT
+                              ...VIDEO_CONSTRAINT
                           }
                         : false,
                 audio: props.allowAudio !== false
@@ -163,11 +162,29 @@ export class ExpressRecorder extends Component<Props, State> {
     isBrowserCompatible = () => {
         const notSupportedError =
             "<b>Browser is not webRTC supported</b><br /><a href='https://webrtc.org/'>Click Here</a> to learn about supported browsers";
-        if (!DetectRTC.isWebRTCSupported) {
+
+        let isWebRTCSupported = false;
+        [
+            "RTCPeerConnection",
+            "webkitRTCPeerConnection",
+            "mozRTCPeerConnection",
+            "RTCIceGatherer"
+        ].forEach(function(item) {
+            if (isWebRTCSupported) {
+                return;
+            }
+
+            if (item in window) {
+                isWebRTCSupported = true;
+            }
+        });
+
+        if (!isWebRTCSupported) {
             this.setState({ error: notSupportedError });
             return false;
         }
 
+        // MediaRecorder does not supported by Edge
         try {
             const temp = MediaRecorder.isTypeSupported({
                 mimeType: "video/webm"
@@ -229,13 +246,13 @@ export class ExpressRecorder extends Component<Props, State> {
         // check if something has been changed
         const { constraints } = this.state;
         if (
-            ((selectedCamera && constraints.video) ||
+            ((selectedCamera && constraints.video) || // check if video was turn on/off
                 (!selectedCamera && !constraints.video)) &&
-            ((selectedAudio && constraints.audio) ||
+            ((selectedAudio && constraints.audio) || // check if audio was turn on/off
                 (!selectedAudio && !constraints.audio)) &&
-            (!selectedCamera ||
+            (!selectedCamera || // check if have different device IDs
                 selectedCamera.deviceId === constraints.video.deviceId) &&
-            (!selectedAudio ||
+            (!selectedAudio || // check if have different device IDs
                 selectedAudio.deviceId === constraints.audio.deviceId)
         ) {
             return;
@@ -245,7 +262,7 @@ export class ExpressRecorder extends Component<Props, State> {
         if (selectedCamera) {
             newConstraints.video = {
                 deviceId: selectedCamera.deviceId,
-                ...VIDEO_CONSTRANT
+                ...VIDEO_CONSTRAINT
             };
         }
         if (selectedAudio) {

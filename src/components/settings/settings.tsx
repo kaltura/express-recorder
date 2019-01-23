@@ -104,39 +104,45 @@ export class Settings extends Component<Props, State> {
 
     handleChooseDevice = (device: any) => {
         if (device.kind === "videoinput") {
-            this.setState({ selectedCamera: device });
+            this.setState({ selectedCamera: device }, () => {
+                this.saveSettings();
+            });
         } else {
-            this.setState({ selectedAudio: device });
+            this.setState({ selectedAudio: device }, () => {
+                this.saveSettings();
+            });
         }
     };
 
     handleClose = () => {
-        this.setState(
-            {
-                isOpen: false,
-                showAudioSettings: false,
-                showCameraSettings: false
-            },
-            () => {
-                if (this.props.onSettingsChanged) {
-                    const camera = this.state.cameraOn
-                        ? this.state.selectedCamera
-                        : false;
-                    const audio = this.state.audioOn
-                        ? this.state.selectedAudio
-                        : false;
-                    this.props.onSettingsChanged(camera, audio);
-                }
-            }
-        );
+        this.setState({
+            isOpen: false,
+            showAudioSettings: false,
+            showCameraSettings: false
+        });
     };
 
     handleToggleChange = (isOn: boolean, type: ResourceTypes) => {
         const { cameraOn, audioOn } = this.state;
-        this.setState({
-            cameraOn: type === ResourceTypes.VIDEO ? isOn : cameraOn,
-            audioOn: type === ResourceTypes.AUDIO ? isOn : audioOn
-        });
+        this.setState(
+            {
+                cameraOn: type === ResourceTypes.VIDEO ? isOn : cameraOn,
+                audioOn: type === ResourceTypes.AUDIO ? isOn : audioOn
+            },
+            () => {
+                this.saveSettings();
+            }
+        );
+    };
+
+    saveSettings = () => {
+        if (this.props.onSettingsChanged) {
+            const camera = this.state.cameraOn
+                ? this.state.selectedCamera
+                : false;
+            const audio = this.state.audioOn ? this.state.selectedAudio : false;
+            this.props.onSettingsChanged(camera, audio);
+        }
     };
 
     handleBack = () => {
