@@ -1,4 +1,5 @@
 import { Component, h } from "preact";
+import StopIcon from './Stop.svg';
 const styles = require("./style.scss");
 
 type Props = {
@@ -69,7 +70,8 @@ export class RecordingTimer extends Component<Props, State> {
                     onClick={this.clickHandler}
                     tabIndex={0}
                 >
-                    <span className={styles["square"]} />
+
+                  <StopIcon/>
                     <span>{timeString}</span>
                 </button>
             </div>
