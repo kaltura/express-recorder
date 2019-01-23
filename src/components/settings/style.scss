@@ -33,6 +33,7 @@
     padding: 3px;
     transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
+    cursor: pointer;
 }
 .settings-box {
     text-align: left;
@@ -73,4 +74,5 @@
     transform: rotate(135deg);
     vertical-align: sub;
     margin-right: 13px;
+    cursor: pointer;
 }
