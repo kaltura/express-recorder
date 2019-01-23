@@ -1,5 +1,6 @@
 import { Component, h } from "preact";
 import { SettingsDevices } from "./settings-devices";
+import SettingsIcon from "./settings.svg";
 const styles = require("./style.scss");
 
 type Props = {
@@ -198,13 +199,13 @@ export class Settings extends Component<Props, State> {
 
         return (
             <div className={styles["settings"]}>
-                <button
-                    className={styles["wheel"]}
-                    onClick={this.toggleMenu}
-                    aria-haspopup="true"
-                    aria-expanded={isOpen}
-                />
-
+                <div className={styles["settings-icon-wrap"]}>
+                    <SettingsIcon
+                        onClick={this.toggleMenu}
+                        aria-haspopup="true"
+                        aria-expanded={isOpen}
+                    />
+                </div>
                 {isOpen && (
                     <div className={styles["settings-box"]}>
                         {!showCameraSettings && !showAudioSettings && (
