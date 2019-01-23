@@ -153,6 +153,9 @@ export class Recorder extends Component<Props, State> {
 
         return (
             <div>
+                {!video && (
+                    <div class={styles["no-video-text"]}>Recording Audio Only</div>
+                )}
                 <video
                     id="recorder"
                     className={`express-recorder__recorder ${
