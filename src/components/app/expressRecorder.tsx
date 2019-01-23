@@ -8,7 +8,6 @@ import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
 import { Settings } from "../settings/settings";
-const DetectRTC = require("../../../node_modules/detectrtc");
 const styles = require("./style.scss");
 
 type Props = {
@@ -75,7 +74,7 @@ export class ExpressRecorder extends Component<Props, State> {
                 video:
                     props.allowVideo !== false
                         ? {
-                            ...VIDEO_CONSTRAINT
+                              ...VIDEO_CONSTRAINT
                           }
                         : false,
                 audio: props.allowAudio !== false
@@ -163,11 +162,29 @@ export class ExpressRecorder extends Component<Props, State> {
     isBrowserCompatible = () => {
         const notSupportedError =
             "<b>Browser is not webRTC supported</b><br /><a href='https://webrtc.org/'>Click Here</a> to learn about supported browsers";
-        if (!DetectRTC.isWebRTCSupported) {
+
+        let isWebRTCSupported = false;
+        [
+            "RTCPeerConnection",
+            "webkitRTCPeerConnection",
+            "mozRTCPeerConnection",
+            "RTCIceGatherer"
+        ].forEach(function(item) {
+            if (isWebRTCSupported) {
+                return;
+            }
+
+            if (item in window) {
+                isWebRTCSupported = true;
+            }
+        });
+
+        if (!isWebRTCSupported) {
             this.setState({ error: notSupportedError });
             return false;
         }
 
+        // MediaRecorder does not supported by Edge
         try {
             const temp = MediaRecorder.isTypeSupported({
                 mimeType: "video/webm"
@@ -231,11 +248,11 @@ export class ExpressRecorder extends Component<Props, State> {
         if (
             ((selectedCamera && constraints.video) || // check if video was turn on/off
                 (!selectedCamera && !constraints.video)) &&
-            ((selectedAudio && constraints.audio) ||  // check if audio was turn on/off
+            ((selectedAudio && constraints.audio) || // check if audio was turn on/off
                 (!selectedAudio && !constraints.audio)) &&
-            (!selectedCamera ||  // check if have different device IDs
+            (!selectedCamera || // check if have different device IDs
                 selectedCamera.deviceId === constraints.video.deviceId) &&
-            (!selectedAudio ||  // check if have different device IDs
+            (!selectedAudio || // check if have different device IDs
                 selectedAudio.deviceId === constraints.audio.deviceId)
         ) {
             return;
