@@ -57,6 +57,19 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    &:hover {
+        .resource-label__popup {
+            visibility: visible;
+            white-space: normal;
+        }
+    }
+}
+.resource-label__popup {
+    visibility: hidden;
+    position: absolute;
+    background-color: white;
+    color: rgba(0, 0, 0, 0.5);
+    margin-left: 100px;
 }
 .selected-device {
     display: list-item;

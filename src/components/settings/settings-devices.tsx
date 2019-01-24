@@ -72,6 +72,7 @@ export class SettingsDevices extends Component<Props, State> {
                     }
                 >
                     <span>{item.label}</span>
+                    <div className={styles["resource-label__popup"]}>{item.label}</div>
                 </div>
             );
         });
