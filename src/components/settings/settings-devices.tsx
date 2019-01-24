@@ -81,7 +81,6 @@ export class SettingsDevices extends Component<Props, State> {
         return (
             <div>
                 <a
-                    role="button"
                     aria-label="Back to Settings"
                     onClick={this.handleClose}
                 >

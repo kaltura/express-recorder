@@ -222,7 +222,6 @@ export class Settings extends Component<Props, State> {
                                             : ""}
                                     </div>
                                     <a
-                                        role="button"
                                         aria-label="Camera Settings"
                                         onClick={() => {
                                             this.getResourceSettings(
@@ -247,7 +246,6 @@ export class Settings extends Component<Props, State> {
                                             : ""}
                                     </div>
                                     <a
-                                        role="button"
                                         aria-label="Audio Settings"
                                         onClick={() => {
                                             this.getResourceSettings(
