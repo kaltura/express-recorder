@@ -68,19 +68,24 @@ export class SettingsDevices extends Component<Props, State> {
                             : undefined
                     }
                     className={
-                        styles[selectedClass] + " " + styles["resource-label"]
+                        styles[selectedClass] + " " + styles["device-label"]
                     }
                 >
                     <span>{item.label}</span>
+                    <div className={styles["device-label__popup"]}>
+                        {item.label}
+                    </div>
                 </div>
             );
         });
         return (
             <div>
-                <div
-                    className={styles["arrow-left"]}
+                <a
+                    aria-label="Back to Settings"
                     onClick={this.handleClose}
-                />
+                >
+                    <i className={styles["arrow-left"]} />
+                </a>
                 <ToggleButton
                     id={resourceName}
                     text={resourceName}
