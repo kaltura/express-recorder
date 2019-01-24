@@ -67,9 +67,24 @@
 .resource-label__popup {
     visibility: hidden;
     position: absolute;
-    background-color: white;
-    color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    background-color: #eaeaea;
+    color: #000;
     margin-left: 100px;
+    padding-left: 10px;
+
+    &:before {
+        content: "";
+        display: block;
+        width: 0;
+        height: 0;
+        position: absolute;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 8px solid #eaeaea;
+        left: 70px;
+        top: -8px;
+    }
 }
 .selected-device {
     display: list-item;
