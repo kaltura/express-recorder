@@ -20,13 +20,6 @@
 .resources-list {
     padding: 10px 0;
 }
-.resources-list div {
-    width: 280px;
-    vertical-align: bottom;
-    i {
-        margin-left: 30px;
-    }
-}
 .arrow-right {
     border: solid #ffffff;
     border-width: 0 2px 2px 0;
@@ -34,7 +27,6 @@
     padding: 3px;
     transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
-    cursor: pointer;
 }
 .settings-box {
     text-align: left;
@@ -53,18 +45,26 @@
     background-color: #ffffff;
     margin: 8px 0;
 }
-.resource-label {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.device-label {
     &:hover {
-        .resource-label__popup {
+        .device-label__popup {
             visibility: visible;
             white-space: normal;
         }
     }
 }
-.resource-label__popup {
+.resource-label, .device-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 280px;
+    vertical-align: bottom;
+}
+.resources-name {
+    width: 150px;
+    vertical-align: bottom;
+}
+.device-label__popup {
     visibility: hidden;
     position: absolute;
     background-color: white;
@@ -89,4 +89,11 @@
     vertical-align: sub;
     margin-right: 13px;
     cursor: pointer;
+}
+.arrow-wrap {
+    width: 20px;
+    cursor: pointer;
+    i {
+        margin-left: 13px;
+    }
 }

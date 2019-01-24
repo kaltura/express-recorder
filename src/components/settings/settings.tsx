@@ -215,7 +215,7 @@ export class Settings extends Component<Props, State> {
                                 aria-labelledby="dropdownMenu"
                             >
                                 <div className={styles["resources-item"]}>
-                                    <div>Camera</div>
+                                    <div className={styles["resources-name"]}>Camera</div>
                                     <div className={styles["resource-label"]}>
                                         {selectedCamera
                                             ? selectedCamera.label
@@ -230,11 +230,17 @@ export class Settings extends Component<Props, State> {
                                             );
                                         }}
                                     >
-                                        <i className={styles["arrow-right"]} />
+                                        <div className={styles["arrow-wrap"]}>
+                                            <i
+                                                className={
+                                                    styles["arrow-right"]
+                                                }
+                                            />
+                                        </div>
                                     </a>
                                 </div>
                                 <div className={styles["resources-item"]}>
-                                    <div>Audio</div>
+                                    <div className={styles["resources-name"]}>Audio</div>
                                     <div className={styles["resource-label"]}>
                                         {selectedAudio
                                             ? selectedAudio.label
@@ -249,7 +255,13 @@ export class Settings extends Component<Props, State> {
                                             );
                                         }}
                                     >
-                                        <i className={styles["arrow-right"]} />
+                                        <div className={styles["arrow-wrap"]}>
+                                            <i
+                                                className={
+                                                    styles["arrow-right"]
+                                                }
+                                            />
+                                        </div>
                                     </a>
                                 </div>
                             </div>
