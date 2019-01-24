@@ -30,8 +30,8 @@ export class ProgressBar extends Component<Props, State> {
 
     render() {
         const { loaded, total } = this.props;
-        const loadedStr = this.bytesToSize(loaded);
         const totalStr = this.bytesToSize(total);
+        const loadedStr = (loaded > total) ? totalStr : this.bytesToSize(loaded);
         const percentage = (loaded * 100) / total;
         return (
             <div
