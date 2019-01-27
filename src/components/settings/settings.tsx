@@ -206,13 +206,13 @@ export class Settings extends Component<Props, State> {
                         aria-haspopup="true"
                         aria-expanded={isOpen}
                         aria-label={"Settings"}
-                        aria-controls="settings-menu"
+                        aria-controls="recorder-settings-menu"
                     >
                         <SettingsIcon />
                     </a>
                 </div>
                 {isOpen && (
-                    <div id="settings-menu" className={styles["settings-box"]}>
+                    <div id="recorder-settings-menu" className={styles["settings-box"]}>
                         {!showCameraSettings && !showAudioSettings && (
                             <div
                                 className={styles["resources-list"]}
