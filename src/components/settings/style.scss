@@ -58,12 +58,19 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 280px;
     vertical-align: bottom;
 }
+.device-label {
+    width: 280px;
+}
+.resource-label {
+    width: 160px;
+    cursor: pointer;
+}
 .resources-name {
-    width: 150px;
+    width: 100px;
     vertical-align: bottom;
+    cursor: pointer;
 }
 .device-label__popup {
     visibility: hidden;
