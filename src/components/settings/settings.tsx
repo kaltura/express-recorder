@@ -200,15 +200,19 @@ export class Settings extends Component<Props, State> {
         return (
             <div className={styles["settings"]}>
                 <div className={styles["settings-icon-wrap"]}>
-                    <a role={"button"} onClick={this.toggleMenu}>
-                        <SettingsIcon
-                            aria-haspopup="true"
-                            aria-expanded={isOpen}
-                        />
+                    <a
+                        role={"button"}
+                        onClick={this.toggleMenu}
+                        aria-haspopup="true"
+                        aria-expanded={isOpen}
+                        aria-label={"Settings"}
+                        aria-controls="settings-menu"
+                    >
+                        <SettingsIcon />
                     </a>
                 </div>
                 {isOpen && (
-                    <div className={styles["settings-box"]}>
+                    <div id="settings-menu" className={styles["settings-box"]}>
                         {!showCameraSettings && !showAudioSettings && (
                             <div
                                 className={styles["resources-list"]}
