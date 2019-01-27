@@ -200,11 +200,12 @@ export class Settings extends Component<Props, State> {
         return (
             <div className={styles["settings"]}>
                 <div className={styles["settings-icon-wrap"]}>
-                    <SettingsIcon
-                        onClick={this.toggleMenu}
-                        aria-haspopup="true"
-                        aria-expanded={isOpen}
-                    />
+                    <a role={"button"} onClick={this.toggleMenu}>
+                        <SettingsIcon
+                            aria-haspopup="true"
+                            aria-expanded={isOpen}
+                        />
+                    </a>
                 </div>
                 {isOpen && (
                     <div className={styles["settings-box"]}>
@@ -214,21 +215,27 @@ export class Settings extends Component<Props, State> {
                                 role="menu"
                                 aria-labelledby="dropdownMenu"
                             >
-                                <div className={styles["resources-item"]}>
-                                    <div className={styles["resources-name"]}>Camera</div>
-                                    <div className={styles["resource-label"]}>
-                                        {selectedCamera
-                                            ? selectedCamera.label
-                                            : ""}
-                                    </div>
-                                    <a
-                                        aria-label="Camera Settings"
-                                        onClick={() => {
-                                            this.getResourceSettings(
-                                                ResourceTypes.VIDEO
-                                            );
-                                        }}
-                                    >
+                                <a
+                                    aria-label="Camera Settings"
+                                    onClick={() => {
+                                        this.getResourceSettings(
+                                            ResourceTypes.VIDEO
+                                        );
+                                    }}
+                                >
+                                    <div className={styles["resources-item"]}>
+                                        <div
+                                            className={styles["resources-name"]}
+                                        >
+                                            Camera
+                                        </div>
+                                        <div
+                                            className={styles["resource-label"]}
+                                        >
+                                            {selectedCamera
+                                                ? selectedCamera.label
+                                                : ""}
+                                        </div>
                                         <div className={styles["arrow-wrap"]}>
                                             <i
                                                 className={
@@ -236,23 +243,30 @@ export class Settings extends Component<Props, State> {
                                                 }
                                             />
                                         </div>
-                                    </a>
-                                </div>
-                                <div className={styles["resources-item"]}>
-                                    <div className={styles["resources-name"]}>Audio</div>
-                                    <div className={styles["resource-label"]}>
-                                        {selectedAudio
-                                            ? selectedAudio.label
-                                            : ""}
                                     </div>
-                                    <a
-                                        aria-label="Audio Settings"
-                                        onClick={() => {
-                                            this.getResourceSettings(
-                                                ResourceTypes.AUDIO
-                                            );
-                                        }}
-                                    >
+                                </a>
+                                <a
+                                    aria-label="Audio Settings"
+                                    onClick={() => {
+                                        this.getResourceSettings(
+                                            ResourceTypes.AUDIO
+                                        );
+                                    }}
+                                >
+                                    <div className={styles["resources-item"]}>
+                                        <div
+                                            className={styles["resources-name"]}
+                                        >
+                                            Audio
+                                        </div>
+                                        <div
+                                            className={styles["resource-label"]}
+                                        >
+                                            {selectedAudio
+                                                ? selectedAudio.label
+                                                : ""}
+                                        </div>
+
                                         <div className={styles["arrow-wrap"]}>
                                             <i
                                                 className={
@@ -260,8 +274,8 @@ export class Settings extends Component<Props, State> {
                                                 }
                                             />
                                         </div>
-                                    </a>
-                                </div>
+                                    </div>
+                                </a>
                             </div>
                         )}
                         {devicesSettings}
