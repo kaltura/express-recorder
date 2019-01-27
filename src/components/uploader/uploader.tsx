@@ -105,7 +105,7 @@ export class Uploader extends Component<Props, State> {
         const entry = new KalturaMediaEntry();
         entry.name = entryName;
         entry.mediaType = mediaType;
-        //entry.adminTags = "expressrecorder";
+        entry.adminTags = "expressrecorder";
 
         // 1.Add entry
         requests.requests.push(
