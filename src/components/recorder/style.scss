@@ -7,17 +7,17 @@
     height: 483px;
     width: 858px;
     border-radius: 4px;
-    background-color: #555555;
-    background: radial-gradient(
-        circle,
-        rgba(255, 255, 255, 0.5) 0%,
-        rgba(67, 67, 67, 0.3) 100%
-    );
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#777777+0,828c95+0,434343+100 */
+    background: rgb(119,119,119); /* Old browsers */
+    background: -moz-radial-gradient(center, ellipse cover, rgba(119,119,119,1) 0%, rgba(130,140,149,1) 0%, rgba(67,67,67,1) 100%); /* FF3.6-15 */
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(119,119,119,1) 0%,rgba(130,140,149,1) 0%,rgba(67,67,67,1) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: radial-gradient(ellipse at center, rgba(119,119,119,1) 0%,rgba(130,140,149,1) 0%,rgba(67,67,67,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#777777', endColorstr='#434343',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
 .no-video-text {
     position: absolute;
     margin-top: 235px;
     margin-left: 350px;
-    color: #c7c7c7;
+    color: white;
 }
