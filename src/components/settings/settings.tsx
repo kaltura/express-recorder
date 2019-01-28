@@ -67,9 +67,10 @@ export class Settings extends Component<Props, State> {
         }
 
         if (
-            (this.cameraDevicesInfo &&
-                this.cameraDevicesInfo[0].label === "") ||
-            (this.audioDevicesInfo && this.audioDevicesInfo[0].label === "")
+            this.cameraDevicesInfo.length === 0 ||
+            this.cameraDevicesInfo[0].label === "" ||
+            this.audioDevicesInfo.length === 0 ||
+            this.audioDevicesInfo[0].label === ""
         ) {
             this.getDevices();
         }
