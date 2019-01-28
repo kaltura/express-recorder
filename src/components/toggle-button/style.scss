@@ -7,7 +7,10 @@
     display: inline;
     .toggle-button__label {
         display: inline;
+        vertical-align: middle;
         vertical-align: -webkit-baseline-middle;
+        vertical-align: -moz-middle-with-baseline;
+
     }
     .toggle-button__checkbox {
         top: auto;
