@@ -228,6 +228,7 @@ export class Settings extends Component<Props, State> {
                             >
                                 <a
                                     aria-label="Camera Settings"
+                                    className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(
                                             ResourceTypes.VIDEO
@@ -258,6 +259,7 @@ export class Settings extends Component<Props, State> {
                                 </a>
                                 <a
                                     aria-label="Audio Settings"
+                                    className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(
                                             ResourceTypes.AUDIO
