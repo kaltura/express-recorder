@@ -36,6 +36,12 @@ export class SettingsDevices extends Component<Props, State> {
         });
     };
 
+    handleItemPress = (e: KeyboardEvent, item: any) => {
+        if (e.key === "Enter") {
+            this.handleItemClick(item);
+        }
+    };
+
     handleToggleClick = (isOn: boolean) => {
         this.setState({ isOn: isOn }, () => {
             if (this.props.onToggleChange) {
@@ -46,6 +52,12 @@ export class SettingsDevices extends Component<Props, State> {
 
     handleClose = () => {
         this.props.onClose();
+    };
+
+    handleSettingsIconKeyPressed = (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+            this.handleClose();
+        }
     };
 
     render() {
@@ -67,9 +79,11 @@ export class SettingsDevices extends Component<Props, State> {
                             ? () => this.handleItemClick(item)
                             : undefined
                     }
+                    onKeyPress={e => this.handleItemPress(e, item)}
                     className={
                         styles[selectedClass] + " " + styles["device-label"]
                     }
+                    tabIndex={0}
                 >
                     <span>{item.label}</span>
                     <div className={styles["device-label__popup"]}>
@@ -83,6 +97,8 @@ export class SettingsDevices extends Component<Props, State> {
                 <a
                     aria-label="Back to Settings"
                     onClick={this.handleClose}
+                    onKeyPress={this.handleSettingsIconKeyPressed}
+                    tabIndex={0}
                 >
                     <i className={styles["arrow-left"]} />
                 </a>

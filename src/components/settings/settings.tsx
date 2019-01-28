@@ -100,6 +100,12 @@ export class Settings extends Component<Props, State> {
         });
     };
 
+    handleMenuIconKeyPressed = (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+            this.toggleMenu();
+        }
+    };
+
     getResourceSettings = (type: ResourceTypes) => {
         if (type === ResourceTypes.VIDEO) {
             this.setState({
@@ -164,6 +170,12 @@ export class Settings extends Component<Props, State> {
         });
     };
 
+    handleShowDeviceSettings = (e: KeyboardEvent, type: ResourceTypes) => {
+        if (e.key === "Enter") {
+            this.getResourceSettings(type);
+        }
+    };
+
     render() {
         const {
             isOpen,
@@ -215,10 +227,12 @@ export class Settings extends Component<Props, State> {
                     <a
                         role={"button"}
                         onClick={this.toggleMenu}
+                        onKeyPress={this.handleMenuIconKeyPressed}
                         aria-haspopup="true"
                         aria-expanded={isOpen}
                         aria-label={"Settings"}
                         aria-controls="recorder-settings-menu"
+                        tabIndex={0}
                     >
                         <SettingsIcon />
                     </a>
@@ -242,6 +256,13 @@ export class Settings extends Component<Props, State> {
                                             ResourceTypes.VIDEO
                                         );
                                     }}
+                                    onKeyPress={e => {
+                                        this.handleShowDeviceSettings(
+                                            e,
+                                            ResourceTypes.VIDEO
+                                        );
+                                    }}
+                                    tabIndex={0}
                                 >
                                     <div className={styles["resources-item"]}>
                                         <div
@@ -273,6 +294,13 @@ export class Settings extends Component<Props, State> {
                                             ResourceTypes.AUDIO
                                         );
                                     }}
+                                    onKeyPress={e => {
+                                        this.handleShowDeviceSettings(
+                                            e,
+                                            ResourceTypes.AUDIO
+                                        );
+                                    }}
+                                    tabIndex={0}
                                 >
                                     <div className={styles["resources-item"]}>
                                         <div
