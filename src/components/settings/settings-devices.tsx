@@ -67,7 +67,7 @@ export class SettingsDevices extends Component<Props, State> {
         const resourcesList = devices.map((item: any, index: number) => {
             let selectedClass = "not-selected-device";
             let isSelected = false;
-            if (selectedDevice && item.label === selectedDevice.label) {
+            if (isOn && selectedDevice && item.label === selectedDevice.label) {
                 selectedClass = "selected-device";
                 isSelected = true;
             }
@@ -75,13 +75,17 @@ export class SettingsDevices extends Component<Props, State> {
                 <div
                     key={index.toString()}
                     onClick={
-                        !isSelected
+                        isOn && !isSelected
                             ? () => this.handleItemClick(item)
                             : undefined
                     }
                     onKeyPress={e => this.handleItemPress(e, item)}
                     className={
-                        styles[selectedClass] + " " + styles["device-label"]
+                        styles[selectedClass] +
+                        " " +
+                        styles["device-label"] +
+                        " " +
+                        (!isOn ? styles["device-disabled"] : "")
                     }
                     tabIndex={0}
                 >
