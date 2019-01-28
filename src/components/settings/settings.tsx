@@ -30,8 +30,8 @@ export enum ResourceTypes {
  * Component to handle settings menu for resources and devices
  */
 export class Settings extends Component<Props, State> {
-    cameraDevicesInfo: object[];
-    audioDevicesInfo: object[];
+    cameraDevicesInfo: any[];
+    audioDevicesInfo: any[];
 
     constructor(props: Props) {
         super(props);
@@ -51,19 +51,7 @@ export class Settings extends Component<Props, State> {
     }
 
     componentDidMount() {
-        // get available devices
-        if (navigator.mediaDevices) {
-            navigator.mediaDevices
-                .enumerateDevices()
-                .then((devices: object[]) => {
-                    this.cameraDevicesInfo = devices.filter(
-                        (item: any) => item.kind === "videoinput"
-                    );
-                    this.audioDevicesInfo = devices.filter(
-                        (item: any) => item.kind === "audioinput"
-                    );
-                });
-        }
+        this.getDevices();
     }
 
     componentDidUpdate() {
@@ -77,8 +65,32 @@ export class Settings extends Component<Props, State> {
                 selectedAudio: this.props.selectedAudio
             });
         }
+
+        if (
+            this.cameraDevicesInfo.length === 0 ||
+            this.cameraDevicesInfo[0].label === "" ||
+            this.audioDevicesInfo.length === 0 ||
+            this.audioDevicesInfo[0].label === ""
+        ) {
+            this.getDevices();
+        }
     }
 
+    getDevices = () => {
+        // get available devices
+        if (navigator.mediaDevices) {
+            navigator.mediaDevices
+                .enumerateDevices()
+                .then((devices: object[]) => {
+                    this.cameraDevicesInfo = devices.filter(
+                        (item: any) => item.kind === "videoinput"
+                    );
+                    this.audioDevicesInfo = devices.filter(
+                        (item: any) => item.kind === "audioinput"
+                    );
+                });
+        }
+    };
     toggleMenu = () => {
         const { isOpen } = this.state;
         this.setState({ isOpen: !isOpen }, () => {
@@ -212,7 +224,10 @@ export class Settings extends Component<Props, State> {
                     </a>
                 </div>
                 {isOpen && (
-                    <div id="recorder-settings-menu" className={styles["settings-box"]}>
+                    <div
+                        id="recorder-settings-menu"
+                        className={styles["settings-box"]}
+                    >
                         {!showCameraSettings && !showAudioSettings && (
                             <div
                                 className={styles["resources-list"]}
@@ -221,6 +236,7 @@ export class Settings extends Component<Props, State> {
                             >
                                 <a
                                     aria-label="Camera Settings"
+                                    className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(
                                             ResourceTypes.VIDEO
@@ -251,6 +267,7 @@ export class Settings extends Component<Props, State> {
                                 </a>
                                 <a
                                     aria-label="Audio Settings"
+                                    className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(
                                             ResourceTypes.AUDIO
