@@ -30,8 +30,8 @@ export enum ResourceTypes {
  * Component to handle settings menu for resources and devices
  */
 export class Settings extends Component<Props, State> {
-    cameraDevicesInfo: object[];
-    audioDevicesInfo: object[];
+    cameraDevicesInfo: any[];
+    audioDevicesInfo: any[];
 
     constructor(props: Props) {
         super(props);
@@ -51,19 +51,7 @@ export class Settings extends Component<Props, State> {
     }
 
     componentDidMount() {
-        // get available devices
-        if (navigator.mediaDevices) {
-            navigator.mediaDevices
-                .enumerateDevices()
-                .then((devices: object[]) => {
-                    this.cameraDevicesInfo = devices.filter(
-                        (item: any) => item.kind === "videoinput"
-                    );
-                    this.audioDevicesInfo = devices.filter(
-                        (item: any) => item.kind === "audioinput"
-                    );
-                });
-        }
+        this.getDevices();
     }
 
     componentDidUpdate() {
@@ -77,8 +65,27 @@ export class Settings extends Component<Props, State> {
                 selectedAudio: this.props.selectedAudio
             });
         }
+
+        if (this.cameraDevicesInfo && this.cameraDevicesInfo[0].label === "") {
+            this.getDevices();
+        }
     }
 
+    getDevices = () => {
+        // get available devices
+        if (navigator.mediaDevices) {
+            navigator.mediaDevices
+                .enumerateDevices()
+                .then((devices: object[]) => {
+                    this.cameraDevicesInfo = devices.filter(
+                        (item: any) => item.kind === "videoinput"
+                    );
+                    this.audioDevicesInfo = devices.filter(
+                        (item: any) => item.kind === "audioinput"
+                    );
+                });
+        }
+    };
     toggleMenu = () => {
         const { isOpen } = this.state;
         this.setState({ isOpen: !isOpen }, () => {
