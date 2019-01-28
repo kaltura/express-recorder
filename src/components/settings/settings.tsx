@@ -66,7 +66,11 @@ export class Settings extends Component<Props, State> {
             });
         }
 
-        if (this.cameraDevicesInfo && this.cameraDevicesInfo[0].label === "") {
+        if (
+            (this.cameraDevicesInfo &&
+                this.cameraDevicesInfo[0].label === "") ||
+            (this.audioDevicesInfo && this.audioDevicesInfo[0].label === "")
+        ) {
             this.getDevices();
         }
     }
@@ -219,7 +223,10 @@ export class Settings extends Component<Props, State> {
                     </a>
                 </div>
                 {isOpen && (
-                    <div id="recorder-settings-menu" className={styles["settings-box"]}>
+                    <div
+                        id="recorder-settings-menu"
+                        className={styles["settings-box"]}
+                    >
                         {!showCameraSettings && !showAudioSettings && (
                             <div
                                 className={styles["resources-list"]}
