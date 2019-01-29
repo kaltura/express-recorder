@@ -127,6 +127,10 @@ export class ExpressRecorder extends Component<Props, State> {
         tag.type = "text/javascript";
         document.body.appendChild(tag);
 
+        window.addEventListener("mediaUploadEnded", (e: Event) =>
+            this.handleBeforeunload(false)
+        );
+
         this.createStream(this.state.constraints);
     }
 
@@ -222,6 +226,7 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     handleStartClick = () => {
+        this.handleBeforeunload(true);
         this.setState({ doCountdown: true });
     };
     handleStopClick = () => {
@@ -289,6 +294,12 @@ export class ExpressRecorder extends Component<Props, State> {
             .catch(e =>
                 this.handleError("Failed to allocate resource: " + e.message)
             );
+    };
+
+    handleBeforeunload = (addMessage: boolean = false) => {
+        window.onbeforeunload = (e: Event) => {
+            return addMessage ? "" : null;
+        };
     };
 
     render() {
