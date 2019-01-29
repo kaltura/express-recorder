@@ -369,7 +369,7 @@ export class ExpressRecorder extends Component<Props, State> {
                 >
                     {!doRecording &&
                         !doCountdown &&
-                        recordedBlobs.length === 0 && (
+                        !doPlayback && (
                             <button
                                 className={`controls__start ${
                                     styles["controls__start"]
