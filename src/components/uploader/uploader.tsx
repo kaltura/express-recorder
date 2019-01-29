@@ -246,7 +246,6 @@ export class Uploader extends Component<Props, State> {
         this.deleteEntry();
         const event = new CustomEvent("mediaUploadCanceled");
         window.dispatchEvent(event);
-
     };
 
     deleteEntry = () => {
@@ -277,7 +276,11 @@ export class Uploader extends Component<Props, State> {
                     <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
                 </span>
                 <button
-                    className={`btn btn-cancel ${styles["btn"]} ${abort ? styles["cancel-btn--disabled"] : ""}`}
+                    className={`btn btn-cancel ${styles["btn"]} ${
+                        abort || loaded >= this.totalSize
+                            ? styles["cancel-btn--disabled"]
+                            : ""
+                    }`}
                     onClick={this.handleCancel}
                     disabled={abort}
                 >
