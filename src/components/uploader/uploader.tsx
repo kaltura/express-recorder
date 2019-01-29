@@ -270,6 +270,7 @@ export class Uploader extends Component<Props, State> {
 
     render() {
         const { loaded, abort } = this.state;
+        const disableCancel = abort || loaded >= this.totalSize;
         return (
             <div>
                 <span className={`progress-bar ${styles["progress-bar"]}`}>
@@ -277,12 +278,10 @@ export class Uploader extends Component<Props, State> {
                 </span>
                 <button
                     className={`btn btn-cancel ${styles["btn"]} ${
-                        abort || loaded >= this.totalSize
-                            ? styles["cancel-btn--disabled"]
-                            : ""
+                        disableCancel ? styles["cancel-btn--disabled"] : ""
                     }`}
-                    onClick={this.handleCancel}
-                    disabled={abort}
+                    onClick={disableCancel ? undefined : this.handleCancel}
+                    disabled={disableCancel}
                 >
                     Cancel
                 </button>
