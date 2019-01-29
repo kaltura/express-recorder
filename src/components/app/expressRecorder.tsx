@@ -378,19 +378,17 @@ export class ExpressRecorder extends Component<Props, State> {
                         styles["express-recorder__controls"]
                     }`}
                 >
-                    {!doRecording &&
-                        !doCountdown &&
-                        !doPlayback && (
-                            <button
-                                className={`controls__start ${
-                                    styles["controls__start"]
-                                }`}
-                                id="startRecord"
-                                onClick={this.handleStartClick}
-                                aria-label={"Start Recording"}
-                                tabIndex={0}
-                            />
-                        )}
+                    {!doRecording && !doCountdown && !doPlayback && (
+                        <button
+                            className={`controls__start ${
+                                styles["controls__start"]
+                            }`}
+                            id="startRecord"
+                            onClick={this.handleStartClick}
+                            aria-label={"Start Recording"}
+                            tabIndex={0}
+                        />
+                    )}
                     {doRecording && (
                         <RecordingTimer
                             onButtonClick={this.handleStopClick}
