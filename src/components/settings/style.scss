@@ -54,14 +54,17 @@
         }
     }
 }
-.resource-label, .device-label {
+.resource-label,
+.device-label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: bottom;
 }
 .device-label {
-    width: 280px;
+    width: 260px;
+    padding-left: 21px;
+    cursor: pointer;
 }
 .resource-label {
     width: 160px;
@@ -94,14 +97,16 @@
         top: -8px;
     }
 }
-.selected-device {
-    display: list-item;
-    list-style-type: disc;
-    list-style-position: inside;
-}
-.not-selected-device {
-    padding-left: 21px;
-    cursor: pointer;
+.selected-device:before {
+    content: "";
+    height: 6px;
+    width: 6px;
+    background-color: white;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: -17px;
+    margin-right: 11px;
 }
 .arrow-left {
     border: solid #ffffff;
@@ -129,4 +134,10 @@
 }
 .device-disabled {
     color: gray;
+}
+.settings-arrow-wrap {
+    cursor: pointer;
+    padding-left: 8px;
+    padding-bottom: 12px;
+    margin-left: -8px;
 }

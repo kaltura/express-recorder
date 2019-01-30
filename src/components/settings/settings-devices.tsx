@@ -54,7 +54,7 @@ export class SettingsDevices extends Component<Props, State> {
         this.props.onClose();
     };
 
-    handleSettingsIconKeyPressed = (e: KeyboardEvent) => {
+    handleBackIconKeyPressed = (e: KeyboardEvent) => {
         if (e.key === "Enter") {
             this.handleClose();
         }
@@ -65,10 +65,10 @@ export class SettingsDevices extends Component<Props, State> {
         const { isOn, selectedDevice } = this.state;
 
         const resourcesList = devices.map((item: any, index: number) => {
-            let selectedClass = "not-selected-device";
+            let selectedClass = "";
             let isSelected = false;
             if (isOn && selectedDevice && item.label === selectedDevice.label) {
-                selectedClass = "selected-device";
+                selectedClass = styles["selected-device"];
                 isSelected = true;
             }
             return (
@@ -81,7 +81,7 @@ export class SettingsDevices extends Component<Props, State> {
                     }
                     onKeyPress={e => this.handleItemPress(e, item)}
                     className={
-                        styles[selectedClass] +
+                        selectedClass +
                         " " +
                         styles["device-label"] +
                         " " +
@@ -101,7 +101,8 @@ export class SettingsDevices extends Component<Props, State> {
                 <a
                     aria-label="Back to Settings"
                     onClick={this.handleClose}
-                    onKeyPress={this.handleSettingsIconKeyPressed}
+                    onKeyPress={this.handleBackIconKeyPressed}
+                    className={styles["settings-arrow-wrap"]}
                     tabIndex={0}
                 >
                     <i className={styles["arrow-left"]} />
