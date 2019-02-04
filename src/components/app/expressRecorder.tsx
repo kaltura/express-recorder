@@ -177,7 +177,6 @@ export class ExpressRecorder extends Component<Props, State> {
             if (isWebRTCSupported) {
                 return;
             }
-
             if (item in window) {
                 isWebRTCSupported = true;
             }
@@ -255,9 +254,9 @@ export class ExpressRecorder extends Component<Props, State> {
                 (!selectedCamera && !constraints.video)) &&
             ((selectedAudio && constraints.audio) || // check if audio was turn on/off
                 (!selectedAudio && !constraints.audio)) &&
-            (!selectedCamera || // check if have different device IDs
+            (!selectedCamera || // check if device id has been changed
                 selectedCamera.deviceId === constraints.video.deviceId) &&
-            (!selectedAudio || // check if have different device IDs
+            (!selectedAudio || // check if device id has been changed
                 selectedAudio.deviceId === constraints.audio.deviceId)
         ) {
             return;
