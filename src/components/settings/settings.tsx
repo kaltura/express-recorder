@@ -222,7 +222,7 @@ export class Settings extends Component<Props, State> {
         }
 
         return (
-            <div className={styles["settings"]}>
+            <div className={`express-recorder__settings ${styles["settings"]}`}>
                 <div className={styles["settings-icon-wrap"]}>
                     <a
                         role={"button"}
@@ -240,7 +240,7 @@ export class Settings extends Component<Props, State> {
                 {isOpen && (
                     <div
                         id="recorder-settings-menu"
-                        className={styles["settings-box"]}
+                        className={`settings-box ${styles["settings-box"]}`}
                     >
                         {!showCameraSettings && !showAudioSettings && (
                             <div

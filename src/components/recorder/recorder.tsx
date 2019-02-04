@@ -154,7 +154,7 @@ export class Recorder extends Component<Props, State> {
         return (
             <div>
                 {!video && (
-                    <div class={styles["no-video-text"]}>Recording Audio Only</div>
+                    <div class={`no-video-text ${styles["no-video-text"]}`}>Recording Audio Only</div>
                 )}
                 <video
                     id="recorder"
