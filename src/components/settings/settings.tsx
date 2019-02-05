@@ -52,6 +52,13 @@ export class Settings extends Component<Props, State> {
 
     componentDidMount() {
         this.getDevices();
+
+        // close settings box when clicking on somewhere else in the widget
+        const elements = Array.from(document.querySelectorAll("#recorder, .controls__start")) as HTMLElement[];
+        elements.map((item) => {
+            item.onclick = this.handleClose;
+        })
+
     }
 
     componentDidUpdate() {
