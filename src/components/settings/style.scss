@@ -6,10 +6,10 @@
     svg {
         vertical-align: middle;
         &:hover {
-            transform: rotate(20deg);
+            transform: rotate(10deg);
             transition: transform 0.3s ease-in-out;
         }
-        transform: rotate(-20deg);
+        transform: rotate(-10deg);
         transition: transform 0.3s ease-in-out;
     }
 }
