@@ -8,6 +8,7 @@ import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
 import { Settings } from "../settings/settings";
+import { AudioIndicator } from "../audioIndicator/AudioIndicator";
 const styles = require("./style.scss");
 
 type Props = {
@@ -336,6 +337,7 @@ export class ExpressRecorder extends Component<Props, State> {
         }
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
+                {stream && (<AudioIndicator stream={stream}/>)}
                 <div className={styles["settings-wrap"]}>
                     {!doUpload && !doPlayback && !doRecording && (
                         <Settings
