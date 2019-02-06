@@ -32,6 +32,7 @@ export enum ResourceTypes {
 export class Settings extends Component<Props, State> {
     cameraDevicesInfo: any[];
     audioDevicesInfo: any[];
+    menuBoxRef: Element | undefined;
 
     constructor(props: Props) {
         super(props);
@@ -52,13 +53,6 @@ export class Settings extends Component<Props, State> {
 
     componentDidMount() {
         this.getDevices();
-
-        // close settings box when clicking on somewhere else in the widget
-        const elements = Array.from(document.querySelectorAll("#recorder, .controls__start")) as HTMLElement[];
-        elements.map((item) => {
-            item.onclick = this.handleClose;
-        })
-
     }
 
     componentDidUpdate() {
@@ -83,6 +77,23 @@ export class Settings extends Component<Props, State> {
         }
     }
 
+    // handle global window click event
+    handleExternalClick = (e: any) => {
+        let element = e.target;
+
+        if (!document.documentElement.contains(element)) {
+            this.toggleMenu();
+        }
+        do {
+            if (element === this.menuBoxRef) {
+                return;
+            }
+            element = element.parentElement || element.parentNode;
+        } while (element !== null && element.nodeType === 1);
+
+        this.toggleMenu();
+    };
+
     getDevices = () => {
         // get available devices
         if (navigator.mediaDevices) {
@@ -103,6 +114,18 @@ export class Settings extends Component<Props, State> {
         this.setState({ isOpen: !isOpen }, () => {
             if (isOpen) {
                 this.handleClose();
+                document.removeEventListener(
+                    "click",
+                    this.handleExternalClick,
+                    true
+                );
+            } else {
+                // handle drop down toggle click
+                document.addEventListener(
+                    "click",
+                    this.handleExternalClick,
+                    true
+                );
             }
         });
     };
@@ -229,7 +252,10 @@ export class Settings extends Component<Props, State> {
         }
 
         return (
-            <div className={`express-recorder__settings ${styles["settings"]}`}>
+            <div
+                className={`express-recorder__settings ${styles["settings"]}`}
+                ref={node => (this.menuBoxRef = node)}
+            >
                 <div className={styles["settings-icon-wrap"]}>
                     <a
                         role={"button"}
