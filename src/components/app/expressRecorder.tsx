@@ -301,6 +301,28 @@ export class ExpressRecorder extends Component<Props, State> {
         };
     };
 
+    handleDownload = () => {
+        const blob = new Blob(this.state.recordedBlobs, { type: "video/webm" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const entryName = this.props.entryName
+            ? this.props.entryName
+            : this.getDefaultEntryName();
+
+        // create hidden link with the file url and perform click to download the file.
+        a.style.display = "none";
+        a.href = url;
+        a.download = entryName + ".webm";
+        document.body.appendChild(a);
+        a.click();
+
+        // release the existing object URL - let the browser know not to keep the reference to the file any longer
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 100);
+    };
+
     render() {
         const {
             partnerId,
@@ -414,9 +436,18 @@ export class ExpressRecorder extends Component<Props, State> {
                                 }`}
                             >
                                 <button
+                                    className={`btn btn__download ${
+                                        styles["bottom__btn"]
+                                    } ${styles["btn__clear"]}`}
+                                    onClick={this.handleDownload}
+                                    tabIndex={0}
+                                >
+                                    Save a copy
+                                </button>
+                                <button
                                     className={`btn btn__reset ${
                                         styles["bottom__btn"]
-                                    } ${styles["btn__reset"]}`}
+                                    } ${styles["btn__clear"]}`}
                                     onClick={this.handleResetClick}
                                     tabIndex={0}
                                 >
