@@ -1,6 +1,7 @@
 import { Component, h } from "preact";
 import { SettingsDevices } from "./settings-devices";
 import SettingsIcon from "./settings.svg";
+import { AudioIndicator } from "../audioIndicator/AudioIndicator";
 const styles = require("./style.scss");
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
     selectedAudio?: any;
     allowVideo: boolean;
     allowAudio: boolean;
+    stream: MediaStream | undefined;
 };
 
 type State = {
@@ -177,6 +179,7 @@ export class Settings extends Component<Props, State> {
     };
 
     render() {
+        const { stream } = this.props;
         const {
             isOpen,
             showCameraSettings,
@@ -307,6 +310,19 @@ export class Settings extends Component<Props, State> {
                                             className={styles["resources-name"]}
                                         >
                                             Audio
+                                            {stream && (
+                                                <div
+                                                    class={
+                                                        styles[
+                                                            "settings-audio-indicator"
+                                                        ]
+                                                    }
+                                                >
+                                                    <AudioIndicator
+                                                        stream={stream}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                         <div
                                             className={styles["resource-label"]}
