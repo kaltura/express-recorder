@@ -304,8 +304,6 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     handleKeyboardControl = (e: any) => {
-        e.preventDefault();
-
         const {
             doCountdown,
             doRecording,
@@ -315,6 +313,7 @@ export class ExpressRecorder extends Component<Props, State> {
 
         console.log(e);
         if (e.altKey && e.shiftKey && e.key === "R") {
+            e.preventDefault();
             if (!doRecording && !doCountdown) {
                 if (!doPlayback) {
                     this.handleStartClick();
@@ -326,6 +325,7 @@ export class ExpressRecorder extends Component<Props, State> {
         }
 
         if (e.altKey && e.shiftKey && e.key === "S") {
+            e.preventDefault();
             if (doRecording) {
                 this.handleStopClick();
             }
@@ -333,6 +333,7 @@ export class ExpressRecorder extends Component<Props, State> {
         }
 
         if (e.altKey && e.shiftKey && e.key === "U") {
+            e.preventDefault();
             if (
                 !doRecording &&
                 recordedBlobs.length > 0 &&
