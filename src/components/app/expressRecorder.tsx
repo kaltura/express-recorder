@@ -309,11 +309,14 @@ export class ExpressRecorder extends Component<Props, State> {
             ? this.props.entryName
             : this.getDefaultEntryName();
 
+        // create hidden link with the file url and perform click to download the file.
         a.style.display = "none";
         a.href = url;
         a.download = entryName + ".webm";
         document.body.appendChild(a);
         a.click();
+
+        // release the existing object URL - let the browser know not to keep the reference to the file any longer
         setTimeout(() => {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
