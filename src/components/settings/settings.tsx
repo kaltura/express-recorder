@@ -312,7 +312,7 @@ export class Settings extends Component<Props, State> {
                                             Audio
                                             {stream && (
                                                 <div
-                                                    class={
+                                                    className={
                                                         styles[
                                                             "settings-audio-indicator"
                                                         ]
