@@ -32,6 +32,7 @@ export enum ResourceTypes {
 export class Settings extends Component<Props, State> {
     cameraDevicesInfo: any[];
     audioDevicesInfo: any[];
+    menuBoxRef: Element | undefined;
 
     constructor(props: Props) {
         super(props);
@@ -76,6 +77,24 @@ export class Settings extends Component<Props, State> {
         }
     }
 
+    componentWillUnmount() {
+        document.removeEventListener("click", this.handleExternalClick, true);
+    }
+
+    // handle global window click event
+    handleExternalClick = (e: any) => {
+        let element = e.target;
+
+        do {
+            if (element === this.menuBoxRef) {
+                return;
+            }
+            element = element.parentElement || element.parentNode;
+        } while (element !== null && element.nodeType === 1);
+
+        this.handleClose();
+    };
+
     getDevices = () => {
         // get available devices
         if (navigator.mediaDevices) {
@@ -96,6 +115,13 @@ export class Settings extends Component<Props, State> {
         this.setState({ isOpen: !isOpen }, () => {
             if (isOpen) {
                 this.handleClose();
+            } else {
+                // handle drop down toggle click
+                document.addEventListener(
+                    "click",
+                    this.handleExternalClick,
+                    true
+                );
             }
         });
     };
@@ -133,6 +159,8 @@ export class Settings extends Component<Props, State> {
     };
 
     handleClose = () => {
+        document.removeEventListener("click", this.handleExternalClick, true);
+
         this.setState({
             isOpen: false,
             showAudioSettings: false,
@@ -222,7 +250,10 @@ export class Settings extends Component<Props, State> {
         }
 
         return (
-            <div className={`express-recorder__settings ${styles["settings"]}`}>
+            <div
+                className={`express-recorder__settings ${styles["settings"]}`}
+                ref={node => (this.menuBoxRef = node)}
+            >
                 <div className={styles["settings-icon-wrap"]}>
                     <a
                         role={"button"}

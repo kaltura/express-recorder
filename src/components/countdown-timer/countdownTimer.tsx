@@ -39,6 +39,10 @@ export class CountdownTimer extends Component<Props, State> {
         }
     }
 
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+
     update() {
         const { countdown } = this.state;
         const { onCountdownComplete } = this.props;
