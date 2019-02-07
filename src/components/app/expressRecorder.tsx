@@ -311,8 +311,7 @@ export class ExpressRecorder extends Component<Props, State> {
             doPlayback
         } = this.state;
 
-        console.log(e);
-        if ((e.altKey || e.metaKey) && e.shiftKey && e.key === "R") {
+        if (e.altKey && (e.shiftKey || e.metaKey) && e.key === "R") {
             e.preventDefault();
             if (!doRecording && !doCountdown) {
                 if (!doPlayback) {
@@ -324,7 +323,7 @@ export class ExpressRecorder extends Component<Props, State> {
             return;
         }
 
-        if ((e.altKey || e.metaKey) && e.shiftKey && e.key === "S") {
+        if (e.altKey && (e.shiftKey || e.metaKey) && e.key === "S") {
             e.preventDefault();
             if (doRecording) {
                 this.handleStopClick();
@@ -332,7 +331,7 @@ export class ExpressRecorder extends Component<Props, State> {
             return;
         }
 
-        if ((e.altKey || e.metaKey) && e.shiftKey && e.key === "U") {
+        if (e.altKey && (e.shiftKey || e.metaKey) && e.key === "U") {
             e.preventDefault();
             if (
                 !doRecording &&
