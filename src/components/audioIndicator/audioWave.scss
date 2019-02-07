@@ -1,0 +1,57 @@
+.audio-wave-wrap {
+    height: 10px;
+
+    .wave {
+        position: absolute;
+        width: 4px;
+        height: 0;
+        background-color: #fff;
+        bottom: 0;
+    }
+}
+
+@keyframes sequence1 {
+    0% {
+        height: 1px;
+    }
+    50% {
+        height: 16px;
+    }
+    100% {
+        height: 1px;
+    }
+}
+
+@keyframes sequence2 {
+    0% {
+        height: 3px;
+    }
+    50% {
+        height: 10px;
+    }
+    100% {
+        height: 3px;
+    }
+}
+
+.wave:nth-child(1) {
+    left: 0;
+    animation: sequence2 1.5s ease infinite 0s;
+}
+.wave:nth-child(2) {
+    left: 5px;
+    animation: sequence1 1.5s ease infinite 0.1s;
+}
+.wave:nth-child(3) {
+    left: 10px;
+    animation: sequence1 1.5s ease-in-out infinite 0.2s;
+}
+.wave:nth-child(4) {
+    left: 15px;
+    animation: sequence2 1.5s ease-in infinite 0.3s;
+}
+
+.audio-wave-inactive .wave {
+    animation: none;
+    height: 1px;
+}
