@@ -340,7 +340,6 @@ export class ExpressRecorder extends Component<Props, State> {
             ) {
                 this.handleUpload();
             }
-
             return;
         }
     };
