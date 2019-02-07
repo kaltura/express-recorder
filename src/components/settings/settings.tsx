@@ -81,9 +81,6 @@ export class Settings extends Component<Props, State> {
     handleExternalClick = (e: any) => {
         let element = e.target;
 
-        if (!document.documentElement.contains(element)) {
-            this.toggleMenu();
-        }
         do {
             if (element === this.menuBoxRef) {
                 return;
