@@ -1,5 +1,6 @@
 import { h, Component } from "preact";
 import { Playback } from "../playback/playback";
+import { AudioIndicator } from "../audioIndicator/AudioIndicator";
 const styles = require("./style.scss");
 const fixVid = require("./webmFix.js");
 type Props = {
@@ -15,7 +16,7 @@ type Props = {
 };
 
 type State = {
-    blobFixReady: boolean
+    blobFixReady: boolean;
 };
 
 /**
@@ -33,8 +34,7 @@ export class Recorder extends Component<Props, State> {
     duration: number;
     recordedBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
-    fixedBlob:any;
-
+    fixedBlob: any;
 
     constructor(props: Props) {
         super(props);
@@ -98,16 +98,15 @@ export class Recorder extends Component<Props, State> {
         this.mediaRecorder.start(10); // collect 10ms of data
         this.startTime = new Date().getTime();
         this.fixedBlob = null;
-        this.setState({blobFixReady: false});
+        this.setState({ blobFixReady: false });
     };
 
     stopRecording = () => {
         this.mediaRecorder.stop();
         if (this.props.onRecordingEnd) {
-
             //since there a known issue with video/webm mime type where there is no duration tag resulting in LIVE displayed in the player and no seek bar,
             //(see https://github.com/muaz-khan/RecordRTC/issues/145) a fix that adds this tag is used here.
-            this.duration = (new Date().getTime() - this.startTime);
+            this.duration = new Date().getTime() - this.startTime;
             const blob = new Blob(this.recordedBlobs, { type: "video/webm" });
             fixVid(blob, this.duration, this.handleFixedBlob);
         }
@@ -125,11 +124,11 @@ export class Recorder extends Component<Props, State> {
     handleFixedBlob = (blob: any) => {
         this.props.onRecordingEnd(this.recordedBlobs);
         this.fixedBlob = blob;
-        this.setState({blobFixReady: true});
+        this.setState({ blobFixReady: true });
     };
 
     render(props: Props) {
-        const { doPlayback, partnerId, uiConfId, video } = this.props;
+        const { doPlayback, partnerId, uiConfId, video, stream } = this.props;
         let noVideoClass = !video ? "__no-video" : "";
 
         if (doPlayback && this.recordedBlobs.length > 0) {
@@ -154,12 +153,19 @@ export class Recorder extends Component<Props, State> {
         return (
             <div>
                 {!video && (
-                    <div class={`no-video-text ${styles["no-video-text"]}`}>Recording Audio Only</div>
+                    <div class={`no-video-text ${styles["no-video-text"]}`}>
+                        Recording Audio Only
+                        {stream && (
+                            <div class={styles["audio-indicator"]}>
+                                <AudioIndicator stream={stream} />
+                            </div>
+                        )}
+                    </div>
                 )}
                 <video
                     id="recorder"
                     className={`express-recorder__recorder ${
-                        styles["express-recorder__recorder" + (noVideoClass)]
+                        styles["express-recorder__recorder" + noVideoClass]
                     }`}
                     muted={true}
                     autoPlay={true}

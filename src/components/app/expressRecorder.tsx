@@ -370,6 +370,7 @@ export class ExpressRecorder extends Component<Props, State> {
                             allowVideo={constraints.video !== false}
                             allowAudio={constraints.audio !== false}
                             onSettingsChanged={this.handleSettingsChange}
+                            stream={stream}
                         />
                     )}
                 </div>
