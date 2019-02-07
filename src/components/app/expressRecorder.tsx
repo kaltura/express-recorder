@@ -131,6 +131,8 @@ export class ExpressRecorder extends Component<Props, State> {
             this.handleBeforeunload(false)
         );
 
+        window.addEventListener("keydown", this.handleKeyboardControl);
+
         this.createStream(this.state.constraints);
     }
 
@@ -301,6 +303,48 @@ export class ExpressRecorder extends Component<Props, State> {
         };
     };
 
+    handleKeyboardControl = (e: any) => {
+        e.preventDefault();
+
+        const {
+            doCountdown,
+            doRecording,
+            recordedBlobs,
+            doPlayback
+        } = this.state;
+
+        console.log(e);
+        if (e.altKey && e.shiftKey && e.key === "R") {
+            if (!doRecording && !doCountdown) {
+                if (!doPlayback) {
+                    this.handleStartClick();
+                } else {
+                    this.handleResetClick();
+                }
+            }
+            return;
+        }
+
+        if (e.altKey && e.shiftKey && e.key === "S") {
+            if (doRecording) {
+                this.handleStopClick();
+            }
+            return;
+        }
+
+        if (e.altKey && e.shiftKey && e.key === "U") {
+            if (
+                !doRecording &&
+                recordedBlobs.length > 0 &&
+                !this.uploadedOnce
+            ) {
+                this.handleUpload();
+            }
+
+            return;
+        }
+    };
+
     handleDownload = () => {
         const blob = new Blob(this.state.recordedBlobs, { type: "video/webm" });
         const url = window.URL.createObjectURL(blob);
@@ -453,17 +497,15 @@ export class ExpressRecorder extends Component<Props, State> {
                                 >
                                     Record Again
                                 </button>
-                                {!this.uploadedOnce && (
-                                    <button
-                                        className={`btn btn-primary btn__save ${
-                                            styles["bottom__btn"]
-                                        } ${styles["btn__save"]}`}
-                                        onClick={this.handleUpload}
-                                        tabIndex={0}
-                                    >
-                                        Use This
-                                    </button>
-                                )}
+                                <button
+                                    className={`btn btn-primary btn__save ${
+                                        styles["bottom__btn"]
+                                    } ${styles["btn__save"]}`}
+                                    onClick={this.handleUpload}
+                                    tabIndex={0}
+                                >
+                                    Use This
+                                </button>
                             </div>
                         )}
                     {doUpload && (
