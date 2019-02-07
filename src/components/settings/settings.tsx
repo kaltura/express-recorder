@@ -77,6 +77,10 @@ export class Settings extends Component<Props, State> {
         }
     }
 
+    componentWillUnmount() {
+        document.removeEventListener("click", this.handleExternalClick, true);
+    }
+
     // handle global window click event
     handleExternalClick = (e: any) => {
         let element = e.target;
@@ -88,7 +92,7 @@ export class Settings extends Component<Props, State> {
             element = element.parentElement || element.parentNode;
         } while (element !== null && element.nodeType === 1);
 
-        this.toggleMenu();
+        this.handleClose();
     };
 
     getDevices = () => {
@@ -111,11 +115,6 @@ export class Settings extends Component<Props, State> {
         this.setState({ isOpen: !isOpen }, () => {
             if (isOpen) {
                 this.handleClose();
-                document.removeEventListener(
-                    "click",
-                    this.handleExternalClick,
-                    true
-                );
             } else {
                 // handle drop down toggle click
                 document.addEventListener(
@@ -160,6 +159,8 @@ export class Settings extends Component<Props, State> {
     };
 
     handleClose = () => {
+        document.removeEventListener("click", this.handleExternalClick, true);
+
         this.setState({
             isOpen: false,
             showAudioSettings: false,
