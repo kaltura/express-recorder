@@ -1,75 +1,77 @@
 import { Component, h } from "preact";
+import { AudioWave } from "./audioWave";
 
 type Props = {
-    stream: MediaStream
+    stream: MediaStream;
 };
 
 type State = {
+    foundAudioSignal: boolean;
 };
 
 /**
- * Component to show countdown from X to 0. uses for delay between clicking on start recording to the actual recording
+ * Process audio level from stream
  */
 export class AudioIndicator extends Component<Props, State> {
-
     audioContext: AudioContext;
-    instant: number;
-    slow: number;
-    clip: number;
-    script: ScriptProcessorNode ;
+    intervalId: number;
 
     constructor(props: Props) {
         super(props);
 
+        this.state = {
+            foundAudioSignal: true
+        };
+
         this.audioContext = new AudioContext();
-        this.instant = 0.0;
-        this.slow = 0.0;
-        this.clip = 0.0;
-        this.script = this.audioContext.createScriptProcessor(2048, 1, 1);
+        this.intervalId = 0;
     }
 
     componentDidMount() {
-        this.script.onaudioprocess = (event) => {
-            const input = event.inputBuffer.getChannelData(0);
-            let i;
-            let sum = 0.0;
-            let clipcount = 0;
-            for (i = 0; i < input.length; ++i) {
-                sum += input[i] * input[i];
-                if (Math.abs(input[i]) > 0.99) {
-                    clipcount += 1;
-                }
-            }
-            this.instant = Math.sqrt(sum / input.length);
-            this.slow = 0.95 * this.slow + 0.05 * this.instant;
-            this.clip = clipcount / input.length;
-            //console.log("instant: " + this.instant);
-            //console.log("slow: " + this.slow);
-            //console.log("clip: " + this.clip);
-        };
+        // create audio analyser
+        let analyser = this.audioContext.createAnalyser();
 
-        this.connectToSource(this.props.stream);
+        // get audio source from stream
+        let source = this.audioContext.createMediaStreamSource(
+            this.props.stream
+        );
+
+        // connect analyser with source
+        source.connect(analyser);
+
+        // define sample window for fft. Should be power of 2 between 32 - 2048.
+        // Bigger number gives more detailed data, but we only need to know if
+        // there is a sound or not.
+        analyser.fftSize = 32;
+
+        let bufferLength = analyser.frequencyBinCount;
+        let dataArray = new Uint8Array(bufferLength);
+
+        // set interval to sample audio sound
+        const int: any = setInterval(() => {
+            // fill dataArray with frequency data
+            analyser.getByteFrequencyData(dataArray);
+
+            const result = dataArray.filter((num: number) => {
+                return num > 0;
+            });
+
+            if (result.length === 0 && this.state.foundAudioSignal) {
+                this.setState({ foundAudioSignal: false });
+            } else if (result.length > 0 && !this.state.foundAudioSignal) {
+                this.setState({ foundAudioSignal: true });
+            }
+        }, 100);
+
+        this.intervalId = int as number;
     }
 
-    connectToSource = (stream: MediaStream) => {
-        console.log('SoundMeter connecting');
-
-        try {
-            let mic = this.audioContext.createMediaStreamSource(stream);
-            mic.connect(this.script);
-            this.script.connect(this.audioContext.destination);
-
-        } catch (e) {
-            console.error(e);
-
-        }
-    };
+    componentWillUnmount() {
+        clearInterval(this.intervalId);
+    }
 
     render() {
-
-        return (
-            <div>
-            </div>
-        );
+        const { foundAudioSignal } = this.state;
+        return <AudioWave active={foundAudioSignal} />;
     }
 }
