@@ -52,13 +52,14 @@ export class AudioIndicator extends Component<Props, State> {
             // fill dataArray with frequency data
             analyser.getByteFrequencyData(dataArray);
 
+            // check if found sound - array of zeros means no sound
             const result = dataArray.filter((num: number) => {
                 return num > 0;
             });
 
-            if (result.length === 0 && this.state.foundAudioSignal) {
+            if (result.length === 0 && this.state.foundAudioSignal) { // no sound found
                 this.setState({ foundAudioSignal: false });
-            } else if (result.length > 0 && !this.state.foundAudioSignal) {
+            } else if (result.length > 0 && !this.state.foundAudioSignal) { // found sound
                 this.setState({ foundAudioSignal: true });
             }
         }, 100);
