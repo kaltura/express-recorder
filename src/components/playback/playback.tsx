@@ -46,7 +46,10 @@ export class Playback extends Component<Props, State> {
                 type: this.kalturaPlayer.MediaType.VOD
 
             },
-            plugins: {}
+            plugins: {},
+            playback: {
+                autoplay: true
+            }
         });
     }
 
