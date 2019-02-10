@@ -6,6 +6,7 @@ type Props = {
     media: { blob: Blob; mimeType: string }; // the actual recorded media
     partnerId: number;
     uiconfId: number; // must be v3
+    autoPlay: boolean;
 };
 
 type State = {};
@@ -35,6 +36,7 @@ export class Playback extends Component<Props, State> {
     }
 
     setMedia(media: { blob: Blob; mimeType: string }) {
+        const { autoPlay } = this.props;
         this.kalturaPlayer.setMedia({
             sources: {
                 progressive: [
@@ -44,9 +46,11 @@ export class Playback extends Component<Props, State> {
                     }
                 ],
                 type: this.kalturaPlayer.MediaType.VOD
-
             },
-            plugins: {}
+            plugins: {},
+            playback: {
+                autoplay: autoPlay
+            }
         });
     }
 
