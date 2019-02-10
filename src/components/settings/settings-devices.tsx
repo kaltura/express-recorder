@@ -8,7 +8,7 @@ type Props = {
     onChooseDevice: (device: object) => void; // device: MediaDeviceInfo
     isOn: boolean;
     selected: any;
-    onClose: () => void;
+    onBack: () => void;
     onToggleChange: (isOn: boolean) => void;
 };
 
@@ -33,6 +33,7 @@ export class SettingsDevices extends Component<Props, State> {
     handleItemClick = (item: any) => {
         this.setState({ selectedDevice: item }, () => {
             this.props.onChooseDevice(item);
+            this.handleBack();
         });
     };
 
@@ -50,13 +51,13 @@ export class SettingsDevices extends Component<Props, State> {
         });
     };
 
-    handleClose = () => {
-        this.props.onClose();
+    handleBack = () => {
+        this.props.onBack();
     };
 
     handleBackIconKeyPressed = (e: KeyboardEvent) => {
         if (e.key === "Enter") {
-            this.handleClose();
+            this.handleBack();
         }
     };
 
@@ -100,7 +101,7 @@ export class SettingsDevices extends Component<Props, State> {
             <div>
                 <a
                     aria-label="Back to Settings"
-                    onClick={this.handleClose}
+                    onClick={this.handleBack}
                     onKeyPress={this.handleBackIconKeyPressed}
                     className={styles["settings-arrow-wrap"]}
                     tabIndex={0}
