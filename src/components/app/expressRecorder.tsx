@@ -131,6 +131,8 @@ export class ExpressRecorder extends Component<Props, State> {
             this.handleBeforeunload(false)
         );
 
+        window.addEventListener("keydown", this.handleKeyboardControl);
+
         this.createStream(this.state.constraints);
     }
 
@@ -301,6 +303,50 @@ export class ExpressRecorder extends Component<Props, State> {
         };
     };
 
+    handleKeyboardControl = (e: any) => {
+        const {
+            doCountdown,
+            doRecording,
+            recordedBlobs,
+            doPlayback
+        } = this.state;
+
+        // start record on Alt + Shift (Meta for mac) + R
+        if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyR") {
+            e.preventDefault();
+            if (!doRecording && !doCountdown) {
+                if (!doPlayback) {
+                    this.handleStartClick();
+                } else {
+                    this.handleResetClick();
+                }
+            }
+            return;
+        }
+
+        // stop record on Alt + Shift (Meta for mac) + S
+        if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyS") {
+            e.preventDefault();
+            if (doRecording) {
+                this.handleStopClick();
+            }
+            return;
+        }
+
+        // upload record on Alt + Shift (Meta for mac) + U
+        if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyU") {
+            e.preventDefault();
+            if (
+                !doRecording &&
+                recordedBlobs.length > 0 &&
+                !this.uploadedOnce
+            ) {
+                this.handleUpload();
+            }
+            return;
+        }
+    };
+
     handleDownload = () => {
         const blob = new Blob(this.state.recordedBlobs, { type: "video/webm" });
         const url = window.URL.createObjectURL(blob);
@@ -454,17 +500,15 @@ export class ExpressRecorder extends Component<Props, State> {
                                 >
                                     Record Again
                                 </button>
-                                {!this.uploadedOnce && (
-                                    <button
-                                        className={`btn btn-primary btn__save ${
-                                            styles["bottom__btn"]
-                                        } ${styles["btn__save"]}`}
-                                        onClick={this.handleUpload}
-                                        tabIndex={0}
-                                    >
-                                        Use This
-                                    </button>
-                                )}
+                                <button
+                                    className={`btn btn-primary btn__save ${
+                                        styles["bottom__btn"]
+                                    } ${styles["btn__save"]}`}
+                                    onClick={this.handleUpload}
+                                    tabIndex={0}
+                                >
+                                    Use This
+                                </button>
                             </div>
                         )}
                     {doUpload && (
