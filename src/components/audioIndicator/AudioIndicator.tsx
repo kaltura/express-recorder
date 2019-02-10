@@ -3,6 +3,7 @@ import { AudioWave } from "./audioWave";
 
 type Props = {
     stream: MediaStream;
+    audioOn?: boolean;
 };
 
 type State = {
@@ -13,6 +14,10 @@ type State = {
  * Process audio level from stream
  */
 export class AudioIndicator extends Component<Props, State> {
+    static defaultProps = {
+        audioOn: true
+    };
+
     audioContext: AudioContext;
     intervalId: number;
 
@@ -20,7 +25,7 @@ export class AudioIndicator extends Component<Props, State> {
         super(props);
 
         this.state = {
-            foundAudioSignal: true
+            foundAudioSignal: false
         };
 
         this.audioContext = new AudioContext();
@@ -28,6 +33,10 @@ export class AudioIndicator extends Component<Props, State> {
     }
 
     componentDidMount() {
+        if (!this.props.audioOn) {
+            return;
+        }
+
         // create audio analyser
         let analyser = this.audioContext.createAnalyser();
 
@@ -57,9 +66,11 @@ export class AudioIndicator extends Component<Props, State> {
                 return num > 0;
             });
 
-            if (result.length === 0 && this.state.foundAudioSignal) { // no sound found
+            if (result.length === 0 && this.state.foundAudioSignal) {
+                // no sound found
                 this.setState({ foundAudioSignal: false });
-            } else if (result.length > 0 && !this.state.foundAudioSignal) { // found sound
+            } else if (result.length > 0 && !this.state.foundAudioSignal) {
+                // found sound
                 this.setState({ foundAudioSignal: true });
             }
         }, 100);

@@ -351,6 +351,7 @@ export class Settings extends Component<Props, State> {
                                                 >
                                                     <AudioIndicator
                                                         stream={stream}
+                                                        audioOn={audioOn}
                                                     />
                                                 </div>
                                             )}
