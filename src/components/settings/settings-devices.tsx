@@ -8,7 +8,7 @@ type Props = {
     onChooseDevice: (device: object) => void; // device: MediaDeviceInfo
     isOn: boolean;
     selected: any;
-    onClose: () => void;
+    onBack: () => void;
     onToggleChange: (isOn: boolean) => void;
 };
 
@@ -52,7 +52,7 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     handleBack = () => {
-        this.props.onClose();
+        this.props.onBack();
     };
 
     handleBackIconKeyPressed = (e: KeyboardEvent) => {

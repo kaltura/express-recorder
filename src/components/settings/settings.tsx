@@ -236,7 +236,7 @@ export class Settings extends Component<Props, State> {
                     selected={
                         showCameraSettings ? selectedCamera : selectedAudio
                     }
-                    onClose={() => {
+                    onBack={() => {
                         this.handleBack();
                     }}
                     onChooseDevice={this.handleChooseDevice}
