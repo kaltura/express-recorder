@@ -6,7 +6,8 @@ type Props = {
     media: { blob: Blob; mimeType: string }; // the actual recorded media
     partnerId: number;
     uiconfId: number; // must be v3
-    autoPlay: boolean;
+    autoPlay?: boolean;
+    pictureInPicture?: boolean;
 };
 
 type State = {};
@@ -16,6 +17,10 @@ let uniqueId: number = 0;
  * Component to play the recorded media, uses v3 player.
  */
 export class Playback extends Component<Props, State> {
+    static defaultProps = {
+        autoplay: false,
+        pictureInPicture: false
+    };
     kalturaPlayer: any;
 
     componentDidMount(): void {
@@ -36,7 +41,7 @@ export class Playback extends Component<Props, State> {
     }
 
     setMedia(media: { blob: Blob; mimeType: string }) {
-        const { autoPlay } = this.props;
+        const { autoPlay, pictureInPicture } = this.props;
         this.kalturaPlayer.setMedia({
             sources: {
                 progressive: [
@@ -49,7 +54,8 @@ export class Playback extends Component<Props, State> {
             },
             plugins: {},
             playback: {
-                autoplay: autoPlay
+                autoplay: autoPlay,
+                pictureInPicture: pictureInPicture
             }
         });
     }
