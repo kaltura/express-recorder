@@ -10,11 +10,11 @@
     width: 72px;
     border-radius: 50%;
     border: none;
-    background-image: linear-gradient(-135deg, #FB4D59 0%, #E91E26 100%);
-    box-shadow: 0 0 32px 0 rgba(0, 0, 0, 0.4);
+    background-image: linear-gradient(-180deg,#ef424e,#db1f26);
+    box-shadow: 0 0 1rem 0 rgba(0,0,0,.5);
 
     &:hover {
-        background-image: linear-gradient(-135deg, #D44753 0%, #f31e26 100%);
+        background-image: linear-gradient(-180deg,#ed2a38,#c51c22);
     }
 }
 .express-recorder__controls {
