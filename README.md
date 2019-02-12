@@ -33,7 +33,7 @@ yarn run storybook
     </tr>
     <tr>
         <td>ks</td>
-        <td>kaltura session ky</td> 
+        <td>kaltura session key</td> 
         <td>string</td>
         <td>yes</td>
         <td>---</td>
