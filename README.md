@@ -1,25 +1,26 @@
 # Express-recorder
-Web recorder based on <a href="https://webrtc.org/">WebRTC</a>.<br />
-Support browsers: Chrome, Firfox, Opera.
+Web recorder based on <a href="https://webrtc.org/">WebRTC</a> and former project - <a href="https://github.com/kaltura/webrtc-krecord">webrtc-krecord</a>.<br />
+Supported browsers: Chrome, Firfox, Opera.
 
 ## Dev install
-1. checkout
+1. git clone
 2. npm install
 
 ## Run the project
 npm start
 
 ## Run with storybook
-yarn run storybook
+1. fill props in expressRecorder.stories.jsx </br>
+2. yarn run storybook
 
 ## Create build release
 1. npm run build
 2. copy files located under build folder to your project.
 
 ## Embedding into html page
-<script type="text/props">{
-    list of props for expressRecorder components in form of 'prop': 'value',...
-}</script></br><script async src="path-to-bundle.js"></script>
+`<script type="text/props">{
+    [list of props for expressRecorder components in form of 'prop': 'value']
+}</script><script async src="path-to-bundle.js"></script>`
 
 ## API
 #### ExpressRecorder props:
