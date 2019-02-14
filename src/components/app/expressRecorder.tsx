@@ -201,8 +201,8 @@ export class ExpressRecorder extends Component<Props, State> {
 
         return true;
     };
-    handleSuccess = (stream: MediaStream) => {
-        this.setState({ stream: stream });
+    handleSuccess = (stream: MediaStream, constraints: Constraints) => {
+        this.setState({ stream: stream, constraints: constraints });
     };
 
     handleError = (error: string) => {
@@ -276,7 +276,6 @@ export class ExpressRecorder extends Component<Props, State> {
         }
 
         this.createStream(newConstraints);
-        this.setState({ constraints: newConstraints });
     };
 
     createStream = (constraints: Constraints) => {
@@ -290,7 +289,7 @@ export class ExpressRecorder extends Component<Props, State> {
         navigator.mediaDevices
             .getUserMedia(constraints)
             .then((stream: MediaStream) => {
-                return this.handleSuccess(stream);
+                this.handleSuccess(stream, constraints);
             })
             .catch(e =>
                 this.handleError("Failed to allocate resource: " + e.message)
