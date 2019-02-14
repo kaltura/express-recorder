@@ -69,7 +69,7 @@ npm start
     </tr>
     <tr>
         <td>uiConfId</td>
-        <td>kaltura player id</td> 
+        <td>kaltura player id (player v3 required)</td> 
         <td>number</td>
         <td>yes</td>
         <td>---</td>
