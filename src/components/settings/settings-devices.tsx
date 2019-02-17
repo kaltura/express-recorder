@@ -30,6 +30,14 @@ export class SettingsDevices extends Component<Props, State> {
         };
     }
 
+    componentDidMount() {
+        const popups = Array.from(document.querySelectorAll(".device-label"));
+        popups.map((element: any) => {
+            if (element.scrollWidth === element.offsetWidth) {
+                element.children[1].style.visibility = "hidden";
+            }
+        })
+    }
     handleItemClick = (item: any) => {
         this.setState({ selectedDevice: item }, () => {
             this.props.onChooseDevice(item);
@@ -83,7 +91,7 @@ export class SettingsDevices extends Component<Props, State> {
                     onKeyPress={e => this.handleItemPress(e, item)}
                     className={
                         selectedClass +
-                        " " +
+                        " device-label " +
                         styles["device-label"] +
                         " " +
                         (!isOn ? styles["device-disabled"] : "")
