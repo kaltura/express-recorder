@@ -257,10 +257,12 @@ export class Settings extends Component<Props, State> {
                 className={`express-recorder__settings ${styles["settings"]}`}
                 ref={node => (this.menuBoxRef = node)}
             >
-                <div className={styles["settings-icon-wrap"]}>
+                <div
+                    className={styles["settings-icon-wrap"]}
+                    onClick={this.toggleMenu}
+                >
                     <a
                         role={"button"}
-                        onClick={this.toggleMenu}
                         onKeyPress={this.handleMenuIconKeyPressed}
                         aria-haspopup="true"
                         aria-expanded={isOpen}
