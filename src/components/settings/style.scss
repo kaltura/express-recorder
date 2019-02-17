@@ -1,5 +1,4 @@
 .settings-icon-wrap {
-    background-color: rgba(0, 0, 0, 0.5);
     padding: 5px;
     border-radius: 3px;
     cursor: pointer;
@@ -37,7 +36,6 @@
 }
 .settings-box {
     text-align: left;
-    background: rgba(0, 0, 0, 0.5);
     margin-top: 4px;
     padding: 4px 20px;
     font-size: 16px;
@@ -45,6 +43,18 @@
     width: 280px;
     position: absolute;
     right: 0;
+}
+.settings-box, .settings-icon-wrap {
+    background: rgba(0,0,0,0.60);
+    &:hover {
+        background: rgba(34,34,34,0.90);
+        box-shadow: 0 2px 8px 0 rgba(0,0,0,0.30);
+    }
+
+    &:active {
+        background: rgba(34,34,34,0.90);
+        box-shadow: 0 2px 8px 0 rgba(0,0,0,0.30);
+    }
 }
 .settings-line {
     height: 1px;
