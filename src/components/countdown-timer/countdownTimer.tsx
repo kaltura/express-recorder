@@ -4,7 +4,6 @@ const styles = require("./style.scss");
 type Props = {
     initialValue: number;
     onCountdownComplete: () => void;
-    radius?: number;
 };
 
 type State = {
@@ -20,7 +19,6 @@ export class CountdownTimer extends Component<Props, State> {
     };
 
     interval: number | undefined;
-    circleRef: HTMLElement | undefined;
 
     constructor(props: Props) {
         super(props);
@@ -28,15 +26,10 @@ export class CountdownTimer extends Component<Props, State> {
     }
 
     componentDidMount() {
-        const { initialValue } = this.props;
         const id: any = setInterval(() => {
             this.update();
         }, 1000);
         this.interval = id as number;
-
-        if (this.circleRef) {
-            this.circleRef.style.animationDuration = initialValue + "s";
-        }
     }
 
     componentWillUnmount() {
@@ -59,7 +52,6 @@ export class CountdownTimer extends Component<Props, State> {
 
     render(props: Props, state: State) {
         const { countdown } = state;
-        const { radius } = props;
 
         return (
             <div class={`countdown ${styles["countdown"]}`}>
@@ -68,15 +60,7 @@ export class CountdownTimer extends Component<Props, State> {
                 >
                     {countdown}
                 </div>
-                <svg className={styles["svg-countDownTimer"]}>
-                    <circle
-                        className={styles["circle"]}
-                        ref={circle => (this.circleRef = circle as HTMLElement)}
-                        r={radius! - 2}
-                        cx={radius}
-                        cy={radius}
-                    />
-                </svg>
+                <div className={styles["circle"]} />
             </div>
         );
     }
