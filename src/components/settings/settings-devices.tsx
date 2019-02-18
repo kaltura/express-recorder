@@ -31,21 +31,27 @@ export class SettingsDevices extends Component<Props, State> {
     }
 
     componentDidMount() {
+        this.removeRedundantPopups();
+    }
+
+    removeRedundantPopups = () => {
         const popups = Array.from(document.querySelectorAll(".device-label"));
         popups.map((element: any) => {
-            if (element.scrollWidth === element.offsetWidth) {
-                for (let i = 0; i < element.children.length; i++) {
-                    if (
-                        element.children[i].classList.contains(
-                            "device-label__popup"
-                        )
-                    ) {
-                        element.children[i].style.visibility = "hidden";
-                    }
+            for (let i = 0; i < element.children.length; i++) {
+                if (
+                    element.children[i].classList.contains(
+                        "device-label__popup"
+                    )
+                ) {
+                    element.children[i].style.visibility =
+                        element.scrollWidth === element.offsetWidth
+                            ? "hidden"
+                            : "";
                 }
             }
         });
-    }
+    };
+
     handleItemClick = (item: any) => {
         this.setState({ selectedDevice: item }, () => {
             this.props.onChooseDevice(item);
