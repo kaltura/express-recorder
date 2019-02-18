@@ -171,7 +171,12 @@ export class Settings extends Component<Props, State> {
     };
 
     handleToggleChange = (isOn: boolean, type: ResourceTypes) => {
-        const { cameraOn, audioOn } = this.state;
+        let { cameraOn, audioOn } = this.state;
+
+        // do not allow both camera and audio to be turned off
+        cameraOn = (!isOn && type === ResourceTypes.AUDIO) ? true : cameraOn;
+        audioOn = (!isOn && type === ResourceTypes.VIDEO) ? true : audioOn;
+
         this.setState(
             {
                 cameraOn: type === ResourceTypes.VIDEO ? isOn : cameraOn,
