@@ -30,6 +30,29 @@ export class SettingsDevices extends Component<Props, State> {
         };
     }
 
+    componentDidMount() {
+        this.removeRedundantPopups();
+    }
+
+    removeRedundantPopups = () => {
+        const popups = Array.from(document.querySelectorAll(".device-label"));
+        popups.map((element: any) => {
+            for (let i = 0; i < element.children.length; i++) {
+                if (
+                    element.children[i].classList.contains(
+                        "device-label__popup"
+                    )
+                ) {
+                    element.children[i].style.visibility =
+                        element.scrollWidth === element.offsetWidth
+                            ? "hidden"
+                            : "";
+                    break;
+                }
+            }
+        });
+    };
+
     handleItemClick = (item: any) => {
         this.setState({ selectedDevice: item }, () => {
             this.props.onChooseDevice(item);
@@ -83,7 +106,7 @@ export class SettingsDevices extends Component<Props, State> {
                     onKeyPress={e => this.handleItemPress(e, item)}
                     className={
                         selectedClass +
-                        " " +
+                        " device-label " +
                         styles["device-label"] +
                         " " +
                         (!isOn ? styles["device-disabled"] : "")
@@ -91,7 +114,12 @@ export class SettingsDevices extends Component<Props, State> {
                     tabIndex={0}
                 >
                     <span>{item.label}</span>
-                    <div className={styles["device-label__popup"]}>
+                    <div
+                        className={
+                            "device-label__popup " +
+                            styles["device-label__popup"]
+                        }
+                    >
                         {item.label}
                     </div>
                 </div>
