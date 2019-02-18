@@ -47,6 +47,7 @@ export class SettingsDevices extends Component<Props, State> {
                         element.scrollWidth === element.offsetWidth
                             ? "hidden"
                             : "";
+                    break;
                 }
             }
         });
