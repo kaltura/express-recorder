@@ -34,9 +34,17 @@ export class SettingsDevices extends Component<Props, State> {
         const popups = Array.from(document.querySelectorAll(".device-label"));
         popups.map((element: any) => {
             if (element.scrollWidth === element.offsetWidth) {
-                element.children[1].style.visibility = "hidden";
+                for (let i = 0; i < element.children.length; i++) {
+                    if (
+                        element.children[i].classList.contains(
+                            "device-label__popup"
+                        )
+                    ) {
+                        element.children[i].style.visibility = "hidden";
+                    }
+                }
             }
-        })
+        });
     }
     handleItemClick = (item: any) => {
         this.setState({ selectedDevice: item }, () => {
@@ -99,7 +107,12 @@ export class SettingsDevices extends Component<Props, State> {
                     tabIndex={0}
                 >
                     <span>{item.label}</span>
-                    <div className={styles["device-label__popup"]}>
+                    <div
+                        className={
+                            "device-label__popup " +
+                            styles["device-label__popup"]
+                        }
+                    >
                         {item.label}
                     </div>
                 </div>
