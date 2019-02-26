@@ -174,8 +174,8 @@ export class Settings extends Component<Props, State> {
         let { cameraOn, audioOn } = this.state;
 
         // do not allow both camera and audio to be turned off
-        cameraOn = (!isOn && type === ResourceTypes.AUDIO) ? true : cameraOn;
-        audioOn = (!isOn && type === ResourceTypes.VIDEO) ? true : audioOn;
+        cameraOn = !isOn && type === ResourceTypes.AUDIO ? true : cameraOn;
+        audioOn = !isOn && type === ResourceTypes.VIDEO ? true : audioOn;
 
         this.setState(
             {
@@ -263,7 +263,15 @@ export class Settings extends Component<Props, State> {
                 ref={node => (this.menuBoxRef = node)}
             >
                 <div
-                    className={styles["settings-icon-wrap"]}
+                    className={
+                        styles["settings-icon"] +
+                        " " +
+                        styles[
+                            isOpen
+                                ? "settings-icon-open"
+                                : "settings-icon-close"
+                        ]
+                    }
                     onClick={this.toggleMenu}
                 >
                     <a
