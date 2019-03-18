@@ -21,6 +21,7 @@ type Props = {
     entryName?: string;
     allowVideo?: boolean; // whether to enable video recording
     allowAudio?: boolean; // whether to enable audio recording
+    browserNotSupportedText?: string ;
     maxRecordingTime?: number;
 };
 
@@ -166,9 +167,10 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     isBrowserCompatible = () => {
-        const notSupportedError =
-            "<b>Browser is not webRTC supported</b><br /><a href='https://webrtc.org/'>Click Here</a> to learn about supported browsers";
+        const notSupportedError  = this.props.browserNotSupportedText ?
+            this.props.browserNotSupportedText : "<b>Browser is not webRTC supported</b><br /><a href='https://webrtc.org/'>Click Here</a> to learn about supported browsers";
 
+        console.log(this.props.browserNotSupportedText);
         let isWebRTCSupported = false;
         [
             "RTCPeerConnection",
@@ -201,6 +203,7 @@ export class ExpressRecorder extends Component<Props, State> {
 
         return true;
     };
+
     handleSuccess = (stream: MediaStream, constraints: Constraints) => {
         this.setState({ stream: stream, constraints: constraints });
     };
