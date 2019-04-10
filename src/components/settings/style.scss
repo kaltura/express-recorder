@@ -83,15 +83,19 @@
     width: 260px;
     padding-left: 21px;
     cursor: pointer;
+    font-size: 14px;
 }
 .resource-label {
     width: 160px;
     cursor: pointer;
+    font-size: 14px;
 }
 .resources-name {
     width: 100px;
     vertical-align: bottom;
     cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
 }
 .device-label__popup {
     visibility: hidden;
