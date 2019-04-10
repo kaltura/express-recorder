@@ -100,7 +100,11 @@
     background-color: #eaeaea;
     color: #000;
     margin-left: 100px;
-    padding: 0 10px;
+    margin-right: 10px;
+    padding: 10px 10px;
+    line-height: 17px;
+    font-size: 13px;
+    font-weight: 600;
 
     &:before {
         content: "";
