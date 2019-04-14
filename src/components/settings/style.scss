@@ -62,6 +62,7 @@
     opacity: 0.15;
     background-color: #ffffff;
     margin: 8px 0;
+    border: none;
 }
 .device-label {
     &:hover {
@@ -82,15 +83,19 @@
     width: 260px;
     padding-left: 21px;
     cursor: pointer;
+    font-size: 14px;
 }
 .resource-label {
     width: 160px;
     cursor: pointer;
+    font-size: 14px;
 }
 .resources-name {
     width: 100px;
     vertical-align: bottom;
     cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
 }
 .device-label__popup {
     visibility: hidden;
@@ -99,7 +104,11 @@
     background-color: #eaeaea;
     color: #000;
     margin-left: 100px;
-    padding: 0 10px;
+    margin-right: 10px;
+    padding: 10px 10px;
+    line-height: 17px;
+    font-size: 13px;
+    font-weight: 600;
 
     &:before {
         content: "";
