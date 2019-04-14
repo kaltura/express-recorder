@@ -13,6 +13,7 @@
     border: none;
     background-image: linear-gradient(-180deg,#ef424e,#db1f26);
     box-shadow: 0 0 1rem 0 rgba(0,0,0,.5);
+    cursor: pointer;
 
     &:hover {
         background-image: linear-gradient(-180deg,#ed2a38,#c51c22);
@@ -41,6 +42,7 @@
     outline: none;
     height: 43px;
     width: 100px;
+    cursor: pointer;
 }
 .bottom__btn {
     height: 36px;
@@ -50,6 +52,7 @@
     font-size: 15px;
     font-weight: 500;
     outline: none;
+    cursor: pointer;
 }
 .btn__save {
     background-color: #008297;
@@ -61,6 +64,9 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #ffffff;
     margin-right: 24px;
+}
+.btn__download {
+    width: 160px;
 }
 .progress-bar {
     margin-top: 130px;
