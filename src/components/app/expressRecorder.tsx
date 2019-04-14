@@ -21,7 +21,7 @@ type Props = {
     entryName?: string;
     allowVideo?: boolean; // whether to enable video recording
     allowAudio?: boolean; // whether to enable audio recording
-    browserNotSupportedText?: string ;
+    browserNotSupportedText?: string;
     maxRecordingTime?: number;
 };
 
@@ -167,8 +167,9 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     isBrowserCompatible = () => {
-        const notSupportedError  = this.props.browserNotSupportedText ?
-            this.props.browserNotSupportedText : "<b>Browser is not webRTC supported</b><br /><a href='https://webrtc.org/'>Click Here</a> to learn about supported browsers";
+        const notSupportedError = this.props.browserNotSupportedText
+            ? this.props.browserNotSupportedText
+            : "<b>Browser is not webRTC supported</b><br /><a href='https://webrtc.org/'>Click Here</a> to learn about supported browsers";
 
         let isWebRTCSupported = false;
         [
@@ -485,11 +486,13 @@ export class ExpressRecorder extends Component<Props, State> {
                                 <button
                                     className={`btn btn__download ${
                                         styles["bottom__btn"]
-                                    } ${styles["btn__clear"]}`}
+                                    } ${styles["btn__clear"]} ${
+                                        styles["btn__download"]
+                                    } `}
                                     onClick={this.handleDownload}
                                     tabIndex={0}
                                 >
-                                    Save a copy
+                                    Download a Copy
                                 </button>
                                 <button
                                     className={`btn btn__reset ${
