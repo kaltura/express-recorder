@@ -273,18 +273,28 @@ export class Uploader extends Component<Props, State> {
         const disableCancel = abort || loaded >= this.totalSize;
         return (
             <div>
-                <span className={`progress-bar ${styles["progress-bar"]}`}>
-                    <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
-                </span>
-                <button
-                    className={`btn btn-cancel ${styles["btn"]} ${
-                        disableCancel ? styles["cancel-btn--disabled"] : ""
-                    }`}
-                    onClick={disableCancel ? undefined : this.handleCancel}
-                    disabled={disableCancel}
-                >
-                    Cancel
-                </button>
+                {loaded < this.totalSize && (
+                    <span className={`progress-bar ${styles["progress-bar"]}`}>
+                        <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
+                    </span>
+                )}
+                {loaded < this.totalSize && (
+                    <button
+                        className={`btn btn-cancel ${styles["btn"]} ${
+                            disableCancel ? styles["cancel-btn--disabled"] : ""
+                        }`}
+                        onClick={disableCancel ? undefined : this.handleCancel}
+                        disabled={disableCancel}
+                    >
+                        Cancel
+                    </button>
+                )}
+                {loaded >= this.totalSize && (
+                    <div className={`large ${styles["progress-complete"]}`}>
+                        <strong>Upload Completed!</strong> Complete the required
+                        information for the uploaded media below.
+                    </div>
+                )}
             </div>
         );
     }
