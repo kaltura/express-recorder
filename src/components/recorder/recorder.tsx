@@ -114,10 +114,10 @@ export class Recorder extends Component<Props, State> {
         const audioTracks = this.props.stream.getAudioTracks();
 
         // Release video and media devices
-        videoTracks.map((item: MediaStreamTrack) => {
+        videoTracks.forEach((item: MediaStreamTrack) => {
             item.stop();
         });
-        audioTracks.map((item: MediaStreamTrack) => {
+        audioTracks.forEach((item: MediaStreamTrack) => {
             item.stop();
         });
     };
