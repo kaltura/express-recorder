@@ -110,16 +110,6 @@ export class Recorder extends Component<Props, State> {
             const blob = new Blob(this.recordedBlobs, { type: "video/webm" });
             fixVid(blob, this.duration, this.handleFixedBlob);
         }
-        const videoTracks = this.props.stream.getVideoTracks();
-        const audioTracks = this.props.stream.getAudioTracks();
-
-        // Release video and media devices
-        videoTracks.forEach((item: MediaStreamTrack) => {
-            item.stop();
-        });
-        audioTracks.forEach((item: MediaStreamTrack) => {
-            item.stop();
-        });
     };
 
     handleDataAvailable = (event: any) => {
