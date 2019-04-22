@@ -212,6 +212,17 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     handleUpload = () => {
+        const videoTracks = this.state.stream ? this.state.stream.getVideoTracks() : [];
+        const audioTracks = this.state.stream ? this.state.stream.getAudioTracks() : [];
+
+        // Release video and media devices
+        videoTracks.forEach((item: MediaStreamTrack) => {
+            item.stop();
+        });
+        audioTracks.forEach((item: MediaStreamTrack) => {
+            item.stop();
+        });
+
         this.setState({ doUpload: true });
     };
 
