@@ -44,6 +44,7 @@ export class Playback extends Component<Props, State> {
         const { autoPlay, pictureInPicture } = this.props;
         this.kalturaPlayer.setMedia({
             sources: {
+                dvr: true,
                 progressive: [
                     {
                         url: window.URL.createObjectURL(media.blob),
