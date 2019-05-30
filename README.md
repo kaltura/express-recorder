@@ -115,3 +115,5 @@ npm start
 * mediaUploadStarted: fires after entry has been created and media upload start. Returns entryId by event.detail.entryId
 * mediaUploadEnded: fires after media upload has been ended. Returns entryId by event.detail.entryId
 * mediaUploadCanceled: fires when media upload has been canceled by the user. Returns entryId by event.detail.entryId
+
+In order to catch event, use addEventListener().
