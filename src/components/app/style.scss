@@ -60,6 +60,8 @@
     color: white;
     width:auto;
     height:auto;
+    min-width: 130px;
+    min-height: 36px;
 }
 .btn__clear {
     background-color: rgba(0, 0, 0, 0.5);
@@ -68,10 +70,14 @@
     margin-right: 24px;
     width:auto;
     height:auto;
+    min-width: 130px;
+    min-height: 36px;
 }
 .btn__download {
-  width:auto;
-  height:auto;
+    min-width: 130px;
+    min-height: 36px;
+    width:auto;
+    height:auto;
 }
 .progress-bar {
     margin-top: 130px;
