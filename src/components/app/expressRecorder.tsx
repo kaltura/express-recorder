@@ -134,6 +134,11 @@ export class ExpressRecorder extends Component<Props, State> {
 
         window.addEventListener("keydown", this.handleKeyboardControl);
 
+        if (this.state.stream) {
+            this.state.stream.getTracks().forEach(function (track) {
+                track.stop();
+            })
+        }
         this.createStream(this.state.constraints);
     }
 
@@ -288,6 +293,11 @@ export class ExpressRecorder extends Component<Props, State> {
             newConstraints.audio = { deviceId: selectedAudio.deviceId };
         }
 
+        if (this.state.stream) {
+            this.state.stream.getTracks().forEach(function (track) {
+                track.stop();
+            })
+        }
         this.createStream(newConstraints);
     };
 
