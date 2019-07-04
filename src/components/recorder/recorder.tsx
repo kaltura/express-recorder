@@ -123,7 +123,7 @@ export class Recorder extends Component<Props, State> {
         }
 
         return (
-            <div>
+            <div class={`video-object-wrap ${styles["video-object-wrap"]}`}>
                 {!video && (
                     <div class={`no-video-text ${styles["no-video-text"]}`}>
                         Recording Audio Only

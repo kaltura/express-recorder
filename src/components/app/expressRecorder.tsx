@@ -442,7 +442,6 @@ export class ExpressRecorder extends Component<Props, State> {
                         />
                     )}
                 </div>
-                <div>
                     <Recorder
                         video={constraints.video !== false}
                         stream={stream!}
@@ -454,7 +453,6 @@ export class ExpressRecorder extends Component<Props, State> {
                         uiConfId={uiConfId}
                         onError={this.handleError}
                     />
-                </div>
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
                         <CountdownTimer
