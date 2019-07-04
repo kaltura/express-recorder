@@ -98,6 +98,7 @@ class LoadData extends Component {
 
 //TODO load script first, only on callback create the element
 storiesOf("Playback", module)
+    .addDecorator(story => <div style={{ width: 858, height: 483}}>{story()}</div>)
     .addDecorator(story => {
         return (
             <div>

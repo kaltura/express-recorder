@@ -4,6 +4,7 @@ import {ErrorScreen} from "./errorScreen";
 
 
 storiesOf("Error Screen", module)
+    .addDecorator(story => <div style={{ width: 858, height: 483}}>{story()}</div>)
     .add("render an error screen without title", () => (<ErrorScreen text={'A terrible error has occured'} ></ErrorScreen>))
     .add("render an error screen with title", () => (<ErrorScreen title={'Oh, No!'} text={'A terrible error has occured'} ></ErrorScreen>))
     .add("render an error screen with HTML text", () => (<ErrorScreen title={'Oh, No!'}
