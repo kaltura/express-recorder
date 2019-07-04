@@ -7,8 +7,14 @@
   <title>Widget Template</title>
 
   <style>
+      .resizeme {
+          width: 1000px;
+          height: 500px;
+          background-color: #f5f5f5;
+      }
     .preview {
       width: 100%;
+      height: 100%;
       max-width: 1100px;
       margin: 80px auto;
       border: 1px dashed rgba(0, 0, 0, 0.2);
@@ -28,12 +34,23 @@
 </head>
 
 <body>
+<div class="resizeme">
   <div data-widget-host="habitat" class="preview">
     <script type="text/props">
-      {}
+      {
+        "ks": "YOUR KS HERE",
+        "serviceUrl": "YOUR SERVICE URL HERE",
+        "app": "YOUR APP NAME HERE",
+        "playerUrl": "YOUR PLAYER URL HERE",
+        "conversionProfileId": "YOUR CONVERSION PROFILE ID",
+        "partnerId": YOUR PID,
+        "uiConfId": YOUR PLAYER ID,
+        "browserNotSupportedText" : null,
+        "maxRecordingTime": null}
    </script>
       <script async src="/bundle.js"></script>
   </div>
+</div>
 </body>
 
 </html>
