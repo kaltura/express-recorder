@@ -4,3 +4,4 @@ build
 /.vscode
 .rpt2_cache
 dist
+.DS_Store
