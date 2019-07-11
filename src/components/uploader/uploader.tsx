@@ -65,37 +65,18 @@ export class Uploader extends Component<Props, State> {
         this.upload();
     }
 
-    upload() {
-        const {
-            mediaType,
-            recordedBlobs,
-            entryName,
-            conversionProfileId
-        } = this.props;
-        this.createEntry(
-            mediaType,
-            recordedBlobs,
-            entryName,
-            conversionProfileId
-        );
-    }
-
     /**
      * 1.Add entry
      * 2.Add uploadToken
      * 3.Attach media with token
      * 4.Upload token with media
-     * @param {KalturaMediaType} mediaType
-     * @param {Blob[]} recordedBlobs
-     * @param {string} entryName
-     * @param {number} conversionProfileId
      */
-    createEntry(
-        mediaType: KalturaMediaType,
-        recordedBlobs: Blob[],
-        entryName: string,
-        conversionProfileId?: number
-    ) {
+    upload() {
+        const {
+            mediaType,
+            entryName,
+            conversionProfileId
+        } = this.props;
         const { client } = this.props;
 
         if (!client) {
@@ -140,7 +121,7 @@ export class Uploader extends Component<Props, State> {
                         this.throwError(
                             new Error(
                                 "Failed to create media entry: " +
-                                    +(data || data!.getFirstError())
+                                +(data || data!.getFirstError())
                             )
                         );
                     } else {
@@ -162,7 +143,7 @@ export class Uploader extends Component<Props, State> {
                     this.throwError(
                         new Error(
                             "Failed to create media entry - reject request: " +
-                                err.message
+                            err.message
                         )
                     );
                 }
@@ -171,13 +152,15 @@ export class Uploader extends Component<Props, State> {
                 this.throwError(
                     new Error(
                         "Failed to create media entry - multirequest failed: " +
-                            err.message
+                        err.message
                     )
                 );
             });
     }
 
-    // Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
+    /**
+     * Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
+     */
     addMedia(tokenId: string) {
         const { client } = this.props;
         if (!client) {
@@ -272,32 +255,32 @@ export class Uploader extends Component<Props, State> {
     }
 
     render() {
-        const { loaded, abort } = this.state;
-        const disableCancel = abort || loaded >= this.totalSize;
+        // const { loaded, abort } = this.state;
+        // const disableCancel = abort || loaded >= this.totalSize;
         return (
             <div>
-                {loaded < this.totalSize && (
-                    <span className={`progress-bar ${styles["progress-bar"]}`}>
-                        <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
-                    </span>
-                )}
-                {loaded < this.totalSize && (
-                    <button
-                        className={`btn btn-cancel ${styles["btn"]} ${
-                            disableCancel ? styles["cancel-btn--disabled"] : ""
-                        }`}
-                        onClick={disableCancel ? undefined : this.handleCancel}
-                        disabled={disableCancel}
-                    >
-                        Cancel
-                    </button>
-                )}
-                {loaded >= this.totalSize && (
-                    <div className={`large ${styles["progress-complete"]}`}>
-                        <strong>Upload Completed!</strong> Complete the required
-                        information for the uploaded media below.
-                    </div>
-                )}
+                {/*{loaded < this.totalSize && (*/}
+                    {/*<span className={`progress-bar ${styles["progress-bar"]}`}>*/}
+                        {/*<ProgressBar loaded={loaded} total={this.totalSize} />{" "}*/}
+                    {/*</span>*/}
+                {/*)}*/}
+                {/*{loaded < this.totalSize && (*/}
+                    {/*<button*/}
+                        {/*className={`btn btn-cancel ${styles["btn"]} ${*/}
+                            {/*disableCancel ? styles["cancel-btn--disabled"] : ""*/}
+                        {/*}`}*/}
+                        {/*onClick={disableCancel ? undefined : this.handleCancel}*/}
+                        {/*disabled={disableCancel}*/}
+                    {/*>*/}
+                        {/*Cancel*/}
+                    {/*</button>*/}
+                {/*)}*/}
+                {/*{loaded >= this.totalSize && (*/}
+                    {/*<div className={`large ${styles["progress-complete"]}`}>*/}
+                        {/*<strong>Upload Completed!</strong> Complete the required*/}
+                        {/*information for the uploaded media below.*/}
+                    {/*</div>*/}
+                {/*)}*/}
             </div>
         );
     }
