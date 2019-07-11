@@ -535,7 +535,7 @@ export class ExpressRecorder extends Component<Props, State> {
                         )}
                     {doUpload && (
                         <div
-                            className={`progress-bar ${styles["progress-bar"]}`}
+                            className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}
                         >
                             <Uploader
                                 client={this.kClient}
