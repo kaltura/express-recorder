@@ -43,11 +43,6 @@ export class Uploader extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = {
-            loaded: 0,
-            abort: false
-        };
-
         this.entryId = "";
         this.totalSize = new Blob(props.recordedBlobs, {
             type: "video/webm"
