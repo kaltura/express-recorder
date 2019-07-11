@@ -81,7 +81,10 @@ export class Uploader extends Component<Props, State> {
     }
 
     /**
-     * 1.Add entry 2.Add uploadToken 3.Attach media with token 4.Upload token with media
+     * 1.Add entry
+     * 2.Add uploadToken
+     * 3.Attach media with token
+     * 4.Upload token with media
      * @param {KalturaMediaType} mediaType
      * @param {Blob[]} recordedBlobs
      * @param {string} entryName
@@ -159,7 +162,7 @@ export class Uploader extends Component<Props, State> {
                     this.throwError(
                         new Error(
                             "Failed to create media entry - reject request: " +
-                                err
+                                err.message
                         )
                     );
                 }
@@ -167,8 +170,8 @@ export class Uploader extends Component<Props, State> {
             .catch((err: Error) => {
                 this.throwError(
                     new Error(
-                        "Failed to create media entry - multirequest faild: " +
-                            err
+                        "Failed to create media entry - multirequest failed: " +
+                            err.message
                     )
                 );
             });
@@ -199,7 +202,7 @@ export class Uploader extends Component<Props, State> {
                 this.addMediaRequest.setProgress(
                     (loaded: number, total: number) => {
                         if (!this.state.abort) {
-                            this.setState({ loaded: loaded }); // loaded bytes until know
+                            this.setState({ loaded: loaded }); // loaded bytes until now
                         }
                     }
                 )
