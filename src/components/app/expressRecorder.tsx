@@ -23,6 +23,7 @@ type Props = {
     allowAudio?: boolean; // whether to enable audio recording
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
+    eventTargetId?: string;  // when supplied, events should be triggered on this object
 };
 
 type State = {
@@ -398,7 +399,8 @@ export class ExpressRecorder extends Component<Props, State> {
             entryName,
             ks,
             serviceUrl,
-            maxRecordingTime
+            maxRecordingTime,
+            eventTargetId
         } = this.props;
         const {
             doCountdown,
@@ -553,6 +555,7 @@ export class ExpressRecorder extends Component<Props, State> {
                                 }
                                 serviceUrl={serviceUrl}
                                 ks={ks}
+                                eventTargetId={eventTargetId}
                             />
                         </div>
                     )}

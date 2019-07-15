@@ -24,6 +24,7 @@ type Props = {
     serviceUrl: string;
     ks: string;
     conversionProfileId?: number;
+    eventTargetId?: string;
 };
 
 type State = {
@@ -70,7 +71,8 @@ export class Uploader extends Component<Props, State> {
         const {
             mediaType,
             entryName,
-            conversionProfileId
+            conversionProfileId,
+            eventTargetId
         } = this.props;
         const { client } = this.props;
 
@@ -127,7 +129,7 @@ export class Uploader extends Component<Props, State> {
                             "mediaUploadStarted",
                             { detail: { entryId: this.entryId! } }
                         );
-                        window.dispatchEvent(eventStart);
+                        (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(eventStart);
                         if (this.state.abort) {
                             this.handleCancel();
                         }
@@ -157,7 +159,7 @@ export class Uploader extends Component<Props, State> {
      * Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
      */
     addMedia(tokenId: string) {
-        const { client } = this.props;
+        const { client, eventTargetId } = this.props;
         if (!client) {
             this.throwError(new Error("Missing client object"));
             return;
@@ -190,7 +192,7 @@ export class Uploader extends Component<Props, State> {
                     const event = new CustomEvent("mediaUploadEnded", {
                         detail: { entryId: this.entryId! }
                     });
-                    window.dispatchEvent(event);
+                    (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(event);
                 },
                 (e: Error) => {
                     this.throwError(e);
@@ -199,7 +201,7 @@ export class Uploader extends Component<Props, State> {
     }
 
     handleCancel = () => {
-        const { client } = this.props;
+        const { client, eventTargetId } = this.props;
 
         if (!client) {
             this.throwError(new Error("Missing client object"));
@@ -226,7 +228,7 @@ export class Uploader extends Component<Props, State> {
         // Delete created entry if exists
         this.deleteEntry();
         const event = new CustomEvent("mediaUploadCanceled");
-        window.dispatchEvent(event);
+        (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(event);
     };
 
     deleteEntry = () => {
@@ -250,32 +252,32 @@ export class Uploader extends Component<Props, State> {
     }
 
     render() {
-        // const { loaded, abort } = this.state;
-        // const disableCancel = abort || loaded >= this.totalSize;
+        const { loaded, abort } = this.state;
+        const disableCancel = abort || loaded >= this.totalSize;
         return (
             <div>
-                {/*{loaded < this.totalSize && (*/}
-                    {/*<span className={`progress-bar ${styles["progress-bar"]}`}>*/}
-                        {/*<ProgressBar loaded={loaded} total={this.totalSize} />{" "}*/}
-                    {/*</span>*/}
-                {/*)}*/}
-                {/*{loaded < this.totalSize && (*/}
-                    {/*<button*/}
-                        {/*className={`btn btn-cancel ${styles["btn"]} ${*/}
-                            {/*disableCancel ? styles["cancel-btn--disabled"] : ""*/}
-                        {/*}`}*/}
-                        {/*onClick={disableCancel ? undefined : this.handleCancel}*/}
-                        {/*disabled={disableCancel}*/}
-                    {/*>*/}
-                        {/*Cancel*/}
-                    {/*</button>*/}
-                {/*)}*/}
-                {/*{loaded >= this.totalSize && (*/}
-                    {/*<div className={`large ${styles["progress-complete"]}`}>*/}
-                        {/*<strong>Upload Completed!</strong> Complete the required*/}
-                        {/*information for the uploaded media below.*/}
-                    {/*</div>*/}
-                {/*)}*/}
+                {loaded < this.totalSize && (
+                    <span className={`progress-bar ${styles["progress-bar"]}`}>
+                        <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
+                    </span>
+                )}
+                {loaded < this.totalSize && (
+                    <button
+                        className={`btn btn-cancel ${styles["btn"]} ${
+                            disableCancel ? styles["cancel-btn--disabled"] : ""
+                        }`}
+                        onClick={disableCancel ? undefined : this.handleCancel}
+                        disabled={disableCancel}
+                    >
+                        Cancel
+                    </button>
+                )}
+                {loaded >= this.totalSize && (
+                    <div className={`large ${styles["progress-complete"]}`}>
+                        <strong>Upload Completed!</strong> Complete the required
+                        information for the uploaded media below.
+                    </div>
+                )}
             </div>
         );
     }
