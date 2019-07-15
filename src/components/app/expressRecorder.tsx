@@ -23,6 +23,7 @@ type Props = {
     allowAudio?: boolean; // whether to enable audio recording
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
+    eventTargetId?: string;  // when supplied, events should be triggered on this object
 };
 
 type State = {
@@ -398,7 +399,8 @@ export class ExpressRecorder extends Component<Props, State> {
             entryName,
             ks,
             serviceUrl,
-            maxRecordingTime
+            maxRecordingTime,
+            eventTargetId
         } = this.props;
         const {
             doCountdown,
@@ -442,7 +444,6 @@ export class ExpressRecorder extends Component<Props, State> {
                         />
                     )}
                 </div>
-                <div>
                     <Recorder
                         video={constraints.video !== false}
                         stream={stream!}
@@ -454,7 +455,6 @@ export class ExpressRecorder extends Component<Props, State> {
                         uiConfId={uiConfId}
                         onError={this.handleError}
                     />
-                </div>
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
                         <CountdownTimer
@@ -537,7 +537,7 @@ export class ExpressRecorder extends Component<Props, State> {
                         )}
                     {doUpload && (
                         <div
-                            className={`progress-bar ${styles["progress-bar"]}`}
+                            className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}
                         >
                             <Uploader
                                 client={this.kClient}
@@ -555,6 +555,7 @@ export class ExpressRecorder extends Component<Props, State> {
                                 }
                                 serviceUrl={serviceUrl}
                                 ks={ks}
+                                eventTargetId={eventTargetId}
                             />
                         </div>
                     )}

@@ -67,4 +67,6 @@ class LoadData extends Component {
 	}
 }
 
-storiesOf("Recorder", module).add("simple recorder", () => <LoadData />);
+storiesOf("Recorder", module)
+	.addDecorator(story => <div style={{ width: 858, height: 483}}>{story()}</div>)
+	.add("simple recorder", () => <LoadData />);

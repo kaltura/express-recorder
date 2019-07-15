@@ -24,6 +24,7 @@ type Props = {
     serviceUrl: string;
     ks: string;
     conversionProfileId?: number;
+    eventTargetId?: string;
 };
 
 type State = {
@@ -43,11 +44,6 @@ export class Uploader extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = {
-            loaded: 0,
-            abort: false
-        };
-
         this.entryId = "";
         this.totalSize = new Blob(props.recordedBlobs, {
             type: "video/webm"
@@ -65,34 +61,19 @@ export class Uploader extends Component<Props, State> {
         this.upload();
     }
 
+    /**
+     * 1.Add entry
+     * 2.Add uploadToken
+     * 3.Attach media with token
+     * 4.Upload token with media
+     */
     upload() {
         const {
             mediaType,
-            recordedBlobs,
             entryName,
-            conversionProfileId
+            conversionProfileId,
+            eventTargetId
         } = this.props;
-        this.createEntry(
-            mediaType,
-            recordedBlobs,
-            entryName,
-            conversionProfileId
-        );
-    }
-
-    /**
-     * 1.Add entry 2.Add uploadToken 3.Attach media with token 4.Upload token with media
-     * @param {KalturaMediaType} mediaType
-     * @param {Blob[]} recordedBlobs
-     * @param {string} entryName
-     * @param {number} conversionProfileId
-     */
-    createEntry(
-        mediaType: KalturaMediaType,
-        recordedBlobs: Blob[],
-        entryName: string,
-        conversionProfileId?: number
-    ) {
         const { client } = this.props;
 
         if (!client) {
@@ -137,7 +118,7 @@ export class Uploader extends Component<Props, State> {
                         this.throwError(
                             new Error(
                                 "Failed to create media entry: " +
-                                    +(data || data!.getFirstError())
+                                +(data || data!.getFirstError())
                             )
                         );
                     } else {
@@ -148,7 +129,7 @@ export class Uploader extends Component<Props, State> {
                             "mediaUploadStarted",
                             { detail: { entryId: this.entryId! } }
                         );
-                        window.dispatchEvent(eventStart);
+                        (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(eventStart);
                         if (this.state.abort) {
                             this.handleCancel();
                         }
@@ -159,7 +140,7 @@ export class Uploader extends Component<Props, State> {
                     this.throwError(
                         new Error(
                             "Failed to create media entry - reject request: " +
-                                err
+                            err.message
                         )
                     );
                 }
@@ -167,16 +148,18 @@ export class Uploader extends Component<Props, State> {
             .catch((err: Error) => {
                 this.throwError(
                     new Error(
-                        "Failed to create media entry - multirequest faild: " +
-                            err
+                        "Failed to create media entry - multirequest failed: " +
+                        err.message
                     )
                 );
             });
     }
 
-    // Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
+    /**
+     * Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
+     */
     addMedia(tokenId: string) {
-        const { client } = this.props;
+        const { client, eventTargetId } = this.props;
         if (!client) {
             this.throwError(new Error("Missing client object"));
             return;
@@ -199,7 +182,7 @@ export class Uploader extends Component<Props, State> {
                 this.addMediaRequest.setProgress(
                     (loaded: number, total: number) => {
                         if (!this.state.abort) {
-                            this.setState({ loaded: loaded }); // loaded bytes until know
+                            this.setState({ loaded: loaded }); // loaded bytes until now
                         }
                     }
                 )
@@ -209,7 +192,7 @@ export class Uploader extends Component<Props, State> {
                     const event = new CustomEvent("mediaUploadEnded", {
                         detail: { entryId: this.entryId! }
                     });
-                    window.dispatchEvent(event);
+                    (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(event);
                 },
                 (e: Error) => {
                     this.throwError(e);
@@ -218,7 +201,7 @@ export class Uploader extends Component<Props, State> {
     }
 
     handleCancel = () => {
-        const { client } = this.props;
+        const { client, eventTargetId } = this.props;
 
         if (!client) {
             this.throwError(new Error("Missing client object"));
@@ -245,7 +228,7 @@ export class Uploader extends Component<Props, State> {
         // Delete created entry if exists
         this.deleteEntry();
         const event = new CustomEvent("mediaUploadCanceled");
-        window.dispatchEvent(event);
+        (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(event);
     };
 
     deleteEntry = () => {

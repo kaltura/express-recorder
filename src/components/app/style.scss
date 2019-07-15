@@ -1,7 +1,7 @@
 .express-recorder {
     text-align: center;
-    height: 483px;
-    width: 858px;
+    height: 100%;
+    width: 100%;
     border-radius: 4px;
     font-family: Helvetica;
     background-color: black;
@@ -79,7 +79,7 @@
     width:auto;
     height:auto;
 }
-.progress-bar {
+.progress-bar-wrap {
     margin-top: 130px;
     width: 858px;
 }
