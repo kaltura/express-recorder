@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Recorder</title>
+
+    <% for (var chunk in htmlWebpackPlugin.files.chunks) { %><script id="bundle" src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script><% } %>
+
+    <style>
+        #parent {
+        }
+    </style>
+</head>
+
+<body>
+<h1>Express Recorder</h1>
+<div style="">
+    <div style="color: darkgreen">
+        <p>Hi Atar,</p>
+        <p>The page added the component below using the new cool API.</p>
+        <p>It will instruct the component to blink every 1 seconds (meaning the page have access to component methods).</p>
+        <p>After 10 seconds it will be destroyed by the page (meaning no memory leaks).</p>
+        <p>Use props to make the him sad (meaning the page can pass props to component).</p>
+        <br>
+        <p>To migrate successfully to the following:</p>
+        <p>1. in 'package.json' update: name, homepage, repository, license, </p>
+        <p>2. copy all relevant content into src and update index.tsx to use your component and props</p>
+        <p>3. update the readme.md file</p>
+        <p>4. update index.template.ejs to include the relevant props with places holders only!</p>
+        <p>5. copy the index.template.ejs file into index.ejs (local version only) and fill the values</p>
+        <p>6. run npm install && npm run serve to see it in action</p>
+        <p>7. run npm run build to bundle and test it somewhere elses</p>
+        <p>Enjoy!</p>
+    </div>
+    <hr/>
+    <div id="parent"></div>
+</div>
+
+<script>
+  const component = Kaltura.ExpressRecorder.create('parent', {isHappy: true});
+
+  const intervalToken = setInterval(() => {
+    component.instance.toggleBlinking();
+  }, 1000);
+
+  setTimeout(() => {
+    clearInterval(intervalToken);
+
+    component.destroy();
+  }, 10000);
+</script>
+
+</body>
+
+</html>
