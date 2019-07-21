@@ -91,6 +91,26 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.isBrowserCompatible = this.isBrowserCompatible.bind(this);
     }
 
+    /* =====================================================================
+     * start Public API
+     * ======================================================================
+     */
+    startRecording = () => {
+        if (this.state.recordedBlobs.length) {
+            this.handleResetClick();
+        }
+        this.handleStartClick();
+    };
+
+    stopRecording = () => {
+        this.handleStopClick();
+    };
+
+    /* =====================================================================
+     * end Public API
+     * ======================================================================
+     */
+
     componentDidMount() {
         const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
 

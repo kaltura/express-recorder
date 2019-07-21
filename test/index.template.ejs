@@ -20,6 +20,10 @@
 <h1>Express Recorder</h1>
 <div>
     <div id="parent"></div>
+    <div>
+        <input type="button" onclick="doStartRecording()" value="start" />
+        <input type="button" onclick="doStopRecording()" value="stop" />
+    </div>
 </div>
 
 <script>
@@ -33,15 +37,8 @@
       "uiConfId": "PLAYER_UICONF_ID",
   });
 
-  const intervalToken = setInterval(() => {
-    component.instance.toggleBlinking();
-  }, 1000);
-
-  setTimeout(() => {
-    clearInterval(intervalToken);
-
-    component.destroy();
-  }, 10000);
+  doStartRecording = () => { component.instance.startRecording()}
+  doStopRecording = () => { component.instance.stopRecording()}
 </script>
 
 </body>
