@@ -44,6 +44,10 @@
   doDownloadRecording = () => { component.instance.saveCopy()}
   doUploadRecording = () => { component.instance.upload()}
 
+  component.instance.addEventListener("recordingStarted", (e) => {console.log(e.type)});
+  component.instance.addEventListener("recordingEnded", (e) => {console.log(e.type)});
+  component.instance.addEventListener("error", (e) => {console.log(e.type + ", " + e.detail.message)});
+
 </script>
 
 </body>

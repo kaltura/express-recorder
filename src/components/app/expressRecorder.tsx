@@ -60,6 +60,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
     kClient: KalturaClient | undefined;
+    dispatcher: EventTarget = new EventTarget();
 
     constructor(props: ExpressRecorderProps) {
         super(props);
@@ -145,6 +146,22 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * ======================================================================
      */
 
+    addEventListener(
+        type: string,
+        listener: EventListener | EventListenerObject | null,
+        options?: boolean | AddEventListenerOptions | undefined
+    ) {
+        this.dispatcher.addEventListener(type, listener, options);
+    }
+
+    removeEventListener(
+        type: string,
+        callback: EventListener | EventListenerObject | null,
+        options?: boolean | AddEventListenerOptions | undefined
+    ) {
+        this.dispatcher.removeEventListener(type, callback, options);
+    }
+
     componentDidMount() {
         const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
 
@@ -165,7 +182,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         );
 
         if (!this.kClient) {
-            this.setState({ error: "Cannot connect to Kaltura server" });
+            this.handleError("Cannot connect to Kaltura server");
         }
 
         // load player lib
@@ -198,7 +215,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             message += !playerUrl ? "playerUrl; " : "";
             message += !uiConfId ? "uiConfId; " : "";
             message += !partnerId ? "partnerId; " : "";
-            this.setState({ error: message });
+            this.handleError(message);
         }
     };
 
@@ -223,7 +240,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         });
 
         if (!isWebRTCSupported) {
-            this.setState({ error: notSupportedError });
+            this.handleError(notSupportedError);
             return false;
         }
 
@@ -233,7 +250,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 mimeType: "video/webm"
             });
         } catch (e) {
-            this.setState({ error: notSupportedError });
+            this.handleError(notSupportedError);
             return false;
         }
 
@@ -245,6 +262,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     handleError = (error: string) => {
         this.setState({ error: error });
+        this.dispatcher.dispatchEvent(new CustomEvent("error", { detail: { message: error } }));
     };
 
     handleUpload = () => {
@@ -264,6 +282,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     handleRecordingEnd = (recordedBlobs: Blob[]) => {
         this.setState({ recordedBlobs: recordedBlobs });
+        this.dispatcher.dispatchEvent(new CustomEvent("recordingEnded"));
     };
 
     getDefaultEntryName() {
@@ -278,12 +297,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     handleStartClick = () => {
         this.handleBeforeunload(true);
         this.setState({ doCountdown: true });
+        this.dispatcher.dispatchEvent(new CustomEvent("recordingStarted"));
     };
     handleStopClick = () => {
         this.setState({ doRecording: false, doPlayback: true });
     };
     handleCancelClick = () => {
         this.setState({ doCountdown: false });
+        this.dispatcher.dispatchEvent(new CustomEvent("recordingCancelled"));
     };
     handleResetClick = () => {
         this.setState({
