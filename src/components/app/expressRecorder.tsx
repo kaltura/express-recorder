@@ -8,6 +8,7 @@ import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
 import { Settings } from "../settings/settings";
+import { RecorderEvents } from "./RecorderEvents";
 const styles = require("./style.scss");
 
 export type ExpressRecorderProps = {
@@ -23,7 +24,6 @@ export type ExpressRecorderProps = {
     allowAudio?: boolean; // whether to enable audio recording
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
-    eventTargetId?: string; // when supplied, events should be triggered on this object
 };
 
 type State = {
@@ -262,7 +262,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     handleError = (error: string) => {
         this.setState({ error: error });
-        this.dispatcher.dispatchEvent(new CustomEvent("error", { detail: { message: error } }));
+        this.dispatcher.dispatchEvent(
+            new CustomEvent(RecorderEvents.error, { detail: { message: error } })
+        );
     };
 
     handleUpload = () => {
@@ -282,7 +284,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     handleRecordingEnd = (recordedBlobs: Blob[]) => {
         this.setState({ recordedBlobs: recordedBlobs });
-        this.dispatcher.dispatchEvent(new CustomEvent("recordingEnded"));
+        this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.recordingEnded));
     };
 
     getDefaultEntryName() {
@@ -297,14 +299,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     handleStartClick = () => {
         this.handleBeforeunload(true);
         this.setState({ doCountdown: true });
-        this.dispatcher.dispatchEvent(new CustomEvent("recordingStarted"));
+        this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.recordingStarted));
     };
     handleStopClick = () => {
         this.setState({ doRecording: false, doPlayback: true });
     };
     handleCancelClick = () => {
         this.setState({ doCountdown: false });
-        this.dispatcher.dispatchEvent(new CustomEvent("recordingCancelled"));
+        this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.recordingCancelled));
     };
     handleResetClick = () => {
         this.setState({
@@ -429,16 +431,22 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         }, 100);
     };
 
+    handleUploadStarted = (entryId: string) => {
+        this.dispatcher.dispatchEvent(
+            new CustomEvent(RecorderEvents.mediaUploadStarted, { detail: { entryId: entryId } })
+        );
+    };
+    handleUploadEnded = (entryId: string) => {
+        this.dispatcher.dispatchEvent(
+            new CustomEvent(RecorderEvents.mediaUploadEnded, { detail: { entryId: entryId } })
+        );
+    };
+    handleUploadCancelled = () => {
+        this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.mediaUploadCancelled));
+    };
+
     render() {
-        const {
-            partnerId,
-            uiConfId,
-            entryName,
-            ks,
-            serviceUrl,
-            maxRecordingTime,
-            eventTargetId
-        } = this.props;
+        const { partnerId, uiConfId, entryName, ks, serviceUrl, maxRecordingTime } = this.props;
         const {
             doCountdown,
             doUpload,
@@ -551,6 +559,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             <Uploader
                                 client={this.kClient}
                                 onError={this.handleError}
+                                onUploadStarted={this.handleUploadStarted}
+                                onUploadEnded={this.handleUploadEnded}
+                                onUploadCancelled={this.handleUploadCancelled}
                                 mediaType={
                                     constraints.video
                                         ? KalturaMediaType.video
@@ -560,7 +571,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 entryName={entryName ? entryName : this.getDefaultEntryName()}
                                 serviceUrl={serviceUrl}
                                 ks={ks}
-                                eventTargetId={eventTargetId}
                             />
                         </div>
                     )}

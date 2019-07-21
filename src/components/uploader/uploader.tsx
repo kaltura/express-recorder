@@ -17,14 +17,16 @@ const styles = require("./style.scss");
 
 type Props = {
     client: KalturaClient | undefined;
-    onError: ((e: string) => void) | undefined;
+    onError?: (error: string) => void;
+    onUploadStarted?: (entryId: string) => void;
+    onUploadEnded?: (entryId: string) => void;
+    onUploadCancelled?: () => void;
     mediaType: KalturaMediaType;
     recordedBlobs: Blob[];
     entryName: string;
     serviceUrl: string;
     ks: string;
     conversionProfileId?: number;
-    eventTargetId?: string;
 };
 
 type State = {
@@ -72,7 +74,8 @@ export class Uploader extends Component<Props, State> {
             mediaType,
             entryName,
             conversionProfileId,
-            eventTargetId
+            onUploadEnded,
+            onUploadStarted
         } = this.props;
         const { client } = this.props;
 
@@ -117,19 +120,16 @@ export class Uploader extends Component<Props, State> {
                     if (!data || data.hasErrors()) {
                         this.throwError(
                             new Error(
-                                "Failed to create media entry: " +
-                                +(data || data!.getFirstError())
+                                "Failed to create media entry: " + +(data || data!.getFirstError())
                             )
                         );
                     } else {
                         // 4.Upload token with media
                         this.entryId = data[0].result.id;
                         this.tokenId = data[1].result.id;
-                        const eventStart = new CustomEvent(
-                            "mediaUploadStarted",
-                            { detail: { entryId: this.entryId! } }
-                        );
-                        (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(eventStart);
+                        if (onUploadStarted) {
+                            onUploadStarted(this.entryId);
+                        }
                         if (this.state.abort) {
                             this.handleCancel();
                         }
@@ -138,19 +138,13 @@ export class Uploader extends Component<Props, State> {
                 },
                 (err: Error) => {
                     this.throwError(
-                        new Error(
-                            "Failed to create media entry - reject request: " +
-                            err.message
-                        )
+                        new Error("Failed to create media entry - reject request: " + err.message)
                     );
                 }
             )
             .catch((err: Error) => {
                 this.throwError(
-                    new Error(
-                        "Failed to create media entry - multirequest failed: " +
-                        err.message
-                    )
+                    new Error("Failed to create media entry - multirequest failed: " + err.message)
                 );
             });
     }
@@ -159,7 +153,7 @@ export class Uploader extends Component<Props, State> {
      * Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
      */
     addMedia(tokenId: string) {
-        const { client, eventTargetId } = this.props;
+        const { client, onUploadEnded } = this.props;
         if (!client) {
             this.throwError(new Error("Missing client object"));
             return;
@@ -179,20 +173,17 @@ export class Uploader extends Component<Props, State> {
 
         client
             .request(
-                this.addMediaRequest.setProgress(
-                    (loaded: number, total: number) => {
-                        if (!this.state.abort) {
-                            this.setState({ loaded: loaded }); // loaded bytes until now
-                        }
+                this.addMediaRequest.setProgress((loaded: number, total: number) => {
+                    if (!this.state.abort) {
+                        this.setState({ loaded: loaded }); // loaded bytes until now
                     }
-                )
+                })
             )
             .then(
                 data => {
-                    const event = new CustomEvent("mediaUploadEnded", {
-                        detail: { entryId: this.entryId! }
-                    });
-                    (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(event);
+                    if (onUploadEnded) {
+                        onUploadEnded(this.entryId);
+                    }
                 },
                 (e: Error) => {
                     this.throwError(e);
@@ -201,7 +192,7 @@ export class Uploader extends Component<Props, State> {
     }
 
     handleCancel = () => {
-        const { client, eventTargetId } = this.props;
+        const { client, onUploadCancelled } = this.props;
 
         if (!client) {
             this.throwError(new Error("Missing client object"));
@@ -227,8 +218,9 @@ export class Uploader extends Component<Props, State> {
 
         // Delete created entry if exists
         this.deleteEntry();
-        const event = new CustomEvent("mediaUploadCanceled");
-        (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(event);
+        if (onUploadCancelled) {
+            onUploadCancelled();
+        }
     };
 
     deleteEntry = () => {
@@ -247,7 +239,7 @@ export class Uploader extends Component<Props, State> {
 
     throwError(error: Error) {
         if (this.props.onError) {
-            this.props.onError(error.name + " : " + error.message);
+            this.props.onError(`${error.name} : ${error.message}`);
         }
     }
 
@@ -273,13 +265,9 @@ export class Uploader extends Component<Props, State> {
                     </button>
                 )}
                 {loaded >= this.totalSize && (
-                    <div
-                        className={`upload-success-message ${
-                            styles["progress-complete"]
-                        }`}
-                    >
-                        <strong>Upload Completed!</strong> Complete the required
-                        information for the uploaded media below.
+                    <div className={`upload-success-message ${styles["progress-complete"]}`}>
+                        <strong>Upload Completed!</strong> Complete the required information for the
+                        uploaded media below.
                     </div>
                 )}
             </div>
