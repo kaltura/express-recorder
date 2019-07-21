@@ -23,6 +23,8 @@
     <div>
         <input type="button" onclick="doStartRecording()" value="start" />
         <input type="button" onclick="doStopRecording()" value="stop" />
+        <input type="button" onclick="doDownloadRecording()" value="save latest recording locally" />
+        <input type="button" onclick="doUploadRecording()" value="Upload latest recording to Kaltura" />
     </div>
 </div>
 
@@ -39,6 +41,9 @@
 
   doStartRecording = () => { component.instance.startRecording()}
   doStopRecording = () => { component.instance.stopRecording()}
+  doDownloadRecording = () => { component.instance.saveCopy()}
+  doUploadRecording = () => { component.instance.upload()}
+
 </script>
 
 </body>

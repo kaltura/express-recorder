@@ -95,15 +95,49 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * start Public API
      * ======================================================================
      */
+
+    /**
+     * clear any existing recording and start a new one
+     */
     startRecording = () => {
-        if (this.state.recordedBlobs.length) {
+        const { recordedBlobs } = this.state;
+        if (recordedBlobs.length) {
             this.handleResetClick();
         }
         this.handleStartClick();
     };
 
+    /**
+     * stop the active recording
+     */
     stopRecording = () => {
-        this.handleStopClick();
+        const { doRecording, doCountdown } = this.state;
+        if (doCountdown) {
+            this.handleCancelClick();
+        }
+        if (doRecording) {
+            this.handleStopClick();
+        }
+    };
+
+    /**
+     * get a local copy of the latest recording
+     */
+    saveCopy = () => {
+        const { doRecording, recordedBlobs } = this.state;
+        if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
+            this.handleDownload();
+        }
+    };
+
+    /**
+     * upload the latest recording to Kaltura
+     */
+    upload = () => {
+        const { doRecording, recordedBlobs } = this.state;
+        if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
+            this.handleUpload();
+        }
     };
 
     /* =====================================================================
