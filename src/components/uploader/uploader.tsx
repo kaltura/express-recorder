@@ -21,6 +21,7 @@ type Props = {
     onUploadStarted?: (entryId: string) => void;
     onUploadEnded?: (entryId: string) => void;
     onUploadCancelled?: () => void;
+    onUploadProgress?: (loaded: number, total: number) => void;
     mediaType: KalturaMediaType;
     recordedBlobs: Blob[];
     entryName: string;
@@ -153,7 +154,7 @@ export class Uploader extends Component<Props, State> {
      * Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
      */
     addMedia(tokenId: string) {
-        const { client, onUploadEnded } = this.props;
+        const { client, onUploadEnded, onUploadProgress } = this.props;
         if (!client) {
             this.throwError(new Error("Missing client object"));
             return;
@@ -176,6 +177,9 @@ export class Uploader extends Component<Props, State> {
                 this.addMediaRequest.setProgress((loaded: number, total: number) => {
                     if (!this.state.abort) {
                         this.setState({ loaded: loaded }); // loaded bytes until now
+                        if (onUploadProgress) {
+                            onUploadProgress(loaded, total);
+                        }
                     }
                 })
             )

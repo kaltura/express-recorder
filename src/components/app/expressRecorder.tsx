@@ -444,6 +444,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     handleUploadCancelled = () => {
         this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.mediaUploadCancelled));
     };
+    handleUploadProgress = (loaded: number, total: number) => {
+        this.dispatcher.dispatchEvent(
+            new CustomEvent(RecorderEvents.mediaUploadProgress, {
+                detail: { loaded: loaded, total: total }
+            })
+        );
+    };
 
     render() {
         const { partnerId, uiConfId, entryName, ks, serviceUrl, maxRecordingTime } = this.props;
@@ -562,6 +569,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 onUploadStarted={this.handleUploadStarted}
                                 onUploadEnded={this.handleUploadEnded}
                                 onUploadCancelled={this.handleUploadCancelled}
+                                onUploadProgress={this.handleUploadProgress}
                                 mediaType={
                                     constraints.video
                                         ? KalturaMediaType.video

@@ -5,5 +5,6 @@ export enum RecorderEvents {
     recordingCancelled = "recordingCancelled",
     mediaUploadStarted = "mediaUploadStarted",
     mediaUploadEnded = "mediaUploadEnded",
-    mediaUploadCancelled = "mediaUploadCancelled"
+    mediaUploadCancelled = "mediaUploadCancelled",
+    mediaUploadProgress = "mediaUploadProgress"
 }
