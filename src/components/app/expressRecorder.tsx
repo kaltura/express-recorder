@@ -10,7 +10,7 @@ import { ErrorScreen } from "../error-screen/errorScreen";
 import { Settings } from "../settings/settings";
 const styles = require("./style.scss");
 
-type Props = {
+export type ExpressRecorderProps = {
     ks: string;
     serviceUrl: string;
     app: string; // parent app for client creation
@@ -23,7 +23,7 @@ type Props = {
     allowAudio?: boolean; // whether to enable audio recording
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
-    eventTargetId?: string;  // when supplied, events should be triggered on this object
+    eventTargetId?: string; // when supplied, events should be triggered on this object
 };
 
 type State = {
@@ -51,7 +51,7 @@ const VIDEO_CONSTRAINT = {
 /**
  * This is the main component of the widget - contains the main flow.
  */
-export class ExpressRecorder extends Component<Props, State> {
+export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     static defaultProps = {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
@@ -61,7 +61,7 @@ export class ExpressRecorder extends Component<Props, State> {
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
     kClient: KalturaClient | undefined;
 
-    constructor(props: Props) {
+    constructor(props: ExpressRecorderProps) {
         super(props);
 
         this.state = {
@@ -92,14 +92,7 @@ export class ExpressRecorder extends Component<Props, State> {
     }
 
     componentDidMount() {
-        const {
-            serviceUrl,
-            app,
-            ks,
-            playerUrl,
-            uiConfId,
-            partnerId
-        } = this.props;
+        const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
 
         this.checkProps();
         if (!this.isBrowserCompatible()) {
@@ -124,43 +117,26 @@ export class ExpressRecorder extends Component<Props, State> {
         // load player lib
         const tag = document.createElement("script");
         tag.async = true;
-        tag.src =
-            playerUrl + `/p/${partnerId}/embedPlaykitJs/uiconf_id/${uiConfId}`;
+        tag.src = playerUrl + `/p/${partnerId}/embedPlaykitJs/uiconf_id/${uiConfId}`;
         tag.type = "text/javascript";
         document.body.appendChild(tag);
 
-        window.addEventListener("mediaUploadEnded", (e: Event) =>
-            this.handleBeforeunload(false)
-        );
+        window.addEventListener("mediaUploadEnded", (e: Event) => this.handleBeforeunload(false));
 
         window.addEventListener("keydown", this.handleKeyboardControl);
 
         if (this.state.stream) {
-            this.state.stream.getTracks().forEach(function (track) {
+            this.state.stream.getTracks().forEach(function(track) {
                 track.stop();
-            })
+            });
         }
         this.createStream(this.state.constraints);
     }
 
     checkProps = () => {
-        const {
-            serviceUrl,
-            app,
-            ks,
-            playerUrl,
-            uiConfId,
-            partnerId
-        } = this.props;
+        const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
 
-        if (
-            !serviceUrl ||
-            !app ||
-            !ks ||
-            !playerUrl ||
-            !uiConfId ||
-            !partnerId
-        ) {
+        if (!serviceUrl || !app || !ks || !playerUrl || !uiConfId || !partnerId) {
             let message = "Missing props: ";
             message += !serviceUrl ? "serviceUrl; " : "";
             message += !app ? "app; " : "";
@@ -295,9 +271,9 @@ export class ExpressRecorder extends Component<Props, State> {
         }
 
         if (this.state.stream) {
-            this.state.stream.getTracks().forEach(function (track) {
+            this.state.stream.getTracks().forEach(function(track) {
                 track.stop();
-            })
+            });
         }
         this.createStream(newConstraints);
     };
@@ -305,8 +281,7 @@ export class ExpressRecorder extends Component<Props, State> {
     createStream = (constraints: Constraints) => {
         if (!constraints.video && !constraints.audio) {
             this.setState({
-                error:
-                    "Video and audio are disabled, at least one of them must be enabled."
+                error: "Video and audio are disabled, at least one of them must be enabled."
             });
             return;
         }
@@ -315,9 +290,7 @@ export class ExpressRecorder extends Component<Props, State> {
             .then((stream: MediaStream) => {
                 this.handleSuccess(stream, constraints);
             })
-            .catch(e =>
-                this.handleError("Failed to allocate resource: " + e.message)
-            );
+            .catch(e => this.handleError("Failed to allocate resource: " + e.message));
     };
 
     handleBeforeunload = (addMessage: boolean = false) => {
@@ -327,12 +300,7 @@ export class ExpressRecorder extends Component<Props, State> {
     };
 
     handleKeyboardControl = (e: any) => {
-        const {
-            doCountdown,
-            doRecording,
-            recordedBlobs,
-            doPlayback
-        } = this.state;
+        const { doCountdown, doRecording, recordedBlobs, doPlayback } = this.state;
 
         // start record on Alt + Shift (Meta for mac) + R
         if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyR") {
@@ -359,11 +327,7 @@ export class ExpressRecorder extends Component<Props, State> {
         // upload record on Alt + Shift (Meta for mac) + U
         if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyU") {
             e.preventDefault();
-            if (
-                !doRecording &&
-                recordedBlobs.length > 0 &&
-                !this.uploadedOnce
-            ) {
+            if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
                 this.handleUpload();
             }
             return;
@@ -374,9 +338,7 @@ export class ExpressRecorder extends Component<Props, State> {
         const blob = new Blob(this.state.recordedBlobs, { type: "video/webm" });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
-        const entryName = this.props.entryName
-            ? this.props.entryName
-            : this.getDefaultEntryName();
+        const entryName = this.props.entryName ? this.props.entryName : this.getDefaultEntryName();
 
         // create hidden link with the file url and perform click to download the file.
         a.style.display = "none";
@@ -419,9 +381,7 @@ export class ExpressRecorder extends Component<Props, State> {
 
         if (error !== "") {
             return (
-                <div
-                    className={`express-recorder ${styles["express-recorder"]}`}
-                >
+                <div className={`express-recorder ${styles["express-recorder"]}`}>
                     {error && <ErrorScreen text={error} />}
                 </div>
             );
@@ -431,12 +391,8 @@ export class ExpressRecorder extends Component<Props, State> {
                 <div className={styles["settings-wrap"]}>
                     {!doUpload && !doPlayback && !doRecording && (
                         <Settings
-                            selectedCamera={
-                                stream ? stream.getVideoTracks()[0] : undefined
-                            }
-                            selectedAudio={
-                                stream ? stream.getAudioTracks()[0] : undefined
-                            }
+                            selectedCamera={stream ? stream.getVideoTracks()[0] : undefined}
+                            selectedAudio={stream ? stream.getAudioTracks()[0] : undefined}
                             allowVideo={constraints.video !== false}
                             allowAudio={constraints.audio !== false}
                             onSettingsChanged={this.handleSettingsChange}
@@ -444,17 +400,17 @@ export class ExpressRecorder extends Component<Props, State> {
                         />
                     )}
                 </div>
-                    <Recorder
-                        video={constraints.video !== false}
-                        stream={stream!}
-                        onRecordingEnd={this.handleRecordingEnd}
-                        doRecording={doRecording}
-                        discard={doCountdown}
-                        doPlayback={doPlayback}
-                        partnerId={partnerId}
-                        uiConfId={uiConfId}
-                        onError={this.handleError}
-                    />
+                <Recorder
+                    video={constraints.video !== false}
+                    stream={stream!}
+                    onRecordingEnd={this.handleRecordingEnd}
+                    doRecording={doRecording}
+                    discard={doCountdown}
+                    doPlayback={doPlayback}
+                    partnerId={partnerId}
+                    uiConfId={uiConfId}
+                    onError={this.handleError}
+                />
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
                         <CountdownTimer
@@ -464,15 +420,11 @@ export class ExpressRecorder extends Component<Props, State> {
                     </div>
                 )}
                 <div
-                    className={`express-recorder__controls ${
-                        styles["express-recorder__controls"]
-                    }`}
+                    className={`express-recorder__controls ${styles["express-recorder__controls"]}`}
                 >
                     {!doRecording && !doCountdown && !doPlayback && (
                         <button
-                            className={`controls__start ${
-                                styles["controls__start"]
-                            }`}
+                            className={`controls__start ${styles["controls__start"]}`}
                             id="startRecord"
                             onClick={this.handleStartClick}
                             aria-label={"Start Recording"}
@@ -487,58 +439,40 @@ export class ExpressRecorder extends Component<Props, State> {
                     )}
                     {doCountdown && (
                         <button
-                            className={`controls__cancel ${
-                                styles["controls__cancel"]
-                            }`}
+                            className={`controls__cancel ${styles["controls__cancel"]}`}
                             onClick={this.handleCancelClick}
                             tabIndex={0}
                         >
                             Cancel
                         </button>
                     )}
-                    {!doRecording &&
-                        recordedBlobs.length > 0 &&
-                        !this.uploadedOnce && (
-                            <div
-                                className={`${
-                                    styles["express-recorder__bottom"]
-                                }`}
+                    {!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce && (
+                        <div className={`${styles["express-recorder__bottom"]}`}>
+                            <button
+                                className={`btn btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
+                                onClick={this.handleDownload}
+                                tabIndex={0}
                             >
-                                <button
-                                    className={`btn btn__download ${
-                                        styles["bottom__btn"]
-                                    } ${styles["btn__clear"]} ${
-                                        styles["btn__download"]
-                                    } `}
-                                    onClick={this.handleDownload}
-                                    tabIndex={0}
-                                >
-                                    Download a Copy
-                                </button>
-                                <button
-                                    className={`btn btn__reset ${
-                                        styles["bottom__btn"]
-                                    } ${styles["btn__clear"]}`}
-                                    onClick={this.handleResetClick}
-                                    tabIndex={0}
-                                >
-                                    Record Again
-                                </button>
-                                <button
-                                    className={`btn btn-primary btn__save ${
-                                        styles["bottom__btn"]
-                                    } ${styles["btn__save"]}`}
-                                    onClick={this.handleUpload}
-                                    tabIndex={0}
-                                >
-                                    Use This
-                                </button>
-                            </div>
-                        )}
+                                Download a Copy
+                            </button>
+                            <button
+                                className={`btn btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
+                                onClick={this.handleResetClick}
+                                tabIndex={0}
+                            >
+                                Record Again
+                            </button>
+                            <button
+                                className={`btn btn-primary btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
+                                onClick={this.handleUpload}
+                                tabIndex={0}
+                            >
+                                Use This
+                            </button>
+                        </div>
+                    )}
                     {doUpload && (
-                        <div
-                            className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}
-                        >
+                        <div className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}>
                             <Uploader
                                 client={this.kClient}
                                 onError={this.handleError}
@@ -548,11 +482,7 @@ export class ExpressRecorder extends Component<Props, State> {
                                         : KalturaMediaType.audio
                                 }
                                 recordedBlobs={recordedBlobs}
-                                entryName={
-                                    entryName
-                                        ? entryName
-                                        : this.getDefaultEntryName()
-                                }
+                                entryName={entryName ? entryName : this.getDefaultEntryName()}
                                 serviceUrl={serviceUrl}
                                 ks={ks}
                                 eventTargetId={eventTargetId}

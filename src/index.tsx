@@ -1,9 +1,10 @@
 import { h, render, Component } from "preact";
 import { CustomComponent, CustomComponentProps } from "./custom-component";
+import { ExpressRecorder, ExpressRecorderProps } from "./components/app/expressRecorder";
 
 export const create = (
     elementId: string,
-    props: CustomComponentProps
+    props: ExpressRecorderProps
 ): { destroy: () => void; instance: CustomComponent } => {
     const parent = document.getElementById(elementId);
 
@@ -16,7 +17,7 @@ export const create = (
         instance = c;
     };
 
-    const child = render(<CustomComponent ref={ref} {...props} />, parent);
+    const child = render(<ExpressRecorder ref={ref} {...props} />, parent);
 
     return {
         destroy: () => {
