@@ -24,6 +24,7 @@ export type ExpressRecorderProps = {
     allowAudio?: boolean; // whether to enable audio recording
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
+    showUploadUI?: boolean;
 };
 
 type State = {
@@ -56,7 +57,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     static defaultProps = {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
-        allowAudio: true
+        allowAudio: true,
+        showUploadUI: true
     };
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
@@ -481,7 +483,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     render() {
-        const { partnerId, uiConfId, entryName, ks, serviceUrl, maxRecordingTime } = this.props;
+        const {
+            partnerId,
+            uiConfId,
+            entryName,
+            ks,
+            serviceUrl,
+            maxRecordingTime,
+            showUploadUI
+        } = this.props;
         const {
             doCountdown,
             doUpload,
@@ -608,7 +618,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 entryName={entryName ? entryName : this.getDefaultEntryName()}
                                 serviceUrl={serviceUrl}
                                 ks={ks}
-                                // showUI={false}
+                                showUI={showUploadUI}
                                 abortUpload={abortUpload}
                             />
                         </div>
