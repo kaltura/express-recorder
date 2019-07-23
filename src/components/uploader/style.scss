@@ -1,3 +1,7 @@
+.uploader {
+    height:100%;
+    width: 100%;
+}
 .btn {
     height: 36px;
     width: 105px;
@@ -6,15 +10,18 @@
     background-color: #ffffff;
     cursor: pointer;
 }
+
+.progress-bar-wrap {
+    width:100%;
+}
 .progress-bar {
-    max-width: 86%;
-    float: left;
-    width: 858px;
-    margin-right: 13px;
+    width: 50%;
+    margin:auto;
 }
 
 .cancel-wrap {
     width: 100%;
+    height: 45%; /// to push bar down
     text-align: right;
 }
 

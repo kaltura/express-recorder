@@ -263,7 +263,7 @@ export class Uploader extends Component<Props, State> {
             return <div />;
         }
         return (
-            <div>
+            <div className={`uploader ${styles["uploader"]}`}>
                 <div className={`cancel-wrap ${styles["cancel-wrap"]}`}>
                     {loaded < this.totalSize && (
                         <button
@@ -282,9 +282,9 @@ export class Uploader extends Component<Props, State> {
                 </div>
                 <div className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}>
                     {loaded < this.totalSize && (
-                        <span className={`progress-bar ${styles["progress-bar"]}`}>
+                        <div className={`progress-bar ${styles["progress-bar"]}`}>
                             <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
-                        </span>
+                        </div>
                     )}
                 </div>
                 {loaded >= this.totalSize && (
