@@ -264,22 +264,29 @@ export class Uploader extends Component<Props, State> {
         }
         return (
             <div>
-                {loaded < this.totalSize && (
-                    <span className={`progress-bar ${styles["progress-bar"]}`}>
-                        <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
-                    </span>
-                )}
-                {loaded < this.totalSize && (
-                    <button
-                        className={`btn btn-cancel ${styles["btn"]} ${
-                            disableCancel ? styles["cancel-btn--disabled"] : ""
-                        }`}
-                        onClick={disableCancel ? undefined : this.handleCancel}
-                        disabled={disableCancel}
-                    >
-                        Cancel
-                    </button>
-                )}
+                <div className={`cancel-wrap ${styles["cancel-wrap"]}`}>
+                    {loaded < this.totalSize && (
+                        <button
+                            className={`btn btn-cancel ${styles["btn"]} ${styles["btn-cancel"]}
+                            ${
+                                disableCancel
+                                    ? `${styles["btn-cancel--disabled"]} btn-cancel--disabled`
+                                    : ""
+                            }`}
+                            onClick={disableCancel ? undefined : this.handleCancel}
+                            disabled={disableCancel}
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
+                <div className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}>
+                    {loaded < this.totalSize && (
+                        <span className={`progress-bar ${styles["progress-bar"]}`}>
+                            <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
+                        </span>
+                    )}
+                </div>
                 {loaded >= this.totalSize && (
                     <div className={`upload-success-message ${styles["progress-complete"]}`}>
                         <strong>Upload Completed!</strong> Complete the required information for the

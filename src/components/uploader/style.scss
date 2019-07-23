@@ -12,7 +12,16 @@
     width: 858px;
     margin-right: 13px;
 }
-.cancel-btn--disabled {
+
+.cancel-wrap {
+    width: 100%;
+    text-align: right;
+}
+
+.btn-cancel {
+    margin: 16px;
+}
+.btn-cancel--disabled {
     opacity: 0.4 !important;
 }
 .progress-complete {
