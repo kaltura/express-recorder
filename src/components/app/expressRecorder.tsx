@@ -32,6 +32,7 @@ type State = {
     doRecording: boolean;
     doCountdown: boolean;
     doPlayback: boolean;
+    abortUpload: boolean;
     recordedBlobs: Blob[];
     error: string;
     constraints: Constraints;
@@ -70,6 +71,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doUpload: false,
             doRecording: false,
             doCountdown: false,
+            abortUpload: false,
             recordedBlobs: [],
             doPlayback: false,
             error: "",
@@ -138,6 +140,16 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         const { doRecording, recordedBlobs } = this.state;
         if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
             this.handleUpload();
+        }
+    };
+
+    /**
+     * cancel an on-going upload
+     */
+    cancelUpload = () => {
+        const { doUpload } = this.state;
+        if (doUpload) {
+            this.setState({ abortUpload: true });
         }
     };
 
@@ -442,6 +454,17 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         );
     };
     handleUploadCancelled = () => {
+        // "reset" state
+        this.setState({
+            doUpload: false,
+            doRecording: false,
+            doCountdown: false,
+            abortUpload: false,
+            recordedBlobs: [],
+            doPlayback: false,
+            error: ""
+        });
+        // notify listeners
         this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.mediaUploadCancelled));
     };
     handleUploadProgress = (loaded: number, total: number) => {
@@ -459,6 +482,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doUpload,
             stream,
             doRecording,
+            abortUpload,
             recordedBlobs,
             doPlayback,
             error,
@@ -580,6 +604,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 serviceUrl={serviceUrl}
                                 ks={ks}
                                 // showUI={false}
+                                abortUpload={abortUpload}
                             />
                         </div>
                     )}

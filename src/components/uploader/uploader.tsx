@@ -29,6 +29,7 @@ type Props = {
     ks: string;
     conversionProfileId?: number;
     showUI?: boolean;
+    abortUpload?: boolean;
 };
 
 type State = {
@@ -41,7 +42,8 @@ type State = {
  */
 export class Uploader extends Component<Props, State> {
     static defaultProps = {
-        showUI: true
+        showUI: true,
+        abortUpload: false
     };
 
     entryId: string;
@@ -65,6 +67,13 @@ export class Uploader extends Component<Props, State> {
         this.addMedia = this.addMedia.bind(this);
     }
 
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        // if abort upload is externally requested
+        if (this.props.abortUpload && !prevProps.abortUpload && !this.state.abort) {
+            this.handleCancel();
+        }
+    }
+
     componentDidMount() {
         this.upload();
     }
@@ -76,13 +85,7 @@ export class Uploader extends Component<Props, State> {
      * 4.Upload token with media
      */
     upload() {
-        const {
-            mediaType,
-            entryName,
-            conversionProfileId,
-            onUploadEnded,
-            onUploadStarted
-        } = this.props;
+        const { mediaType, entryName, conversionProfileId, onUploadStarted } = this.props;
         const { client } = this.props;
 
         if (!client) {
