@@ -28,6 +28,7 @@ type Props = {
     serviceUrl: string;
     ks: string;
     conversionProfileId?: number;
+    showUI?: boolean;
 };
 
 type State = {
@@ -39,6 +40,10 @@ type State = {
  * handle the upload of the recorder file including display of progress bar
  */
 export class Uploader extends Component<Props, State> {
+    static defaultProps = {
+        showUI: true
+    };
+
     entryId: string;
     totalSize: number;
     tokenId: string;
@@ -249,7 +254,11 @@ export class Uploader extends Component<Props, State> {
 
     render() {
         const { loaded, abort } = this.state;
+        const { showUI } = this.props;
         const disableCancel = abort || loaded >= this.totalSize;
+        if (!showUI) {
+            return <div />;
+        }
         return (
             <div>
                 {loaded < this.totalSize && (

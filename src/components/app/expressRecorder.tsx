@@ -579,6 +579,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 entryName={entryName ? entryName : this.getDefaultEntryName()}
                                 serviceUrl={serviceUrl}
                                 ks={ks}
+                                // showUI={false}
                             />
                         </div>
                     )}
