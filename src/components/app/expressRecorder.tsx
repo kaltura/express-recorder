@@ -9,7 +9,7 @@ import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
 import { Settings } from "../settings/settings";
 import { RecorderEvents } from "./RecorderEvents";
-import { UploaderDummy } from "../uploader/uploaderDummy";
+import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
 const styles = require("./style.scss");
 
 export type ExpressRecorderProps = {
@@ -64,7 +64,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
     kClient: KalturaClient | undefined;
-    dispatcher: EventTarget = new EventTarget();
+    dispatcher: PubSub = new PubSub(this);
 
     constructor(props: ExpressRecorderProps) {
         super(props);
@@ -161,20 +161,12 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * ======================================================================
      */
 
-    addEventListener(
-        type: string,
-        listener: EventListener | EventListenerObject | null,
-        options?: boolean | AddEventListenerOptions | undefined
-    ) {
-        this.dispatcher.addEventListener(type, listener, options);
+    addEventListener(type: string, listener: (event: ExpressRecorderEvent) => void) {
+        this.dispatcher.addEventListener(type, listener);
     }
 
-    removeEventListener(
-        type: string,
-        callback: EventListener | EventListenerObject | null,
-        options?: boolean | AddEventListenerOptions | undefined
-    ) {
-        this.dispatcher.removeEventListener(type, callback, options);
+    removeEventListener(type: string, callback: (event: ExpressRecorderEvent) => void) {
+        this.dispatcher.removeEventListener(type, callback);
     }
 
     componentDidMount() {
@@ -276,9 +268,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     handleError = (error: string) => {
         this.setState({ error: error });
-        this.dispatcher.dispatchEvent(
-            new CustomEvent(RecorderEvents.error, { detail: { message: error } })
-        );
+        this.dispatcher.dispatchEvent(RecorderEvents.error, { message: error });
     };
 
     handleUpload = () => {
@@ -298,7 +288,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     handleRecordingEnd = (recordedBlobs: Blob[]) => {
         this.setState({ recordedBlobs: recordedBlobs });
-        this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.recordingEnded));
+        this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
     };
 
     getDefaultEntryName() {
@@ -312,14 +302,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     handleStartClick = () => {
         this.handleBeforeunload(true);
         this.setState({ doCountdown: true });
-        this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.recordingStarted));
+        this.dispatcher.dispatchEvent(RecorderEvents.recordingStarted);
     };
     handleStopClick = () => {
         this.setState({ doRecording: false, doPlayback: true });
     };
     handleCancelClick = () => {
         this.setState({ doCountdown: false });
-        this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.recordingCancelled));
+        this.dispatcher.dispatchEvent(RecorderEvents.recordingCancelled);
     };
     handleResetClick = () => {
         this.setState({
@@ -445,14 +435,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     handleUploadStarted = (entryId: string) => {
-        this.dispatcher.dispatchEvent(
-            new CustomEvent(RecorderEvents.mediaUploadStarted, { detail: { entryId: entryId } })
-        );
+        this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadStarted, { entryId: entryId });
     };
     handleUploadEnded = (entryId: string) => {
-        this.dispatcher.dispatchEvent(
-            new CustomEvent(RecorderEvents.mediaUploadEnded, { detail: { entryId: entryId } })
-        );
+        this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadEnded, { entryId: entryId });
     };
     handleUploadCancelled = () => {
         // "reset" state
@@ -469,16 +455,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             },
             () => {
                 // notify listeners
-                this.dispatcher.dispatchEvent(new CustomEvent(RecorderEvents.mediaUploadCancelled));
+                this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadCancelled);
             }
         );
     };
     handleUploadProgress = (loaded: number, total: number) => {
-        this.dispatcher.dispatchEvent(
-            new CustomEvent(RecorderEvents.mediaUploadProgress, {
-                detail: { loaded: loaded, total: total }
-            })
-        );
+        this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, {
+            loaded: loaded,
+            total: total
+        });
     };
 
     render() {
