@@ -9,6 +9,7 @@ import { RecordingTimer } from "../recording-timer/recordingTimer";
 import { ErrorScreen } from "../error-screen/errorScreen";
 import { Settings } from "../settings/settings";
 import { RecorderEvents } from "./RecorderEvents";
+import { UploaderDummy } from "../uploader/uploaderDummy";
 const styles = require("./style.scss");
 
 export type ExpressRecorderProps = {
@@ -178,7 +179,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     componentDidMount() {
         const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
-
         this.checkProps();
         if (!this.isBrowserCompatible()) {
             return;
@@ -305,9 +305,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         const { constraints } = this.state;
         if (constraints.video) {
             return "Video Recording - " + new Date();
-        } else {
-            return "Audio Recording - " + new Date();
         }
+        return "Audio Recording - " + new Date();
     }
 
     handleStartClick = () => {
@@ -515,13 +514,36 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 </div>
             );
         }
+        if (doUpload) {
+            return (
+                <div className={`express-recorder ${styles["express-recorder"]}`}>
+                    <Uploader
+                        client={this.kClient}
+                        onError={this.handleError}
+                        onUploadStarted={this.handleUploadStarted}
+                        onUploadEnded={this.handleUploadEnded}
+                        onUploadCancelled={this.handleUploadCancelled}
+                        onUploadProgress={this.handleUploadProgress}
+                        mediaType={
+                            constraints.video ? KalturaMediaType.video : KalturaMediaType.audio
+                        }
+                        recordedBlobs={recordedBlobs}
+                        entryName={entryName ? entryName : this.getDefaultEntryName()}
+                        serviceUrl={serviceUrl}
+                        ks={ks}
+                        showUI={showUploadUI}
+                        abortUpload={abortUpload}
+                    />
+                </div>
+            );
+        }
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
                 <div className={styles["settings-wrap"]}>
-                    {!doUpload && !doPlayback && !doRecording && (
+                    {!doPlayback && !doRecording && (
                         <Settings
-                            selectedCamera={stream ? stream.getVideoTracks()[0] : undefined}
-                            selectedAudio={stream ? stream.getAudioTracks()[0] : undefined}
+                            selectedCamera={stream ? stream!.getVideoTracks()[0] : undefined}
+                            selectedAudio={stream ? stream!.getAudioTracks()[0] : undefined}
                             allowVideo={constraints.video !== false}
                             allowAudio={constraints.audio !== false}
                             onSettingsChanged={this.handleSettingsChange}
@@ -598,29 +620,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             >
                                 Use This
                             </button>
-                        </div>
-                    )}
-                    {doUpload && (
-                        <div className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}>
-                            <Uploader
-                                client={this.kClient}
-                                onError={this.handleError}
-                                onUploadStarted={this.handleUploadStarted}
-                                onUploadEnded={this.handleUploadEnded}
-                                onUploadCancelled={this.handleUploadCancelled}
-                                onUploadProgress={this.handleUploadProgress}
-                                mediaType={
-                                    constraints.video
-                                        ? KalturaMediaType.video
-                                        : KalturaMediaType.audio
-                                }
-                                recordedBlobs={recordedBlobs}
-                                entryName={entryName ? entryName : this.getDefaultEntryName()}
-                                serviceUrl={serviceUrl}
-                                ks={ks}
-                                showUI={showUploadUI}
-                                abortUpload={abortUpload}
-                            />
                         </div>
                     )}
                 </div>
