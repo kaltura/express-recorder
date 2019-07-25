@@ -510,7 +510,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (error !== "") {
             return (
                 <div className={`express-recorder ${styles["express-recorder"]}`}>
-                    {error && <ErrorScreen text={error} />}
+                    <ErrorScreen text={error} />
                 </div>
             );
         }

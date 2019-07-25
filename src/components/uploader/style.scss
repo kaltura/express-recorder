@@ -34,15 +34,13 @@
     opacity: 0.4 !important;
     cursor: default;
 }
-.progress-complete {
+.upload-success-message {
+    width: 50%;
     display: inline-block;
-    color: #3c763d;
-    background-color: #b9df90;
-    padding: 15px 40px 15px 50px;
+    color: white;
+    background-color: #666666;
     font-size: 14px;
-    line-height: 24px;
-    width: 100%;
-    max-width: 89%;
+    line-height: 28px;
     border-radius: 4px;
     border: none;
 }

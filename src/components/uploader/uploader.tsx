@@ -288,9 +288,8 @@ export class Uploader extends Component<Props, State> {
                     )}
                 </div>
                 {loaded >= this.totalSize && (
-                    <div className={`upload-success-message ${styles["progress-complete"]}`}>
-                        <strong>Upload Completed!</strong> Complete the required information for the
-                        uploaded media below.
+                    <div className={`upload-success-message ${styles["upload-success-message"]}`}>
+                        <strong>Upload Completed!</strong>
                     </div>
                 )}
             </div>
