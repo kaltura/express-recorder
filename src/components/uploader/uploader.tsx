@@ -129,7 +129,7 @@ export class Uploader extends Component<Props, State> {
                     if (!data || data.hasErrors()) {
                         this.throwError(
                             new Error(
-                                "Failed to create media entry: " + +(data || data!.getFirstError())
+                                "Failed to create media entry: " + (data && data.getFirstError())
                             )
                         );
                     } else {
