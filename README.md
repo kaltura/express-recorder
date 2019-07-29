@@ -7,7 +7,7 @@ Supported browsers: Chrome, Firfox, Opera.
 2. npm install
 
 ## Run the project
-npm start
+npm serve
 
 ## Run with storybook
 1. fill props in expressRecorder.stories.jsx </br>
