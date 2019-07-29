@@ -2,13 +2,14 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
+var dotenv = require('dotenv').config({path: __dirname + '/.env'});
 const packageJson = require('./package.json');
 
 const isDevServer = process.argv.find(v => v.indexOf('webpack-dev-server') !== -1);
 const testFolder = path.join(__dirname, "/test");
 const distFolder = path.join(__dirname, "/dist");
-const pluginName = 'hotspots';
 
+console.log(JSON.stringify(dotenv));
 const plugins = [];
 
 if (isDevServer) {
@@ -18,7 +19,10 @@ if (isDevServer) {
       filename: path.resolve(distFolder, "index.html"),
       template: path.resolve(testFolder, "index.ejs"),
       inject: false,
-      hash: true
+      hash: true,
+      config: {
+        ks: 'sss'
+      }
     }),
     new CopyPlugin([
       { from: testFolder, to: distFolder }
@@ -75,7 +79,7 @@ module.exports = (env, options) => {
         {
           test: /\.svg/,
           use: {
-            loader: 'svg-url-loader',
+            loader: 'preact-svg-loader',
             options: {}
           }
         },
