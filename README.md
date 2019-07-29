@@ -18,9 +18,9 @@ npm start
 2. copy files located under build folder to your project.
 
 ## Embedding into html page
-`<script type="text/props">{
-    [list of props for expressRecorder components in form of 'prop': 'value']
-}</script><script async src="path-to-bundle.js"></script>`
+`const component = Kaltura.ExpressRecorder.create('parent_div_id', {
+       list of props for expressRecorder components in form of 'prop': 'value'
+   });`
 
 ## API
 #### ExpressRecorder props:
@@ -109,11 +109,46 @@ npm start
         <td>no</td>
         <td>unlimited</td>
     </tr>
+    <tr>
+        <td>showUploadUI</td>
+        <td>show upload progress and cancel button during upload</td> 
+        <td>boolean</td>
+        <td>no</td>
+        <td>true</td>
+    </tr>
 </table>
 
-#### Events:
-* mediaUploadStarted: fires after entry has been created and media upload start. Returns entryId by event.detail.entryId
-* mediaUploadEnded: fires after media upload has been ended. Returns entryId by event.detail.entryId
-* mediaUploadCanceled: fires when media upload has been canceled by the user. Returns entryId by event.detail.entryId
 
-In order to catch event, use addEventListener().
+#### Events:
+##### Event Types:
+* error: fired when errors occur. <code>event.detail.message holds error text</code> 
+* recordingStarted: fired when countdown to recording starts
+* recordingEnded: fired when recording ends
+* recordingCancelled: fired after a recording is cancelled
+* mediaUploadStarted: fires after entry has been created and media upload start. Returns entryId by event.detail.entryId
+* mediaUploadProgress: describes upload progress. <code>event.detail.loaded</code> holds the amount of bytes loaded, <code>event.detail.total</code> holds the total amount of bytes to be loaded.  
+* mediaUploadEnded: fires after media upload has been ended. Returns entryId by event.detail.entryId
+* mediaUploadCancelled: fires when media upload has been canceled by the user. Returns entryId by event.detail.entryId
+
+##### Listening to Events
+`
+const component = Kaltura.ExpressRecorder.create('parent_div_id', {...});
+component.instance.addEventListener(eventType, callback);
+`
+
+#### Methods:
+* <code>startRecording()</code>
+clears existing recording if exists and starts the recording countdown.
+* <code>stopRecording()</code>
+stops an ongoing recording.
+* <code>saveCopy()</code>
+after recording exists, saves a local copy of the recorded media.
+* <code>upload()</code>
+uploads the latest recording to Kaltura.
+* <code>cancelUpload()</code>
+cancels an ongoing upload.
+* <code>addEventListener(type: string, listener: (event: ExpressRecorderEvent) => void)</code>
+allows listening to recorder events.
+* <code>removeEventListener(type: string, callback: (event: ExpressRecorderEvent) => void)</code>
+stops listening to recorder events.
+
