@@ -582,31 +582,34 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             Cancel
                         </button>
                     )}
-                    {!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce && (
-                        <div className={`${styles["express-recorder__bottom"]}`}>
-                            <button
-                                className={`btn btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
-                                onClick={this.handleDownload}
-                                tabIndex={0}
-                            >
-                                Download a Copy
-                            </button>
-                            <button
-                                className={`btn btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
-                                onClick={this.handleResetClick}
-                                tabIndex={0}
-                            >
-                                Record Again
-                            </button>
-                            <button
-                                className={`btn btn-primary btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
-                                onClick={this.handleUpload}
-                                tabIndex={0}
-                            >
-                                Use This
-                            </button>
-                        </div>
-                    )}
+                    {showUploadUI &&
+                        !doRecording &&
+                        recordedBlobs.length > 0 &&
+                        !this.uploadedOnce && (
+                            <div className={`${styles["express-recorder__bottom"]}`}>
+                                <button
+                                    className={`btn btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
+                                    onClick={this.handleDownload}
+                                    tabIndex={0}
+                                >
+                                    Download a Copy
+                                </button>
+                                <button
+                                    className={`btn btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
+                                    onClick={this.handleResetClick}
+                                    tabIndex={0}
+                                >
+                                    Record Again
+                                </button>
+                                <button
+                                    className={`btn btn-primary btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
+                                    onClick={this.handleUpload}
+                                    tabIndex={0}
+                                >
+                                    Use This
+                                </button>
+                            </div>
+                        )}
                 </div>
             </div>
         );
