@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Recorder</title>
+
+    <% for (var chunk in htmlWebpackPlugin.files.chunks) { %><script id="bundle" src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script><% } %>
+
+    <style>
+        #parent {
+            width: 858px;
+            height: 483px;
+        }
+    </style>
+</head>
+
+<body>
+<h1>Express Recorder</h1>
+<div>
+    <div id="parent"></div>
+    <div>
+        <input type="button" onclick="doStartRecording()" value="start" />
+        <input type="button" onclick="doStopRecording()" value="stop" />
+        <input type="button" onclick="doDownloadRecording()" value="save latest recording locally" />
+        <input type="button" onclick="doUploadRecording()" value="Upload latest recording to Kaltura" />
+    </div>
+</div>
+
+<script>
+  const component = Kaltura.ExpressRecorder.create('parent', {
+      "ks": "YOUR_KS",
+      "serviceUrl": "SERVICE_URL", // IE http://www.kaltura.com,
+      "app": "APP_NAME",
+      "playerUrl": "PLAYER_CDN_URL", // IE http://cdnapi.kaltura.com,
+      "conversionProfileId": "CONVERSION_PROFILE_ID",
+      "partnerId": PARTNER_ID,
+      "uiConfId": "PLAYER_UICONF_ID",
+  });
+
+  doStartRecording = () => { component.instance.startRecording()}
+  doStopRecording = () => { component.instance.stopRecording()}
+  doDownloadRecording = () => { component.instance.saveCopy()}
+  doUploadRecording = () => { component.instance.upload()}
+
+  component.instance.addEventListener("recordingStarted", (e) => {console.log(e.type)});
+  component.instance.addEventListener("recordingEnded", (e) => {console.log(e.type)});
+  component.instance.addEventListener("error", (e) => {console.log(e.type + ", " + e.detail.message)});
+
+</script>
+
+</body>
+
+</html>

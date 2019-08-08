@@ -17,14 +17,19 @@ const styles = require("./style.scss");
 
 type Props = {
     client: KalturaClient | undefined;
-    onError: ((e: string) => void) | undefined;
+    onError?: (error: string) => void;
+    onUploadStarted?: (entryId: string) => void;
+    onUploadEnded?: (entryId: string) => void;
+    onUploadCancelled?: () => void;
+    onUploadProgress?: (loaded: number, total: number) => void;
     mediaType: KalturaMediaType;
     recordedBlobs: Blob[];
     entryName: string;
     serviceUrl: string;
     ks: string;
     conversionProfileId?: number;
-    eventTargetId?: string;
+    showUI?: boolean;
+    abortUpload?: boolean;
 };
 
 type State = {
@@ -36,6 +41,11 @@ type State = {
  * handle the upload of the recorder file including display of progress bar
  */
 export class Uploader extends Component<Props, State> {
+    static defaultProps = {
+        showUI: true,
+        abortUpload: false
+    };
+
     entryId: string;
     totalSize: number;
     tokenId: string;
@@ -57,6 +67,13 @@ export class Uploader extends Component<Props, State> {
         this.addMedia = this.addMedia.bind(this);
     }
 
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        // if abort upload is externally requested
+        if (this.props.abortUpload && !prevProps.abortUpload && !this.state.abort) {
+            this.handleCancel();
+        }
+    }
+
     componentDidMount() {
         this.upload();
     }
@@ -68,12 +85,7 @@ export class Uploader extends Component<Props, State> {
      * 4.Upload token with media
      */
     upload() {
-        const {
-            mediaType,
-            entryName,
-            conversionProfileId,
-            eventTargetId
-        } = this.props;
+        const { mediaType, entryName, conversionProfileId, onUploadStarted } = this.props;
         const { client } = this.props;
 
         if (!client) {
@@ -117,19 +129,16 @@ export class Uploader extends Component<Props, State> {
                     if (!data || data.hasErrors()) {
                         this.throwError(
                             new Error(
-                                "Failed to create media entry: " +
-                                +(data || data!.getFirstError())
+                                "Failed to create media entry: " + (data && data.getFirstError())
                             )
                         );
                     } else {
                         // 4.Upload token with media
                         this.entryId = data[0].result.id;
                         this.tokenId = data[1].result.id;
-                        const eventStart = new CustomEvent(
-                            "mediaUploadStarted",
-                            { detail: { entryId: this.entryId! } }
-                        );
-                        (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(eventStart);
+                        if (onUploadStarted) {
+                            onUploadStarted(this.entryId);
+                        }
                         if (this.state.abort) {
                             this.handleCancel();
                         }
@@ -138,19 +147,13 @@ export class Uploader extends Component<Props, State> {
                 },
                 (err: Error) => {
                     this.throwError(
-                        new Error(
-                            "Failed to create media entry - reject request: " +
-                            err.message
-                        )
+                        new Error("Failed to create media entry - reject request: " + err.message)
                     );
                 }
             )
             .catch((err: Error) => {
                 this.throwError(
-                    new Error(
-                        "Failed to create media entry - multirequest failed: " +
-                        err.message
-                    )
+                    new Error("Failed to create media entry - multirequest failed: " + err.message)
                 );
             });
     }
@@ -159,7 +162,7 @@ export class Uploader extends Component<Props, State> {
      * Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
      */
     addMedia(tokenId: string) {
-        const { client, eventTargetId } = this.props;
+        const { client, onUploadEnded, onUploadProgress } = this.props;
         if (!client) {
             this.throwError(new Error("Missing client object"));
             return;
@@ -179,20 +182,20 @@ export class Uploader extends Component<Props, State> {
 
         client
             .request(
-                this.addMediaRequest.setProgress(
-                    (loaded: number, total: number) => {
-                        if (!this.state.abort) {
-                            this.setState({ loaded: loaded }); // loaded bytes until now
+                this.addMediaRequest.setProgress((loaded: number, total: number) => {
+                    if (!this.state.abort) {
+                        this.setState({ loaded: loaded }); // loaded bytes until now
+                        if (onUploadProgress) {
+                            onUploadProgress(loaded, total);
                         }
                     }
-                )
+                })
             )
             .then(
                 data => {
-                    const event = new CustomEvent("mediaUploadEnded", {
-                        detail: { entryId: this.entryId! }
-                    });
-                    (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(event);
+                    if (onUploadEnded) {
+                        onUploadEnded(this.entryId);
+                    }
                 },
                 (e: Error) => {
                     this.throwError(e);
@@ -201,7 +204,7 @@ export class Uploader extends Component<Props, State> {
     }
 
     handleCancel = () => {
-        const { client, eventTargetId } = this.props;
+        const { client, onUploadCancelled } = this.props;
 
         if (!client) {
             this.throwError(new Error("Missing client object"));
@@ -227,8 +230,9 @@ export class Uploader extends Component<Props, State> {
 
         // Delete created entry if exists
         this.deleteEntry();
-        const event = new CustomEvent("mediaUploadCanceled");
-        (eventTargetId ? document.getElementById(eventTargetId)! : window).dispatchEvent(event);
+        if (onUploadCancelled) {
+            onUploadCancelled();
+        }
     };
 
     deleteEntry = () => {
@@ -247,39 +251,45 @@ export class Uploader extends Component<Props, State> {
 
     throwError(error: Error) {
         if (this.props.onError) {
-            this.props.onError(error.name + " : " + error.message);
+            this.props.onError(`${error.name} : ${error.message}`);
         }
     }
 
     render() {
         const { loaded, abort } = this.state;
+        const { showUI } = this.props;
         const disableCancel = abort || loaded >= this.totalSize;
+        if (!showUI) {
+            return <div />;
+        }
         return (
-            <div>
-                {loaded < this.totalSize && (
-                    <span className={`progress-bar ${styles["progress-bar"]}`}>
-                        <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
-                    </span>
-                )}
-                {loaded < this.totalSize && (
-                    <button
-                        className={`btn btn-cancel ${styles["btn"]} ${
-                            disableCancel ? styles["cancel-btn--disabled"] : ""
-                        }`}
-                        onClick={disableCancel ? undefined : this.handleCancel}
-                        disabled={disableCancel}
-                    >
-                        Cancel
-                    </button>
-                )}
+            <div className={`uploader ${styles["uploader"]}`}>
+                <div className={`cancel-wrap ${styles["cancel-wrap"]}`}>
+                    {loaded < this.totalSize && (
+                        <button
+                            className={`btn btn-cancel ${styles["btn"]} ${styles["btn-cancel"]}
+                            ${
+                                disableCancel
+                                    ? `${styles["btn-cancel--disabled"]} btn-cancel--disabled`
+                                    : ""
+                            }`}
+                            onClick={disableCancel ? undefined : this.handleCancel}
+                            disabled={disableCancel}
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
+                <div className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}>
+                    {loaded < this.totalSize && (
+                        <div className={`progress-bar ${styles["progress-bar"]}`}>
+                            <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
+                        </div>
+                    )}
+                </div>
                 {loaded >= this.totalSize && (
-                    <div
-                        className={`upload-success-message ${
-                            styles["progress-complete"]
-                        }`}
-                    >
-                        <strong>Upload Completed!</strong> Complete the required
-                        information for the uploaded media below.
+                    <div className={`upload-success-message ${styles["upload-success-message"]}`}>
+                        <strong>Upload Completed!</strong>
                     </div>
                 )}
             </div>

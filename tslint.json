@@ -22,7 +22,7 @@
         ],
         "no-arg": true,
         "no-bitwise": true,
-        "no-consecutive-blank-lines": true,
+        "no-consecutive-blank-lines": false,
         "no-construct": true,
         "no-duplicate-variable": true,
         "no-empty": true,
@@ -33,12 +33,10 @@
         "no-trailing-whitespace": false,
         "no-unused-expression": false,
         "no-use-before-declare": true,
-        "one-line": [true, "check-catch", "check-else", "check-open-brace", "check-whitespace"],
+        "one-line": [true, "check-open-brace", "check-whitespace"],
         "radix": true,
         "switch-default": true,
-
         "trailing-comma": [false],
-
         "triple-equals": [true, "allow-null-check"],
         "typedef-whitespace": [
             true,
@@ -57,13 +55,6 @@
             "allow-leading-underscore",
             "allow-pascal-case"
         ],
-        "whitespace": [
-            true,
-            "check-branch",
-            "check-decl",
-            "check-module",
-            "check-operator",
-            "check-separator"
-        ]
+        "whitespace": [true, "check-branch", "check-decl", "check-operator", "check-separator"]
     }
 }
