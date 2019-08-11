@@ -267,6 +267,26 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ stream: stream, constraints: constraints });
     };
 
+    resetApp = () => {
+        this.uploadedOnce = false;
+        this.setState({
+            doUpload: false,
+            doRecording: false,
+            doCountdown: false,
+            abortUpload: false,
+            recordedBlobs: [],
+            doPlayback: false,
+            error: "",
+            uploadStatus: { loaded: 0, total: 0 }
+        });
+        if (this.state.stream) {
+            this.state.stream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+        this.createStream(this.state.constraints);
+    };
+
     handleError = (error: string) => {
         this.setState({ error: error });
         this.dispatcher.dispatchEvent(RecorderEvents.error, { message: error });
@@ -287,6 +307,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ doUpload: true });
     };
 
+    /**
+     * triggered when recording is finished
+     * @param recordedBlobs
+     */
     handleRecordingEnd = (recordedBlobs: Blob[]) => {
         this.setState({ recordedBlobs: recordedBlobs });
         this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
@@ -305,9 +329,17 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ doCountdown: true });
         this.dispatcher.dispatchEvent(RecorderEvents.recordingStarted);
     };
+
+    /**
+     * when user requests to stop the recording
+     */
     handleStopClick = () => {
         this.setState({ doRecording: false, doPlayback: true });
     };
+
+    /**
+     * triggered when recording is cancelled during countdown
+     */
     handleCancelClick = () => {
         this.setState({ doCountdown: false });
         this.dispatcher.dispatchEvent(RecorderEvents.recordingCancelled);
@@ -441,6 +473,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     handleUploadEnded = (entryId: string) => {
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadEnded, { entryId: entryId });
         this.setBeforeunload(false);
+        this.resetApp();
     };
     handleUploadCancelled = () => {
         // "reset" state
