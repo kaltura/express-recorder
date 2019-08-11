@@ -198,8 +198,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         tag.type = "text/javascript";
         document.body.appendChild(tag);
 
-        window.addEventListener("mediaUploadEnded", (e: Event) => this.handleBeforeunload(false));
-
         window.addEventListener("keydown", this.handleKeyboardControl);
 
         if (this.state.stream) {
@@ -439,6 +437,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
     handleUploadEnded = (entryId: string) => {
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadEnded, { entryId: entryId });
+        this.handleBeforeunload(false);
     };
     handleUploadCancelled = () => {
         // "reset" state
