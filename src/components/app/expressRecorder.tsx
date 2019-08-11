@@ -476,23 +476,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.resetApp();
     };
     handleUploadCancelled = () => {
-        // "reset" state
-        this.uploadedOnce = false;
-        this.setState(
-            {
-                doUpload: false,
-                doRecording: false,
-                doCountdown: false,
-                abortUpload: false,
-                recordedBlobs: [],
-                doPlayback: false,
-                error: ""
-            },
-            () => {
-                // notify listeners
-                this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadCancelled);
-            }
-        );
+        this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadCancelled);
+        this.resetApp();
     };
     handleUploadProgress = (loaded: number, total: number) => {
         const status = {
