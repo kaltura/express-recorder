@@ -12,8 +12,6 @@ import {
     KalturaMultiRequest,
     KalturaMultiResponse
 } from "kaltura-typescript-client";
-import { ProgressBar } from "../progress-bar/progressBar";
-const styles = require("./style.scss");
 
 type Props = {
     client: KalturaClient | undefined;
@@ -28,7 +26,6 @@ type Props = {
     serviceUrl: string;
     ks: string;
     conversionProfileId?: number;
-    showUI?: boolean;
     abortUpload?: boolean;
 };
 
@@ -38,11 +35,10 @@ type State = {
 };
 
 /**
- * handle the upload of the recorder file including display of progress bar
+ * handle upload of recorded media
  */
-export class Uploader extends Component<Props, State> {
+export class UploadMagic extends Component<Props, State> {
     static defaultProps = {
-        showUI: true,
         abortUpload: false
     };
 
@@ -256,43 +252,6 @@ export class Uploader extends Component<Props, State> {
     }
 
     render() {
-        const { loaded, abort } = this.state;
-        const { showUI } = this.props;
-        const disableCancel = abort || loaded >= this.totalSize;
-        if (!showUI) {
-            return <div />;
-        }
-        return (
-            <div className={`uploader ${styles["uploader"]}`}>
-                <div className={`cancel-wrap ${styles["cancel-wrap"]}`}>
-                    {loaded < this.totalSize && (
-                        <button
-                            className={`btn btn-cancel ${styles["btn"]} ${styles["btn-cancel"]}
-                            ${
-                                disableCancel
-                                    ? `${styles["btn-cancel--disabled"]} btn-cancel--disabled`
-                                    : ""
-                            }`}
-                            onClick={disableCancel ? undefined : this.handleCancel}
-                            disabled={disableCancel}
-                        >
-                            Cancel
-                        </button>
-                    )}
-                </div>
-                <div className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}>
-                    {loaded < this.totalSize && (
-                        <div className={`progress-bar ${styles["progress-bar"]}`}>
-                            <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
-                        </div>
-                    )}
-                </div>
-                {loaded >= this.totalSize && (
-                    <div className={`upload-success-message ${styles["upload-success-message"]}`}>
-                        <strong>Upload Completed!</strong>
-                    </div>
-                )}
-            </div>
-        );
+        return <div />;
     }
 }

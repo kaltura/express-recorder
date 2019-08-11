@@ -2,7 +2,6 @@ import { Component, h } from "preact";
 import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
 import { KalturaConversionProfileType } from "kaltura-typescript-client/api/types/KalturaConversionProfileType";
 import { KalturaClient } from "kaltura-typescript-client";
-import { Uploader } from "../uploader/uploader";
 import { Recorder } from "../recorder/recorder";
 import { CountdownTimer } from "../countdown-timer/countdownTimer";
 import { RecordingTimer } from "../recording-timer/recordingTimer";
@@ -10,6 +9,8 @@ import { ErrorScreen } from "../error-screen/errorScreen";
 import { Settings } from "../settings/settings";
 import { RecorderEvents } from "./RecorderEvents";
 import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
+import { UploadUI } from "../uploader/uploadUI";
+import { UploadMagic } from "../uploader/uploadMagic";
 const styles = require("./style.scss");
 
 export type ExpressRecorderProps = {
@@ -38,6 +39,7 @@ type State = {
     recordedBlobs: Blob[];
     error: string;
     constraints: Constraints;
+    uploadStatus: { loaded: number; total: number };
 };
 
 export type Constraints = {
@@ -86,7 +88,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                           }
                         : false,
                 audio: props.allowAudio !== false
-            }
+            },
+            uploadStatus: { loaded: 0, total: 0 }
         };
 
         this.handleSuccess = this.handleSuccess.bind(this);
@@ -363,9 +366,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             });
             return;
         }
+        console.log("asking for user media");
         navigator.mediaDevices
             .getUserMedia(constraints)
             .then((stream: MediaStream) => {
+                console.log("got user media");
                 this.handleSuccess(stream, constraints);
             })
             .catch(e => this.handleError("Failed to allocate resource: " + e.message));
@@ -459,10 +464,12 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         );
     };
     handleUploadProgress = (loaded: number, total: number) => {
-        this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, {
+        const status = {
             loaded: loaded,
             total: total
-        });
+        };
+        this.setState({ uploadStatus: status });
+        this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, status);
     };
 
     render() {
@@ -484,7 +491,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             recordedBlobs,
             doPlayback,
             error,
-            constraints
+            constraints,
+            uploadStatus
         } = this.state;
 
         if (doUpload && !this.uploadedOnce) {
@@ -501,7 +509,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (doUpload) {
             return (
                 <div className={`express-recorder ${styles["express-recorder"]}`}>
-                    <Uploader
+                    <UploadMagic
                         client={this.kClient}
                         onError={this.handleError}
                         onUploadStarted={this.handleUploadStarted}
@@ -515,9 +523,16 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         entryName={entryName ? entryName : this.getDefaultEntryName()}
                         serviceUrl={serviceUrl}
                         ks={ks}
-                        showUI={showUploadUI}
                         abortUpload={abortUpload}
                     />
+                    {showUploadUI && (
+                        <UploadUI
+                            loaded={uploadStatus.loaded}
+                            total={uploadStatus.total}
+                            abort={abortUpload}
+                            onCancel={this.cancelUpload}
+                        />
+                    )}
                 </div>
             );
         }
