@@ -92,9 +92,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             uploadStatus: { loaded: 0, total: 0 }
         };
 
-        this.handleSuccess = this.handleSuccess.bind(this);
+        this.saveStream = this.saveStream.bind(this);
         this.handleError = this.handleError.bind(this);
-        this.handleUpload = this.handleUpload.bind(this);
+        this.initiateUpload = this.initiateUpload.bind(this);
         this.handleStartClick = this.handleStartClick.bind(this);
         this.checkProps = this.checkProps.bind(this);
         this.isBrowserCompatible = this.isBrowserCompatible.bind(this);
@@ -111,7 +111,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     startRecording = () => {
         const { recordedBlobs } = this.state;
         if (recordedBlobs.length) {
-            this.handleResetClick();
+            this.recordAgain();
         }
         this.handleStartClick();
     };
@@ -135,7 +135,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     saveCopy = () => {
         const { doRecording, recordedBlobs } = this.state;
         if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
-            this.handleDownload();
+            this.saveFile();
         }
     };
 
@@ -145,7 +145,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     upload = () => {
         const { doRecording, recordedBlobs } = this.state;
         if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
-            this.handleUpload();
+            this.initiateUpload();
         }
     };
 
@@ -263,7 +263,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         return true;
     };
-    handleSuccess = (stream: MediaStream, constraints: Constraints) => {
+    saveStream = (stream: MediaStream, constraints: Constraints) => {
         this.setState({ stream: stream, constraints: constraints });
     };
 
@@ -272,7 +272,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.dispatcher.dispatchEvent(RecorderEvents.error, { message: error });
     };
 
-    handleUpload = () => {
+    initiateUpload = () => {
         const videoTracks = this.state.stream ? this.state.stream.getVideoTracks() : [];
         const audioTracks = this.state.stream ? this.state.stream.getAudioTracks() : [];
 
@@ -301,7 +301,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     }
 
     handleStartClick = () => {
-        this.handleBeforeunload(true);
+        this.setBeforeunload(true);
         this.setState({ doCountdown: true });
         this.dispatcher.dispatchEvent(RecorderEvents.recordingStarted);
     };
@@ -312,7 +312,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ doCountdown: false });
         this.dispatcher.dispatchEvent(RecorderEvents.recordingCancelled);
     };
-    handleResetClick = () => {
+    recordAgain = () => {
         this.setState({
             recordedBlobs: [],
             doCountdown: true,
@@ -366,17 +366,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             });
             return;
         }
-        console.log("asking for user media");
         navigator.mediaDevices
             .getUserMedia(constraints)
             .then((stream: MediaStream) => {
-                console.log("got user media");
-                this.handleSuccess(stream, constraints);
+                this.saveStream(stream, constraints);
             })
             .catch(e => this.handleError("Failed to allocate resource: " + e.message));
     };
 
-    handleBeforeunload = (addMessage: boolean = false) => {
+    setBeforeunload = (addMessage: boolean = false) => {
         window.onbeforeunload = (e: Event) => {
             return addMessage ? "" : null;
         };
@@ -392,7 +390,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 if (!doPlayback) {
                     this.handleStartClick();
                 } else {
-                    this.handleResetClick();
+                    this.recordAgain();
                 }
             }
             return;
@@ -411,13 +409,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyU") {
             e.preventDefault();
             if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
-                this.handleUpload();
+                this.initiateUpload();
             }
             return;
         }
     };
 
-    handleDownload = () => {
+    saveFile = () => {
         const blob = new Blob(this.state.recordedBlobs, { type: "video/webm" });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -442,7 +440,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
     handleUploadEnded = (entryId: string) => {
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadEnded, { entryId: entryId });
-        this.handleBeforeunload(false);
+        this.setBeforeunload(false);
     };
     handleUploadCancelled = () => {
         // "reset" state
@@ -603,21 +601,21 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             <div className={`${styles["express-recorder__bottom"]}`}>
                                 <button
                                     className={`btn btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
-                                    onClick={this.handleDownload}
+                                    onClick={this.saveFile}
                                     tabIndex={0}
                                 >
                                     Download a Copy
                                 </button>
                                 <button
                                     className={`btn btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
-                                    onClick={this.handleResetClick}
+                                    onClick={this.recordAgain}
                                     tabIndex={0}
                                 >
                                     Record Again
                                 </button>
                                 <button
                                     className={`btn btn-primary btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
-                                    onClick={this.handleUpload}
+                                    onClick={this.initiateUpload}
                                     tabIndex={0}
                                 >
                                     Use This
