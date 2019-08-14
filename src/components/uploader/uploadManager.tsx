@@ -39,7 +39,7 @@ type State = {
 /**
  * handle upload of recorded media
  */
-export class UploadMagic extends Component<Props, State> {
+export class UploadManager extends Component<Props, State> {
     static defaultProps = {
         abortUpload: false
     };

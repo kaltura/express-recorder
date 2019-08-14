@@ -10,7 +10,7 @@ import { Settings } from "../settings/settings";
 import { RecorderEvents } from "./RecorderEvents";
 import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
 import { UploadUI } from "../uploader/uploadUI";
-import { UploadMagic } from "../uploader/uploadMagic";
+import { UploadManager } from "../uploader/uploadManager";
 const styles = require("./style.scss");
 
 export type ExpressRecorderProps = {
@@ -525,7 +525,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (doUpload) {
             return (
                 <div className={`express-recorder ${styles["express-recorder"]}`}>
-                    <UploadMagic
+                    <UploadManager
                         client={this.kClient}
                         onError={this.handleError}
                         onUploadStarted={this.handleUploadStarted}
