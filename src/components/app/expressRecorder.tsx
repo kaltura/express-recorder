@@ -590,7 +590,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 >
                     {!doRecording && !doCountdown && !doPlayback && (
                         <button
-                            className={`controls__start ${styles["controls__start"]}`}
+                            className={`xr_controls__start ${styles["controls__start"]}`}
                             id="startRecord"
                             onClick={this.handleStartClick}
                             aria-label={"Start Recording"}
@@ -605,7 +605,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     )}
                     {doCountdown && (
                         <button
-                            className={`controls__cancel ${styles["controls__cancel"]}`}
+                            className={`xr_controls__cancel ${styles["controls__cancel"]}`}
                             onClick={this.handleCancelClick}
                             tabIndex={0}
                         >
@@ -618,21 +618,21 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         !this.uploadedOnce && (
                             <div className={`${styles["express-recorder__bottom"]}`}>
                                 <button
-                                    className={`btn btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
+                                    className={`xr_btn xr_btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
                                     onClick={this.saveFile}
                                     tabIndex={0}
                                 >
                                     Download a Copy
                                 </button>
                                 <button
-                                    className={`btn btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
+                                    className={`xr_btn xr_btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
                                     onClick={this.recordAgain}
                                     tabIndex={0}
                                 >
                                     Record Again
                                 </button>
                                 <button
-                                    className={`btn btn-primary btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
+                                    className={`xr_btn xr_btn-primary xr_btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
                                     onClick={this.initiateUpload}
                                     tabIndex={0}
                                 >

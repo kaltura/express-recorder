@@ -35,7 +35,7 @@ export class ToggleButton extends Component<Props, State> {
 
     render(props: Props) {
         const { text, id, name, screenReaderText } = props;
-        const {isToggleOn} = this.state;
+        const { isToggleOn } = this.state;
 
         let sName = name;
         if (!sName) {
@@ -48,40 +48,26 @@ export class ToggleButton extends Component<Props, State> {
         }
 
         return (
-            <div class={`toggle-button ${styles["toggle-button"]}`}>
-                <div
-                    class={`toggle-button__label ${
-                        styles["toggle-button__label"]
-                    }`}
-                >
+            <div class={`xr_toggle-button ${styles["toggle-button"]}`}>
+                <div class={`xr_toggle-button__label ${styles["toggle-button__label"]}`}>
                     {text}
                 </div>
-                <div
-                    class={`toggle-button__button ${
-                        styles["toggle-button__button"]
-                    }`}
-                >
+                <div class={`xr_toggle-button__button ${styles["toggle-button__button"]}`}>
                     <div>
                         <input
                             type={"checkbox"}
                             name={sName}
                             id={id}
-                            class={`toggle-button__checkbox ${
-                                styles["toggle-button__checkbox"]
-                            } ${styles["screenreader-only"]}`}
+                            class={`xr_toggle-button__checkbox ${styles["toggle-button__checkbox"]} ${styles["screenreader-only"]}`}
                             onClick={this.handleClick}
                             checked={isToggleOn}
                             tabIndex={0}
                         />
                         <label
                             for={id}
-                            class={`toggle-button__checkbox-label ${
-                                styles["toggle-button__checkbox-label"]
-                            }`}
+                            class={`xr_toggle-button__checkbox-label ${styles["toggle-button__checkbox-label"]}`}
                         >
-                            <span class={styles["screenreader-only"]}>
-                                {srText}
-                            </span>
+                            <span class={styles["screenreader-only"]}>{srText}</span>
                         </label>
                     </div>
                 </div>

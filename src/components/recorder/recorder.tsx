@@ -111,7 +111,9 @@ export class Recorder extends Component<Props, State> {
             };
 
             return (
-                <div className={styles["express-recorder__playback"]}>
+                <div
+                    className={`express-recorder__playback ${styles["express-recorder__playback"]}`}
+                >
                     <Playback
                         partnerId={partnerId}
                         uiconfId={uiConfId}
@@ -123,9 +125,9 @@ export class Recorder extends Component<Props, State> {
         }
 
         return (
-            <div class={`video-object-wrap ${styles["video-object-wrap"]}`}>
+            <div class={`xr_video-object-wrap ${styles["video-object-wrap"]}`}>
                 {!video && (
-                    <div class={`no-video-text ${styles["no-video-text"]}`}>
+                    <div class={`xr_no-video-text ${styles["no-video-text"]}`}>
                         Recording Audio Only
                         {stream && (
                             <div class={styles["audio-indicator"]}>

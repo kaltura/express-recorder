@@ -54,13 +54,11 @@ export class CountdownTimer extends Component<Props, State> {
         const { countdown } = state;
 
         return (
-            <div class={`countdown ${styles["countdown"]}`}>
-                <div
-                    className={`countdown-number ${styles["countdown-number"]}`}
-                >
+            <div class={`xr_countdown ${styles["countdown"]}`}>
+                <div className={`xr_countdown-number ${styles["countdown-number"]}`}>
                     {countdown}
                 </div>
-                <div className={styles["circle"]} />
+                <div className={`xr_circle ${styles["circle"]}`} />
             </div>
         );
     }
