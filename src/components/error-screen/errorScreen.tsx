@@ -9,19 +9,15 @@ type Props = {
 export function ErrorScreen(props: Props) {
     const { title, text } = props;
     return (
-        <div class={`error-screen ${styles["error-screen-wrap"]}`}>
+        <div class={`xr_error-screen ${styles["error-screen-wrap"]}`}>
             <div className={`${styles["error-screen"]}`}>
                 {title && (
-                    <h1
-                        class={`error-screen__title ${
-                            styles["error-screen__title"]
-                        }`}
-                    >
+                    <h1 class={`xr_error-screen__title ${styles["error-screen__title"]}`}>
                         {title}
                     </h1>
                 )}
                 <p
-                    class={`error-screen__text ${styles["error-screen__text"]}`}
+                    class={`xr_error-screen__text ${styles["error-screen__text"]}`}
                     dangerouslySetInnerHTML={{ __html: text }}
                 />
             </div>

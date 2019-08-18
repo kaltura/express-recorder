@@ -2,6 +2,7 @@ import { Component, h } from "preact";
 import { SettingsDevices } from "./settings-devices";
 import SettingsIcon from "./settings.svg";
 import { AudioIndicator } from "../audioIndicator/AudioIndicator";
+
 const styles = require("./style.scss");
 
 type Props = {
@@ -100,16 +101,10 @@ export class Settings extends Component<Props, State> {
     getDevices = () => {
         // get available devices
         if (navigator.mediaDevices) {
-            navigator.mediaDevices
-                .enumerateDevices()
-                .then((devices: object[]) => {
-                    this.cameraDevicesInfo = devices.filter(
-                        (item: any) => item.kind === "videoinput"
-                    );
-                    this.audioDevicesInfo = devices.filter(
-                        (item: any) => item.kind === "audioinput"
-                    );
-                });
+            navigator.mediaDevices.enumerateDevices().then((devices: object[]) => {
+                this.cameraDevicesInfo = devices.filter((item: any) => item.kind === "videoinput");
+                this.audioDevicesInfo = devices.filter((item: any) => item.kind === "audioinput");
+            });
         }
     };
     toggleMenu = () => {
@@ -119,11 +114,7 @@ export class Settings extends Component<Props, State> {
                 this.handleClose();
             } else {
                 // handle drop down toggle click
-                document.addEventListener(
-                    "click",
-                    this.handleExternalClick,
-                    true
-                );
+                document.addEventListener("click", this.handleExternalClick, true);
             }
         });
     };
@@ -190,9 +181,7 @@ export class Settings extends Component<Props, State> {
 
     saveSettings = () => {
         if (this.props.onSettingsChanged) {
-            const camera = this.state.cameraOn
-                ? this.state.selectedCamera
-                : false;
+            const camera = this.state.cameraOn ? this.state.selectedCamera : false;
             const audio = this.state.audioOn ? this.state.selectedAudio : false;
             this.props.onSettingsChanged(camera, audio);
         }
@@ -227,20 +216,10 @@ export class Settings extends Component<Props, State> {
         if (showAudioSettings || showCameraSettings) {
             devicesSettings = (
                 <SettingsDevices
-                    resourceName={
-                        showCameraSettings
-                            ? ResourceTypes.VIDEO
-                            : ResourceTypes.AUDIO
-                    }
-                    devices={
-                        showCameraSettings
-                            ? this.cameraDevicesInfo
-                            : this.audioDevicesInfo
-                    }
+                    resourceName={showCameraSettings ? ResourceTypes.VIDEO : ResourceTypes.AUDIO}
+                    devices={showCameraSettings ? this.cameraDevicesInfo : this.audioDevicesInfo}
                     isOn={showCameraSettings ? cameraOn : audioOn}
-                    selected={
-                        showCameraSettings ? selectedCamera : selectedAudio
-                    }
+                    selected={showCameraSettings ? selectedCamera : selectedAudio}
                     onBack={() => {
                         this.handleBack();
                     }}
@@ -248,9 +227,7 @@ export class Settings extends Component<Props, State> {
                     onToggleChange={(isOn: boolean) => {
                         this.handleToggleChange(
                             isOn,
-                            showCameraSettings
-                                ? ResourceTypes.VIDEO
-                                : ResourceTypes.AUDIO
+                            showCameraSettings ? ResourceTypes.VIDEO : ResourceTypes.AUDIO
                         );
                     }}
                 />
@@ -263,15 +240,9 @@ export class Settings extends Component<Props, State> {
                 ref={node => (this.menuBoxRef = node)}
             >
                 <div
-                    className={
-                        styles["settings-icon"] +
-                        " " +
-                        styles[
-                            isOpen
-                                ? "settings-icon-open"
-                                : "settings-icon-close"
-                        ]
-                    }
+                    className={`${styles["settings-icon"]}  ${
+                        styles[isOpen ? "settings-icon-open" : "settings-icon-close"]
+                    }`}
                     onClick={this.toggleMenu}
                 >
                     <a
@@ -289,7 +260,7 @@ export class Settings extends Component<Props, State> {
                 {isOpen && (
                     <div
                         id="recorder-settings-menu"
-                        className={`settings-box ${styles["settings-box"]}`}
+                        className={`xr_settings-box ${styles["settings-box"]}`}
                     >
                         {!showCameraSettings && !showAudioSettings && (
                             <div
@@ -301,37 +272,20 @@ export class Settings extends Component<Props, State> {
                                     aria-label="Camera Settings"
                                     className={styles["resource-link"]}
                                     onClick={() => {
-                                        this.getResourceSettings(
-                                            ResourceTypes.VIDEO
-                                        );
+                                        this.getResourceSettings(ResourceTypes.VIDEO);
                                     }}
                                     onKeyPress={e => {
-                                        this.handleShowDeviceSettings(
-                                            e,
-                                            ResourceTypes.VIDEO
-                                        );
+                                        this.handleShowDeviceSettings(e, ResourceTypes.VIDEO);
                                     }}
                                     tabIndex={0}
                                 >
                                     <div className={styles["resources-item"]}>
-                                        <div
-                                            className={styles["resources-name"]}
-                                        >
-                                            Camera
-                                        </div>
-                                        <div
-                                            className={styles["resource-label"]}
-                                        >
-                                            {selectedCamera
-                                                ? selectedCamera.label
-                                                : ""}
+                                        <div className={styles["resources-name"]}>Camera</div>
+                                        <div className={styles["resource-label"]}>
+                                            {selectedCamera ? selectedCamera.label : ""}
                                         </div>
                                         <div className={styles["arrow-wrap"]}>
-                                            <i
-                                                className={
-                                                    styles["arrow-right"]
-                                                }
-                                            />
+                                            <i className={styles["arrow-right"]} />
                                         </div>
                                     </div>
                                 </a>
@@ -339,31 +293,18 @@ export class Settings extends Component<Props, State> {
                                     aria-label="Audio Settings"
                                     className={styles["resource-link"]}
                                     onClick={() => {
-                                        this.getResourceSettings(
-                                            ResourceTypes.AUDIO
-                                        );
+                                        this.getResourceSettings(ResourceTypes.AUDIO);
                                     }}
                                     onKeyPress={e => {
-                                        this.handleShowDeviceSettings(
-                                            e,
-                                            ResourceTypes.AUDIO
-                                        );
+                                        this.handleShowDeviceSettings(e, ResourceTypes.AUDIO);
                                     }}
                                     tabIndex={0}
                                 >
                                     <div className={styles["resources-item"]}>
-                                        <div
-                                            className={styles["resources-name"]}
-                                        >
+                                        <div className={styles["resources-name"]}>
                                             Audio
                                             {stream && (
-                                                <div
-                                                    className={
-                                                        styles[
-                                                            "settings-audio-indicator"
-                                                        ]
-                                                    }
-                                                >
+                                                <div className={styles["settings-audio-indicator"]}>
                                                     <AudioIndicator
                                                         stream={stream}
                                                         audioOn={audioOn}
@@ -371,20 +312,12 @@ export class Settings extends Component<Props, State> {
                                                 </div>
                                             )}
                                         </div>
-                                        <div
-                                            className={styles["resource-label"]}
-                                        >
-                                            {selectedAudio
-                                                ? selectedAudio.label
-                                                : ""}
+                                        <div className={styles["resource-label"]}>
+                                            {selectedAudio ? selectedAudio.label : ""}
                                         </div>
 
                                         <div className={styles["arrow-wrap"]}>
-                                            <i
-                                                className={
-                                                    styles["arrow-right"]
-                                                }
-                                            />
+                                            <i className={styles["arrow-right"]} />
                                         </div>
                                     </div>
                                 </a>

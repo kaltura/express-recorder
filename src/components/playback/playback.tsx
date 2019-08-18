@@ -28,11 +28,7 @@ export class Playback extends Component<Props, State> {
         uniqueId++;
     }
 
-    componentDidUpdate(
-        previousProps: Props,
-        previousState: State,
-        previousContext: any
-    ): void {
+    componentDidUpdate(previousProps: Props, previousState: State, previousContext: any): void {
         const { media } = this.props;
         if (previousProps.media !== media) {
             // play the new media
@@ -81,7 +77,7 @@ export class Playback extends Component<Props, State> {
         return (
             <div
                 id={"player-wrap_" + uniqueId}
-                className={`player-wrap ${styles["player-wrap"]}`}
+                className={`xr_player-wrap ${styles["player-wrap"]}`}
             />
         );
     }

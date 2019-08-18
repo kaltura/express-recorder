@@ -7,13 +7,13 @@ import { MediaAddAction } from "kaltura-typescript-client/api/types/MediaAddActi
 import { BaseEntryDeleteAction } from "kaltura-typescript-client/api/types/BaseEntryDeleteAction";
 import { UploadTokenUploadAction } from "kaltura-typescript-client/api/types/UploadTokenUploadAction";
 import { UploadTokenAddAction } from "kaltura-typescript-client/api/types/UploadTokenAddAction";
+import { CancelableAction } from "kaltura-typescript-client/cancelable-action";
 import {
     KalturaClient,
     KalturaMultiRequest,
     KalturaMultiResponse
 } from "kaltura-typescript-client";
-import { ProgressBar } from "../progress-bar/progressBar";
-const styles = require("./style.scss");
+import { KalturaUploadToken } from "kaltura-typescript-client/api/types";
 
 type Props = {
     client: KalturaClient | undefined;
@@ -28,7 +28,6 @@ type Props = {
     serviceUrl: string;
     ks: string;
     conversionProfileId?: number;
-    showUI?: boolean;
     abortUpload?: boolean;
 };
 
@@ -38,18 +37,17 @@ type State = {
 };
 
 /**
- * handle the upload of the recorder file including display of progress bar
+ * handle upload of recorded media
  */
-export class Uploader extends Component<Props, State> {
+export class UploadManager extends Component<Props, State> {
     static defaultProps = {
-        showUI: true,
         abortUpload: false
     };
 
     entryId: string;
     totalSize: number;
     tokenId: string;
-    addMediaRequest: UploadTokenUploadAction | undefined;
+    cancellableUploadAction: CancelableAction<KalturaUploadToken> | undefined;
 
     constructor(props: Props) {
         super(props);
@@ -175,32 +173,31 @@ export class Uploader extends Component<Props, State> {
         const file = new File([blob], "name");
 
         // keep request so it can be canceled
-        this.addMediaRequest = new UploadTokenUploadAction({
+        const addMediaRequest = new UploadTokenUploadAction({
             uploadTokenId: tokenId,
             fileData: file
         });
 
-        client
-            .request(
-                this.addMediaRequest.setProgress((loaded: number, total: number) => {
-                    if (!this.state.abort) {
-                        this.setState({ loaded: loaded }); // loaded bytes until now
-                        if (onUploadProgress) {
-                            onUploadProgress(loaded, total);
-                        }
+        this.cancellableUploadAction = client.request(
+            addMediaRequest.setProgress((loaded: number, total: number) => {
+                if (!this.state.abort) {
+                    this.setState({ loaded: loaded }); // loaded bytes until now
+                    if (onUploadProgress) {
+                        onUploadProgress(loaded, total);
                     }
-                })
-            )
-            .then(
-                data => {
-                    if (onUploadEnded) {
-                        onUploadEnded(this.entryId);
-                    }
-                },
-                (e: Error) => {
-                    this.throwError(e);
                 }
-            );
+            })
+        );
+        this.cancellableUploadAction.then(
+            data => {
+                if (onUploadEnded) {
+                    onUploadEnded(this.entryId);
+                }
+            },
+            (e: Error) => {
+                this.throwError(e);
+            }
+        );
     }
 
     handleCancel = () => {
@@ -214,18 +211,8 @@ export class Uploader extends Component<Props, State> {
         this.setState({ abort: true });
 
         // Cancel request if not finished yet
-        if (this.addMediaRequest) {
-            client
-                .request(this.addMediaRequest)
-                .then(
-                    data => {
-                        return;
-                    },
-                    (e: Error) => {
-                        this.throwError(e);
-                    }
-                )
-                .cancel();
+        if (this.cancellableUploadAction) {
+            this.cancellableUploadAction.cancel();
         }
 
         // Delete created entry if exists
@@ -256,43 +243,6 @@ export class Uploader extends Component<Props, State> {
     }
 
     render() {
-        const { loaded, abort } = this.state;
-        const { showUI } = this.props;
-        const disableCancel = abort || loaded >= this.totalSize;
-        if (!showUI) {
-            return <div />;
-        }
-        return (
-            <div className={`uploader ${styles["uploader"]}`}>
-                <div className={`cancel-wrap ${styles["cancel-wrap"]}`}>
-                    {loaded < this.totalSize && (
-                        <button
-                            className={`btn btn-cancel ${styles["btn"]} ${styles["btn-cancel"]}
-                            ${
-                                disableCancel
-                                    ? `${styles["btn-cancel--disabled"]} btn-cancel--disabled`
-                                    : ""
-                            }`}
-                            onClick={disableCancel ? undefined : this.handleCancel}
-                            disabled={disableCancel}
-                        >
-                            Cancel
-                        </button>
-                    )}
-                </div>
-                <div className={`progress-bar-wrap ${styles["progress-bar-wrap"]}`}>
-                    {loaded < this.totalSize && (
-                        <div className={`progress-bar ${styles["progress-bar"]}`}>
-                            <ProgressBar loaded={loaded} total={this.totalSize} />{" "}
-                        </div>
-                    )}
-                </div>
-                {loaded >= this.totalSize && (
-                    <div className={`upload-success-message ${styles["upload-success-message"]}`}>
-                        <strong>Upload Completed!</strong>
-                    </div>
-                )}
-            </div>
-        );
+        return <div />;
     }
 }

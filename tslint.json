@@ -12,6 +12,7 @@
         "jsdoc-format": true,
         "jsx-no-lambda": false,
         "jsx-no-multiline-js": false,
+        "jsx-alignment": false,
         "label-position": true,
         "max-line-length": [true, 200],
         "member-ordering": [

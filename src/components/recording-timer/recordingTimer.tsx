@@ -1,5 +1,5 @@
 import { Component, h } from "preact";
-import StopIcon from './Stop.svg';
+import StopIcon from "./Stop.svg";
 const styles = require("./style.scss");
 
 type Props = {
@@ -32,7 +32,7 @@ export class RecordingTimer extends Component<Props, State> {
     }
 
     update() {
-        const {maxRecordingTime} = this.props;
+        const { maxRecordingTime } = this.props;
         if (maxRecordingTime && maxRecordingTime <= this.state.currentTime) {
             this.clickHandler();
             return;
@@ -63,15 +63,14 @@ export class RecordingTimer extends Component<Props, State> {
         timeString += ":" + (seconds < 10 ? "0" + seconds : seconds);
 
         return (
-            <div className={`timer ${styles["timer"]}`}>
+            <div className={`xr_timer ${styles["timer"]}`}>
                 <button
                     type={"button"}
-                    className={`timer-button ${styles["timer-button"]}`}
+                    className={`xr_timer-button ${styles["timer-button"]}`}
                     onClick={this.clickHandler}
                     tabIndex={0}
                 >
-
-                  <StopIcon/>
+                    <StopIcon />
                     <span>{timeString}</span>
                 </button>
             </div>

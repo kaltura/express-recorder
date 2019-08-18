@@ -31,20 +31,14 @@ export class ProgressBar extends Component<Props, State> {
     render() {
         const { loaded, total } = this.props;
         const totalStr = this.bytesToSize(total);
-        const loadedStr = (loaded > total) ? totalStr : this.bytesToSize(loaded);
+        const loadedStr = loaded > total ? totalStr : this.bytesToSize(loaded);
         const percentage = (loaded * 100) / total;
         return (
-            <div
-                className={`progress ${styles["progress"]}`}
-                style={"margin-top: 0;"}
-            >
-                <div className={`upload-status ${styles["upload-status"]}`}>
+            <div className={`xr_progress ${styles["progress"]}`} style={"margin-top: 0;"}>
+                <div className={`xr_upload-status ${styles["upload-status"]}`}>
                     {loadedStr} / {totalStr}{" "}
                 </div>
-                <div
-                    className={`bar ${styles["bar"]}`}
-                    style={`width: ${percentage}%;`}
-                />
+                <div className={`xr_bar ${styles["bar"]}`} style={`width: ${percentage}%;`} />
             </div>
         );
     }
