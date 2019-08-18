@@ -20,6 +20,7 @@ export const create = (
 
     return {
         destroy: () => {
+            instance.destroy();
             render(null, parent, child);
         },
         instance
