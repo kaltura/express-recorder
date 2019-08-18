@@ -1,10 +1,10 @@
 import { h, render, Component } from "preact";
 import { ExpressRecorder, ExpressRecorderProps } from "./components/app/expressRecorder";
-
+import { version } from "./version";
 export const create = (
     elementId: string,
     props: ExpressRecorderProps
-): { destroy: () => void; instance: ExpressRecorder } => {
+): { destroy: () => void; instance: ExpressRecorder; version: string } => {
     const parent = document.getElementById(elementId);
 
     if (!parent) {
@@ -23,6 +23,7 @@ export const create = (
             instance.destroy();
             render(null, parent, child);
         },
-        instance
+        instance,
+        version
     };
 };
