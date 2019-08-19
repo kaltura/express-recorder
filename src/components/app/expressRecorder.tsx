@@ -30,6 +30,7 @@ export type ExpressRecorderProps = {
 };
 
 type State = {
+    destroyed: boolean;
     stream: MediaStream | undefined;
     doUpload: boolean;
     doRecording: boolean;
@@ -72,6 +73,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         super(props);
 
         this.state = {
+            destroyed: false,
             stream: undefined,
             doUpload: false,
             doRecording: false,
@@ -157,6 +159,29 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (doUpload) {
             this.setState({ abortUpload: true });
         }
+    };
+
+    destroy = () => {
+        // stop recording
+        this.stopRecording();
+        let state: any = { destroyed: true, doPlayback: false };
+        // abort upload if any
+        if (this.state.doUpload) {
+            state["abortUpload"] = true;
+        }
+        // setState in callback because we want the app to render with the first props
+        // so any upload will be cancelled, the to show the error screen.
+        this.setState(state, () => {
+            this.setState({ error: "Widget Destroyed" });
+        });
+        // stop stream:
+        if (this.state.stream) {
+            this.state.stream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+        // keyboard
+        window.removeEventListener("keydown", this.handleKeyboardControl);
     };
 
     /* =====================================================================
@@ -284,7 +309,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 track.stop();
             });
         }
-        this.createStream(this.state.constraints);
+        if (!this.state.destroyed) {
+            this.createStream(this.state.constraints);
+        }
     };
 
     handleError = (error: string) => {
