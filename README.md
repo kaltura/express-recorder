@@ -22,6 +22,9 @@ npm serve
        list of props for expressRecorder components in form of 'prop': 'value'
    });`
 
+## deployment to Kaltura server
+1. unzip `v<version number>.zip` (attached to version release notes) to `Kaltura-server/apps/expressrecorder/v<version number>`
+
 ## API
 #### ExpressRecorder props:
 <table>
