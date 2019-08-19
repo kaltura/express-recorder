@@ -6,10 +6,9 @@ build
 /.vscode
 .rpt2_cache
 dist
+v[0-9]*.zip
 
-.rpt2_cache
 .rpt2*
 stats.json
 
-dist
 .env

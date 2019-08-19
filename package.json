@@ -12,6 +12,7 @@
   "scripts": {
     "test": "NODE_ENV=test jest",
     "update-version": "node scripts/version.js",
+    "make-package": "node scripts/makepackage.js",
     "clean": "rimraf dist",
     "reset": "npm run clean && rimraf node_modules",
     "build": "npm run clean && npm run update-version && webpack --mode production",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@storybook/react": "^4.1.1",
     "@types/jest": "^23.3.10",
+    "archiver": "^3.1.1",
     "awesome-typescript-loader": "^5.2.1",
     "copy-webpack-plugin": "^5.0.2",
     "css-loader": "^2.1.1",
