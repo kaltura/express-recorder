@@ -15,12 +15,15 @@ npm serve
 
 ## Create build release
 1. npm run build
-2. copy files located under build folder to your project.
+2. copy files located under build folder to your project, or use the zip file with the version name.
 
 ## Embedding into html page
 `const component = Kaltura.ExpressRecorder.create('parent_div_id', {
        list of props for expressRecorder components in form of 'prop': 'value'
    });`
+
+## deployment to Kaltura server
+1. unzip `v<version number>.zip` (attached to version release notes) to `Kaltura-server/apps/expressrecorder/v<version number>`
 
 ## API
 #### ExpressRecorder props:
