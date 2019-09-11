@@ -8,14 +8,21 @@ type Props = {
     screenReaderText?: string;
     onClick?: (isOn: boolean) => void;
     isToggleOn: boolean;
+    disabled?: boolean;
 };
 
 type State = {
     isToggleOn: boolean;
 };
 
-// show toggle button. used in settings box to turn on/off resource
+/**
+ * show toggle button. used in settings box to turn on/off resource
+ */
 export class ToggleButton extends Component<Props, State> {
+    static defaultProps = {
+        disabled: false
+    };
+
     constructor(props: Props) {
         super(props);
 
@@ -34,7 +41,7 @@ export class ToggleButton extends Component<Props, State> {
     };
 
     render(props: Props) {
-        const { text, id, name, screenReaderText } = props;
+        const { text, id, name, screenReaderText, disabled } = props;
         const { isToggleOn } = this.state;
 
         let sName = name;
@@ -62,6 +69,7 @@ export class ToggleButton extends Component<Props, State> {
                             onClick={this.handleClick}
                             checked={isToggleOn}
                             tabIndex={0}
+                            disabled={disabled}
                         />
                         <label
                             for={id}

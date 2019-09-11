@@ -4,29 +4,34 @@ const styles = require("./style.scss");
 
 type Props = {
     resourceName: string;
-    devices: object[]; // MediaDeviceInfo[]
-    onChooseDevice: (device: object) => void; // device: MediaDeviceInfo
+    devices: MediaDeviceInfo[];
+    onChooseDevice: (device: MediaDeviceInfo) => void;
     isOn: boolean;
-    selected: any;
+    disabled?: boolean;
+    selected: MediaDeviceInfo | false;
     onBack: () => void;
     onToggleChange: (isOn: boolean) => void;
 };
 
 type State = {
     isOn: boolean;
-    selectedDevice: any;
+    selectedDevice?: MediaDeviceInfo;
 };
 
 /**
  * Component to display devices for one resource (camera / audio)
  */
 export class SettingsDevices extends Component<Props, State> {
+    static defaultProps = {
+        disabled: false
+    };
+
     constructor(props: Props) {
         super(props);
 
         this.state = {
             isOn: props.isOn,
-            selectedDevice: props.selected
+            selectedDevice: props.selected ? props.selected : undefined
         };
     }
 
@@ -38,29 +43,23 @@ export class SettingsDevices extends Component<Props, State> {
         const popups = Array.from(document.querySelectorAll(".device-label"));
         popups.map((element: any) => {
             for (let i = 0; i < element.children.length; i++) {
-                if (
-                    element.children[i].classList.contains(
-                        "device-label__popup"
-                    )
-                ) {
+                if (element.children[i].classList.contains("device-label__popup")) {
                     element.children[i].style.visibility =
-                        element.scrollWidth === element.offsetWidth
-                            ? "hidden"
-                            : "";
+                        element.scrollWidth === element.offsetWidth ? "hidden" : "";
                     break;
                 }
             }
         });
     };
 
-    handleItemClick = (item: any) => {
+    handleItemClick = (item: MediaDeviceInfo) => {
         this.setState({ selectedDevice: item }, () => {
             this.props.onChooseDevice(item);
             this.handleBack();
         });
     };
 
-    handleItemPress = (e: KeyboardEvent, item: any) => {
+    handleItemPress = (e: KeyboardEvent, item: MediaDeviceInfo) => {
         if (e.key === "Enter") {
             this.handleItemClick(item);
         }
@@ -85,10 +84,10 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     render() {
-        const { resourceName, devices } = this.props;
+        const { resourceName, devices, disabled } = this.props;
         const { isOn, selectedDevice } = this.state;
 
-        const resourcesList = devices.map((item: any, index: number) => {
+        const resourcesList = devices.map((item: MediaDeviceInfo, index: number) => {
             let selectedClass = "";
             let isSelected = false;
             if (isOn && selectedDevice && item.label === selectedDevice.label) {
@@ -98,11 +97,7 @@ export class SettingsDevices extends Component<Props, State> {
             return (
                 <div
                     key={index.toString()}
-                    onClick={
-                        isOn && !isSelected
-                            ? () => this.handleItemClick(item)
-                            : undefined
-                    }
+                    onClick={isOn && !isSelected ? () => this.handleItemClick(item) : undefined}
                     onKeyPress={e => this.handleItemPress(e, item)}
                     className={
                         selectedClass +
@@ -114,12 +109,7 @@ export class SettingsDevices extends Component<Props, State> {
                     tabIndex={0}
                 >
                     <span>{item.label}</span>
-                    <div
-                        className={
-                            "device-label__popup " +
-                            styles["device-label__popup"]
-                        }
-                    >
+                    <div className={"device-label__popup " + styles["device-label__popup"]}>
                         {item.label}
                     </div>
                 </div>
@@ -141,6 +131,7 @@ export class SettingsDevices extends Component<Props, State> {
                     text={resourceName}
                     onClick={this.handleToggleClick}
                     isToggleOn={isOn}
+                    disabled={disabled}
                 />
                 <hr className={styles["settings-line"]} />
                 <div className={styles["devices-list"]}>{resourcesList}</div>

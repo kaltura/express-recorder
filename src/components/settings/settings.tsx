@@ -6,18 +6,21 @@ import { AudioIndicator } from "../audioIndicator/AudioIndicator";
 const styles = require("./style.scss");
 
 type Props = {
-    onSettingsChanged?: (selectedCamera: any, selectedAudio: any) => void;
-    selectedCamera?: any;
-    selectedAudio?: any;
+    onSettingsChanged?: (
+        selectedCamera: MediaDeviceInfo | false,
+        selectedAudio: MediaDeviceInfo | false
+    ) => void;
+    selectedCameraDevice?: MediaStreamTrack;
+    selectedAudioDevice?: MediaStreamTrack;
     allowVideo: boolean;
     allowAudio: boolean;
-    stream: MediaStream | undefined;
+    stream?: MediaStream | undefined;
 };
 
 type State = {
     isOpen: boolean;
-    selectedCamera: any;
-    selectedAudio: any;
+    selectedCamera: MediaDeviceInfo | false;
+    selectedAudio: MediaDeviceInfo | false;
     showCameraSettings: boolean;
     showAudioSettings: boolean;
     cameraOn: boolean;
@@ -33,17 +36,31 @@ export enum ResourceTypes {
  * Component to handle settings menu for resources and devices
  */
 export class Settings extends Component<Props, State> {
-    cameraDevicesInfo: any[];
-    audioDevicesInfo: any[];
+    cameraDevicesInfo: MediaDeviceInfo[];
+    audioDevicesInfo: MediaDeviceInfo[];
     menuBoxRef: Element | undefined;
 
     constructor(props: Props) {
         super(props);
 
+        let selectedCamera: any = false;
+        if (props.selectedCameraDevice) {
+            selectedCamera = {
+                kind: "videoinput",
+                label: props.selectedCameraDevice.label
+            };
+        }
+        let selectedAudio: any = false;
+        if (props.selectedAudioDevice) {
+            selectedAudio = {
+                kind: "audioinput",
+                label: props.selectedAudioDevice.label
+            };
+        }
         this.state = {
             isOpen: false,
-            selectedCamera: props.selectedCamera,
-            selectedAudio: props.selectedAudio,
+            selectedCamera: selectedCamera,
+            selectedAudio: selectedAudio,
             showAudioSettings: false,
             showCameraSettings: false,
             cameraOn: props.allowVideo,
@@ -58,15 +75,30 @@ export class Settings extends Component<Props, State> {
         this.getDevices();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps: Props, prevState: State) {
         // get updated resources once stream is ready
         if (
-            (!this.state.selectedCamera || !this.state.selectedAudio) &&
-            this.props.selectedCamera
+            (!prevProps.selectedCameraDevice && this.props.selectedCameraDevice) ||
+            (!prevProps.selectedAudioDevice && this.props.selectedAudioDevice)
         ) {
+            let selectedCamera: any = false;
+            if (this.props.selectedCameraDevice) {
+                selectedCamera = {
+                    kind: "videoinput",
+                    label: this.props.selectedCameraDevice.label
+                };
+            }
+            let selectedAudio: any = false;
+            if (this.props.selectedAudioDevice) {
+                selectedAudio = {
+                    kind: "audioinput",
+                    label: this.props.selectedAudioDevice.label
+                };
+            }
+
             this.setState({
-                selectedCamera: this.props.selectedCamera,
-                selectedAudio: this.props.selectedAudio
+                selectedCamera: selectedCamera,
+                selectedAudio: selectedAudio
             });
         }
 
@@ -98,15 +130,18 @@ export class Settings extends Component<Props, State> {
         this.handleClose();
     };
 
+    /**
+     * get available devices
+     */
     getDevices = () => {
-        // get available devices
         if (navigator.mediaDevices) {
-            navigator.mediaDevices.enumerateDevices().then((devices: object[]) => {
+            navigator.mediaDevices.enumerateDevices().then((devices: MediaDeviceInfo[]) => {
                 this.cameraDevicesInfo = devices.filter((item: any) => item.kind === "videoinput");
                 this.audioDevicesInfo = devices.filter((item: any) => item.kind === "audioinput");
             });
         }
     };
+
     toggleMenu = () => {
         const { isOpen } = this.state;
         this.setState({ isOpen: !isOpen }, () => {
@@ -139,7 +174,7 @@ export class Settings extends Component<Props, State> {
         }
     };
 
-    handleChooseDevice = (device: any) => {
+    handleChooseDevice = (device: MediaDeviceInfo) => {
         if (device.kind === "videoinput") {
             this.setState({ selectedCamera: device }, () => {
                 this.saveSettings();
@@ -161,17 +196,22 @@ export class Settings extends Component<Props, State> {
         });
     };
 
-    handleToggleChange = (isOn: boolean, type: ResourceTypes) => {
+    /**
+     *
+     * @param isOn boolean, new value for the toggle control
+     * @param resourceType  ResourceTypes, the type of the control that changed
+     */
+    handleToggleChange = (isOn: boolean, resourceType: ResourceTypes) => {
         let { cameraOn, audioOn } = this.state;
 
         // do not allow both camera and audio to be turned off
-        cameraOn = !isOn && type === ResourceTypes.AUDIO ? true : cameraOn;
-        audioOn = !isOn && type === ResourceTypes.VIDEO ? true : audioOn;
+        cameraOn = !isOn && resourceType === ResourceTypes.AUDIO ? true : cameraOn;
+        audioOn = !isOn && resourceType === ResourceTypes.VIDEO ? true : audioOn;
 
         this.setState(
             {
-                cameraOn: type === ResourceTypes.VIDEO ? isOn : cameraOn,
-                audioOn: type === ResourceTypes.AUDIO ? isOn : audioOn
+                cameraOn: resourceType === ResourceTypes.VIDEO ? isOn : cameraOn,
+                audioOn: resourceType === ResourceTypes.AUDIO ? isOn : audioOn
             },
             () => {
                 this.saveSettings();
@@ -201,7 +241,7 @@ export class Settings extends Component<Props, State> {
     };
 
     render() {
-        const { stream } = this.props;
+        const { stream, allowAudio, allowVideo } = this.props;
         const {
             isOpen,
             showCameraSettings,
@@ -219,6 +259,7 @@ export class Settings extends Component<Props, State> {
                     resourceName={showCameraSettings ? ResourceTypes.VIDEO : ResourceTypes.AUDIO}
                     devices={showCameraSettings ? this.cameraDevicesInfo : this.audioDevicesInfo}
                     isOn={showCameraSettings ? cameraOn : audioOn}
+                    disabled={!(allowVideo && allowAudio)} // can only turn off if both are available, so we won't end up with none
                     selected={showCameraSettings ? selectedCamera : selectedAudio}
                     onBack={() => {
                         this.handleBack();
