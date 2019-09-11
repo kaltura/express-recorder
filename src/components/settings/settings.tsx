@@ -10,11 +10,11 @@ type Props = {
         selectedCamera: MediaDeviceInfo | false,
         selectedAudio: MediaDeviceInfo | false
     ) => void;
-    selectedCamera?: MediaStreamTrack;
-    selectedAudio?: MediaStreamTrack;
+    selectedCameraDevice?: MediaStreamTrack;
+    selectedAudioDevice?: MediaStreamTrack;
     allowVideo: boolean;
     allowAudio: boolean;
-    stream: MediaStream | undefined;
+    stream?: MediaStream | undefined;
 };
 
 type State = {
@@ -44,20 +44,19 @@ export class Settings extends Component<Props, State> {
         super(props);
 
         let selectedCamera: any = false;
-        if (props.selectedCamera) {
+        if (props.selectedCameraDevice) {
             selectedCamera = {
                 kind: "videoinput",
-                label: props.selectedCamera.label
+                label: props.selectedCameraDevice.label
             };
         }
         let selectedAudio: any = false;
-        if (props.selectedAudio) {
+        if (props.selectedAudioDevice) {
             selectedAudio = {
                 kind: "audioinput",
-                label: props.selectedAudio.label
+                label: props.selectedAudioDevice.label
             };
         }
-
         this.state = {
             isOpen: false,
             selectedCamera: selectedCamera,
@@ -76,25 +75,24 @@ export class Settings extends Component<Props, State> {
         this.getDevices();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps: Props, prevState: State) {
         // get updated resources once stream is ready
-        // if there is a camera in props but not in state, save it to the state
         if (
-            (!this.state.selectedCamera || !this.state.selectedAudio) &&
-            this.props.selectedCamera
+            (!prevProps.selectedCameraDevice && this.props.selectedCameraDevice) ||
+            (!prevProps.selectedAudioDevice && this.props.selectedAudioDevice)
         ) {
             let selectedCamera: any = false;
-            if (this.props.selectedCamera) {
+            if (this.props.selectedCameraDevice) {
                 selectedCamera = {
                     kind: "videoinput",
-                    label: this.props.selectedCamera.label
+                    label: this.props.selectedCameraDevice.label
                 };
             }
             let selectedAudio: any = false;
-            if (this.props.selectedAudio) {
+            if (this.props.selectedAudioDevice) {
                 selectedAudio = {
                     kind: "audioinput",
-                    label: this.props.selectedAudio.label
+                    label: this.props.selectedAudioDevice.label
                 };
             }
 

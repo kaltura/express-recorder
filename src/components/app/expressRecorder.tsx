@@ -588,8 +588,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 <div className={styles["settings-wrap"]}>
                     {!doPlayback && !doRecording && (
                         <Settings
-                            selectedCamera={stream ? stream.getVideoTracks()[0] : undefined}
-                            selectedAudio={stream ? stream.getAudioTracks()[0] : undefined}
+                            selectedCameraDevice={stream ? stream.getVideoTracks()[0] : undefined}
+                            selectedAudioDevice={stream ? stream.getAudioTracks()[0] : undefined}
                             allowVideo={allowVideo!}
                             allowAudio={allowAudio!}
                             onSettingsChanged={this.handleSettingsChange}
