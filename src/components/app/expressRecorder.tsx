@@ -39,19 +39,14 @@ type State = {
     abortUpload: boolean;
     recordedBlobs: Blob[];
     error: string;
-    constraints: Constraints;
+    constraints: MediaStreamConstraints;
     uploadStatus: { loaded: number; total: number };
 };
 
-export type Constraints = {
-    video: any | boolean;
-    audio: any | boolean;
-};
-
 const VIDEO_CONSTRAINT = {
-    frameRate: "15",
-    height: "483",
-    width: "858"
+    frameRate: 15,
+    height: 483,
+    width: 858
 };
 
 /**
@@ -383,7 +378,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             this.setState({ doCountdown: false, doRecording: true });
         }
     };
-    handleSettingsChange = (selectedCamera: any, selectedAudio: any) => {
+    handleSettingsChange = (
+        selectedCamera: MediaDeviceInfo | false,
+        selectedAudio: MediaDeviceInfo | false
+    ) => {
         // check if something has been changed
         const { constraints } = this.state;
         if (
@@ -392,14 +390,18 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             ((selectedAudio && constraints.audio) || // check if audio was turn on/off
                 (!selectedAudio && !constraints.audio)) &&
             (!selectedCamera || // check if device id has been changed
-                selectedCamera.deviceId === constraints.video.deviceId) &&
+                (constraints.video &&
+                    typeof constraints.video !== "boolean" &&
+                    selectedCamera.deviceId === constraints.video.deviceId)) &&
             (!selectedAudio || // check if device id has been changed
-                selectedAudio.deviceId === constraints.audio.deviceId)
+                (constraints.audio &&
+                    typeof constraints.audio !== "boolean" &&
+                    selectedAudio.deviceId === constraints.audio.deviceId))
         ) {
             return;
         }
 
-        let newConstraints: Constraints = { video: false, audio: false };
+        let newConstraints: MediaStreamConstraints = { video: false, audio: false };
         if (selectedCamera) {
             newConstraints.video = {
                 deviceId: selectedCamera.deviceId,
@@ -418,7 +420,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.createStream(newConstraints);
     };
 
-    createStream = (constraints: Constraints) => {
+    createStream = (constraints: MediaStreamConstraints) => {
         if (!constraints.video && !constraints.audio) {
             this.setState({
                 error: "Video and audio are disabled, at least one of them must be enabled."

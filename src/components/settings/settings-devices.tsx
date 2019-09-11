@@ -4,18 +4,18 @@ const styles = require("./style.scss");
 
 type Props = {
     resourceName: string;
-    devices: object[]; // MediaDeviceInfo[]
-    onChooseDevice: (device: object) => void; // device: MediaDeviceInfo
+    devices: MediaDeviceInfo[];
+    onChooseDevice: (device: MediaDeviceInfo) => void;
     isOn: boolean;
     disabled?: boolean;
-    selected: any;
+    selected: MediaDeviceInfo | false;
     onBack: () => void;
     onToggleChange: (isOn: boolean) => void;
 };
 
 type State = {
     isOn: boolean;
-    selectedDevice: any;
+    selectedDevice?: MediaDeviceInfo;
 };
 
 /**
@@ -31,7 +31,7 @@ export class SettingsDevices extends Component<Props, State> {
 
         this.state = {
             isOn: props.isOn,
-            selectedDevice: props.selected
+            selectedDevice: props.selected ? props.selected : undefined
         };
     }
 
@@ -52,14 +52,14 @@ export class SettingsDevices extends Component<Props, State> {
         });
     };
 
-    handleItemClick = (item: any) => {
+    handleItemClick = (item: MediaDeviceInfo) => {
         this.setState({ selectedDevice: item }, () => {
             this.props.onChooseDevice(item);
             this.handleBack();
         });
     };
 
-    handleItemPress = (e: KeyboardEvent, item: any) => {
+    handleItemPress = (e: KeyboardEvent, item: MediaDeviceInfo) => {
         if (e.key === "Enter") {
             this.handleItemClick(item);
         }
@@ -87,7 +87,7 @@ export class SettingsDevices extends Component<Props, State> {
         const { resourceName, devices, disabled } = this.props;
         const { isOn, selectedDevice } = this.state;
 
-        const resourcesList = devices.map((item: any, index: number) => {
+        const resourcesList = devices.map((item: MediaDeviceInfo, index: number) => {
             let selectedClass = "";
             let isSelected = false;
             if (isOn && selectedDevice && item.label === selectedDevice.label) {
