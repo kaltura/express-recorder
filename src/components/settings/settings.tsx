@@ -161,17 +161,22 @@ export class Settings extends Component<Props, State> {
         });
     };
 
-    handleToggleChange = (isOn: boolean, type: ResourceTypes) => {
+    /**
+     *
+     * @param isOn boolean, new value for the toggle control
+     * @param resourceType  ResourceTypes, the type of the control that changed
+     */
+    handleToggleChange = (isOn: boolean, resourceType: ResourceTypes) => {
         let { cameraOn, audioOn } = this.state;
 
         // do not allow both camera and audio to be turned off
-        cameraOn = !isOn && type === ResourceTypes.AUDIO ? true : cameraOn;
-        audioOn = !isOn && type === ResourceTypes.VIDEO ? true : audioOn;
+        cameraOn = !isOn && resourceType === ResourceTypes.AUDIO ? true : cameraOn;
+        audioOn = !isOn && resourceType === ResourceTypes.VIDEO ? true : audioOn;
 
         this.setState(
             {
-                cameraOn: type === ResourceTypes.VIDEO ? isOn : cameraOn,
-                audioOn: type === ResourceTypes.AUDIO ? isOn : audioOn
+                cameraOn: resourceType === ResourceTypes.VIDEO ? isOn : cameraOn,
+                audioOn: resourceType === ResourceTypes.AUDIO ? isOn : audioOn
             },
             () => {
                 this.saveSettings();
@@ -201,7 +206,7 @@ export class Settings extends Component<Props, State> {
     };
 
     render() {
-        const { stream } = this.props;
+        const { stream, allowAudio, allowVideo } = this.props;
         const {
             isOpen,
             showCameraSettings,
@@ -219,6 +224,7 @@ export class Settings extends Component<Props, State> {
                     resourceName={showCameraSettings ? ResourceTypes.VIDEO : ResourceTypes.AUDIO}
                     devices={showCameraSettings ? this.cameraDevicesInfo : this.audioDevicesInfo}
                     isOn={showCameraSettings ? cameraOn : audioOn}
+                    disabled={!(allowVideo && allowAudio)} // can only turn off if both are available, so we won't end up with none
                     selected={showCameraSettings ? selectedCamera : selectedAudio}
                     onBack={() => {
                         this.handleBack();

@@ -7,6 +7,7 @@ type Props = {
     devices: object[]; // MediaDeviceInfo[]
     onChooseDevice: (device: object) => void; // device: MediaDeviceInfo
     isOn: boolean;
+    disabled?: boolean;
     selected: any;
     onBack: () => void;
     onToggleChange: (isOn: boolean) => void;
@@ -21,6 +22,10 @@ type State = {
  * Component to display devices for one resource (camera / audio)
  */
 export class SettingsDevices extends Component<Props, State> {
+    static defaultProps = {
+        disabled: false
+    };
+
     constructor(props: Props) {
         super(props);
 
@@ -38,15 +43,9 @@ export class SettingsDevices extends Component<Props, State> {
         const popups = Array.from(document.querySelectorAll(".device-label"));
         popups.map((element: any) => {
             for (let i = 0; i < element.children.length; i++) {
-                if (
-                    element.children[i].classList.contains(
-                        "device-label__popup"
-                    )
-                ) {
+                if (element.children[i].classList.contains("device-label__popup")) {
                     element.children[i].style.visibility =
-                        element.scrollWidth === element.offsetWidth
-                            ? "hidden"
-                            : "";
+                        element.scrollWidth === element.offsetWidth ? "hidden" : "";
                     break;
                 }
             }
@@ -85,7 +84,7 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     render() {
-        const { resourceName, devices } = this.props;
+        const { resourceName, devices, disabled } = this.props;
         const { isOn, selectedDevice } = this.state;
 
         const resourcesList = devices.map((item: any, index: number) => {
@@ -98,11 +97,7 @@ export class SettingsDevices extends Component<Props, State> {
             return (
                 <div
                     key={index.toString()}
-                    onClick={
-                        isOn && !isSelected
-                            ? () => this.handleItemClick(item)
-                            : undefined
-                    }
+                    onClick={isOn && !isSelected ? () => this.handleItemClick(item) : undefined}
                     onKeyPress={e => this.handleItemPress(e, item)}
                     className={
                         selectedClass +
@@ -114,12 +109,7 @@ export class SettingsDevices extends Component<Props, State> {
                     tabIndex={0}
                 >
                     <span>{item.label}</span>
-                    <div
-                        className={
-                            "device-label__popup " +
-                            styles["device-label__popup"]
-                        }
-                    >
+                    <div className={"device-label__popup " + styles["device-label__popup"]}>
                         {item.label}
                     </div>
                 </div>
@@ -141,6 +131,7 @@ export class SettingsDevices extends Component<Props, State> {
                     text={resourceName}
                     onClick={this.handleToggleClick}
                     isToggleOn={isOn}
+                    disabled={disabled}
                 />
                 <hr className={styles["settings-line"]} />
                 <div className={styles["devices-list"]}>{resourcesList}</div>
