@@ -170,8 +170,7 @@ export class UploadManager extends Component<Props, State> {
         }
 
         const blob = new Blob(this.props.recordedBlobs, { type: "video/webm" });
-        const file = new File([blob], "name");
-
+        const file = new File([blob], "name.webm");
         // keep request so it can be canceled
         const addMediaRequest = new UploadTokenUploadAction({
             uploadTokenId: tokenId,
