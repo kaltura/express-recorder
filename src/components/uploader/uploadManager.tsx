@@ -83,8 +83,7 @@ export class UploadManager extends Component<Props, State> {
      * 4.Upload token with media
      */
     upload() {
-        const { mediaType, entryName, conversionProfileId, onUploadStarted } = this.props;
-        const { client } = this.props;
+        const { mediaType, entryName, conversionProfileId, onUploadStarted, client } = this.props;
 
         if (!client) {
             this.throwError(new Error("Cannot connect to Kaltura server"));
