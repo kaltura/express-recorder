@@ -223,7 +223,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             tag.type = "text/javascript";
             document.body.appendChild(tag);
         } else if (typeof KalturaPlayer === "undefined") {
-            this.handleError("Kaltura Player was not found in global scope");
+            this.handleError(
+                "Kaltura Player was not found in global scope and uiConfId prop was not provided"
+            );
         }
 
         window.addEventListener("keydown", this.handleKeyboardControl);
