@@ -12,6 +12,8 @@ import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
 import { UploadUI } from "../uploader/uploadUI";
 import { UploadManager } from "../uploader/uploadManager";
 const styles = require("./style.scss");
+// player is loaded to global scope, let TypeScript know about it
+declare var KalturaPlayer: any;
 
 export type ExpressRecorderProps = {
     ks: string;
@@ -213,12 +215,18 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             this.handleError("Cannot connect to Kaltura server");
         }
 
-        // load player lib
-        const tag = document.createElement("script");
-        tag.async = true;
-        tag.src = playerUrl + `/p/${partnerId}/embedPlaykitJs/uiconf_id/${uiConfId}`;
-        tag.type = "text/javascript";
-        document.body.appendChild(tag);
+        // load player lib if uiConfId was provided, otherwise assume KalturaPlayer exists as global var
+        if (uiConfId) {
+            const tag = document.createElement("script");
+            tag.async = true;
+            tag.src = playerUrl + `/p/${partnerId}/embedPlaykitJs/uiconf_id/${uiConfId}`;
+            tag.type = "text/javascript";
+            document.body.appendChild(tag);
+        } else if (typeof KalturaPlayer === "undefined") {
+            this.handleError(
+                "Kaltura Player was not found in global scope and uiConfId prop was not provided"
+            );
+        }
 
         window.addEventListener("keydown", this.handleKeyboardControl);
 
@@ -233,14 +241,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     checkProps = () => {
         const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
 
-        if (!serviceUrl || !app || !ks || !playerUrl || !uiConfId || !partnerId) {
-            let message = "Missing props: ";
+        let message = "Missing props: ";
+        if (!serviceUrl || !app || !ks || !partnerId) {
             message += !serviceUrl ? "serviceUrl; " : "";
             message += !app ? "app; " : "";
             message += !ks ? "ks; " : "";
-            message += !playerUrl ? "playerUrl; " : "";
-            message += !uiConfId ? "uiConfId; " : "";
             message += !partnerId ? "partnerId; " : "";
+            this.handleError(message);
+        } else if (uiConfId && !playerUrl) {
+            message += !playerUrl ? "playerUrl; " : "";
             this.handleError(message);
         }
     };
