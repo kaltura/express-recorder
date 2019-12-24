@@ -12,6 +12,7 @@ import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
 import { UploadUI } from "../uploader/uploadUI";
 import { UploadManager } from "../uploader/uploadManager";
 const styles = require("./style.scss");
+// player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
 
 export type ExpressRecorderProps = {
