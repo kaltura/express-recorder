@@ -7,7 +7,9 @@ Supported browsers: Chrome, Firfox, Opera.
 2. npm install
 
 ## Run the project
-npm serve
+clone index.template.ejs into index.ejs (Same dir) and fill in the needed properties.
+
+execute - "npm run serve"
 
 ## Run with storybook
 1. fill props in expressRecorder.stories.jsx </br>

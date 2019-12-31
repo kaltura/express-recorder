@@ -65,31 +65,27 @@ export class Recorder extends Component<Props, State> {
     startRecording = () => {
         const { stream } = this.props;
 
-        let options = { mimeType: "video/webm;codecs=vp9,opus" };
-        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            console.log(options.mimeType + ' is not Supported');
-            options = { mimeType: "video/webm;codecs=vp8,opus" };
+        const mimeTypes = [
+            "video/webm;codecs=vp9,opus",
+            "video/webm;codecs=vp8,opus",
+            "video/webm;codecs=h264",
+            "video/webm;codecs=H264",
+            "video/webm",
+            "video/mpeg4",
+            ""
+        ];
+        let options = { mimeType: "" };
+        for (let i = 0; i < mimeTypes.length; i++) {
+            let mimeType = mimeTypes[i];
+            options = { mimeType: mimeType };
             if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                console.log(options.mimeType + ' is not Supported');
-                options = { mimeType: "video/webm;codecs=h264" };
-                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                        console.log(options.mimeType + ' is not Supported');
-                        options = { mimeType: "video/webm;codecs=H264" };
-                        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                            console.log(options.mimeType + ' is not Supported');
-                            options = { mimeType: 'video/webm' };
-                            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                                console.log(options.mimeType + ' is not Supported');
-                                options = { mimeType: "video/mpeg4" };
-                                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                                    console.log(options.mimeType + ' is not Supported');
-                                    options = {mimeType: ''};
-                                }
-                            }
-                        }
-                    }
-                }
+                console.log(mimeType + " is not Supported");
+            } else {
+                break;
             }
+        }
+
+        console.log(options.mimeType + " is selected");
 
         try {
             this.mediaRecorder = new MediaRecorder(stream, options);
