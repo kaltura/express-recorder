@@ -16,8 +16,10 @@ execute - "npm run serve"
 2. yarn run storybook
 
 ## Create build release
-1. npm run build
-2. copy files located under 'dist' folder to your project, or use the zip file with the version name.
+1. update the package.json file with the new version
+2. npm run build
+3. copy files located under 'dist' folder to your project, or use the zip file with the version name.
+4. attach the zip created (on the root of the project) to the release notes.
 
 ## Embedding into html page
 `const component = Kaltura.ExpressRecorder.create('parent_div_id', {
