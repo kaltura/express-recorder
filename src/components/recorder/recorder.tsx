@@ -64,16 +64,33 @@ export class Recorder extends Component<Props, State> {
 
     startRecording = () => {
         const { stream } = this.props;
-        let options = { mimeType: "video/webm;codecs=vp9" };
+
+        let options = { mimeType: "video/webm;codecs=vp9,opus" };
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            options = { mimeType: "video/webm;codecs=vp8" };
+            console.log(options.mimeType + ' is not Supported');
+            options = { mimeType: "video/webm;codecs=vp8,opus" };
             if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                options = { mimeType: "video/webm" };
+                console.log(options.mimeType + ' is not Supported');
+                options = { mimeType: "video/webm;codecs=h264" };
                 if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                    options = { mimeType: "" };
+                        console.log(options.mimeType + ' is not Supported');
+                        options = { mimeType: "video/webm;codecs=H264" };
+                        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                            console.log(options.mimeType + ' is not Supported');
+                            options = { mimeType: 'video/webm' };
+                            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                                console.log(options.mimeType + ' is not Supported');
+                                options = { mimeType: "video/mpeg4" };
+                                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                                    console.log(options.mimeType + ' is not Supported');
+                                    options = {mimeType: ''};
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        }
+
         try {
             this.mediaRecorder = new MediaRecorder(stream, options);
         } catch (e) {
