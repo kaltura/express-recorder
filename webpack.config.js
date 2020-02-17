@@ -2,14 +2,10 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
-var dotenv = require('dotenv').config({path: __dirname + '/.env'});
-const packageJson = require('./package.json');
-
 const isDevServer = process.argv.find(v => v.indexOf('webpack-dev-server') !== -1);
 const testFolder = path.join(__dirname, "/test");
 const distFolder = path.join(__dirname, "/dist");
 
-console.log(JSON.stringify(dotenv));
 const plugins = [];
 
 if (isDevServer) {
