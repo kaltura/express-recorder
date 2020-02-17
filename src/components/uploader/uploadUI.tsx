@@ -7,14 +7,17 @@ type Props = {
     total: number;
     abort: boolean;
     onCancel: () => void;
+    translate: (value: string) => string;
 };
+
+type State = {};
 
 /**
  * ui for upload phase
  */
-export class UploadUI extends Component<Props> {
+export class UploadUI extends Component<Props, State> {
     render() {
-        const { loaded, total, abort, onCancel } = this.props;
+        const { loaded, total, abort, onCancel, translate } = this.props;
         const disableCancel = abort || loaded >= total;
 
         return (
@@ -33,7 +36,7 @@ export class UploadUI extends Component<Props> {
                             onClick={disableCancel ? undefined : onCancel}
                             disabled={disableCancel}
                         >
-                            Cancel
+                            {translate("Cancel")}
                         </button>
                     )}
                 </div>
@@ -48,7 +51,7 @@ export class UploadUI extends Component<Props> {
                     <div
                         className={`xr_upload-success-message ${styles["upload-success-message"]}`}
                     >
-                        <strong>Upload Completed!</strong>
+                        <strong>{translate("Upload Completed!")}</strong>
                     </div>
                 )}
             </div>
