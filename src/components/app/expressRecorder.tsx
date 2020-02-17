@@ -29,6 +29,7 @@ export type ExpressRecorderProps = {
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
     showUploadUI?: boolean;
+    translations?: any;
 };
 
 type State = {
@@ -59,7 +60,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
         allowAudio: true,
-        showUploadUI: true
+        showUploadUI: true,
+        translations: []
     };
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
@@ -525,6 +527,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ uploadStatus: status });
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, status);
     };
+    translate = (value: string): string => {
+        const { translations } = this.props;
+        if (translations && translations[value]) {
+            return translations[value];
+        }
+        return value;
+    };
 
     render(props: ExpressRecorderProps, state: State) {
         const {
@@ -587,6 +596,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             total={uploadStatus.total}
                             abort={abortUpload}
                             onCancel={this.cancelUpload}
+                            translate={this.translate}
                         />
                     )}
                 </div>
@@ -603,6 +613,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             allowAudio={allowAudio!}
                             onSettingsChanged={this.handleSettingsChange}
                             stream={stream}
+                            translate={this.translate}
                         />
                     )}
                 </div>
