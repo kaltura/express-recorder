@@ -1,4 +1,4 @@
-import { ExpressRecorder } from "../components/app/expressRecorder";
+import { ExpressRecorder } from "../components/App/ExpressRecorder";
 
 export type ExpressRecorderEvent = {
     target: ExpressRecorder;

@@ -1,5 +1,5 @@
 import { h, render, Component } from "preact";
-import { ExpressRecorder, ExpressRecorderProps } from "./components/app/expressRecorder";
+import { ExpressRecorder, ExpressRecorderProps } from "./components/App/ExpressRecorder";
 import { version } from "./version";
 export const create = (
     elementId: string,

@@ -1,6 +1,6 @@
  import { h } from "preact";
 import { storiesOf } from "@storybook/react";
-import {RecordingTimer} from "./recordingTimer";
+import {RecordingTimer} from "./RecordingTimer";
 
 
 

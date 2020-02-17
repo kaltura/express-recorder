@@ -1,5 +1,5 @@
 import { Component, h } from "preact";
-import { ToggleButton } from "../toggle-button/toggleButton";
+import { ToggleButton } from "../Toggle-button/ToggleButton";
 const styles = require("./style.scss");
 
 type Props = {

@@ -1,5 +1,5 @@
 import { Component, h } from "preact";
-import { ProgressBar } from "../progress-bar/progressBar";
+import { ProgressBar } from "../Progress-bar/ProgressBar";
 const styles = require("./style.scss");
 
 type Props = {

@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
-import { SettingsDevices } from "./settings-devices";
+import { SettingsDevices } from "./Settings-devices";
 import SettingsIcon from "./settings.svg";
-import { AudioIndicator } from "../audioIndicator/AudioIndicator";
+import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 
 const styles = require("./style.scss");
 

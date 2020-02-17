@@ -1,5 +1,5 @@
 import { Component, h } from "preact";
-import { AudioWave } from "./audioWave";
+import { AudioWave } from "./AudioWave";
 
 type Props = {
     stream: MediaStream;
@@ -41,9 +41,7 @@ export class AudioIndicator extends Component<Props, State> {
         let analyser = this.audioContext.createAnalyser();
 
         // get audio source from stream
-        let source = this.audioContext.createMediaStreamSource(
-            this.props.stream
-        );
+        let source = this.audioContext.createMediaStreamSource(this.props.stream);
 
         // connect analyser with source
         source.connect(analyser);
