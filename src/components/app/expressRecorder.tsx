@@ -352,9 +352,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     getDefaultEntryName() {
         const { constraints } = this.state;
         if (constraints.video) {
-            return "Video Recording - " + new Date();
+            return this.translate("Video Recording") + " - " + new Date();
         }
-        return "Audio Recording - " + new Date();
+        return this.translate("Audio Recording") + " - " + new Date();
     }
 
     handleStartClick = () => {
@@ -434,7 +434,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     createStream = (constraints: MediaStreamConstraints) => {
         if (!constraints.video && !constraints.audio) {
             this.setState({
-                error: "Video and audio are disabled, at least one of them must be enabled."
+                error: this.translate(
+                    "Video and audio are disabled, at least one of them must be enabled."
+                )
             });
             return;
         }
@@ -644,7 +646,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             className={`xr_controls__start ${styles["controls__start"]}`}
                             id="startRecord"
                             onClick={this.handleStartClick}
-                            aria-label={"Start Recording"}
+                            aria-label={this.translate("Start Recording")}
                             tabIndex={0}
                         />
                     )}
@@ -660,7 +662,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             onClick={this.handleCancelClick}
                             tabIndex={0}
                         >
-                            Cancel
+                            {this.translate("Cancel")}
                         </button>
                     )}
                     {showUploadUI &&
@@ -673,21 +675,21 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                     onClick={this.saveFile}
                                     tabIndex={0}
                                 >
-                                    Download a Copy
+                                    {this.translate("Download a Copy")}
                                 </button>
                                 <button
                                     className={`xr_btn xr_btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
                                     onClick={this.recordAgain}
                                     tabIndex={0}
                                 >
-                                    Record Again
+                                    {this.translate("Record Again")}
                                 </button>
                                 <button
                                     className={`xr_btn xr_btn-primary xr_btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
                                     onClick={this.initiateUpload}
                                     tabIndex={0}
                                 >
-                                    Use This
+                                    {this.translate("Use This")}
                                 </button>
                             </div>
                         )}
