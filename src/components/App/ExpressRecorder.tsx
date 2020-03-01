@@ -29,7 +29,7 @@ export type ExpressRecorderProps = {
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
     showUploadUI?: boolean;
-    translations?: any;
+    translations?: Record<string, string>;
 };
 
 type State = {
@@ -60,8 +60,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
         allowAudio: true,
-        showUploadUI: true,
-        translations: []
+        showUploadUI: true
     };
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
