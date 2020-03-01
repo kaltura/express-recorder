@@ -2,6 +2,7 @@ import { Component, h } from "preact";
 import { SettingsDevices } from "./Settings-devices";
 import SettingsIcon from "./settings.svg";
 import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
+import { Translator } from "../Translator/Translator";
 
 const styles = require("./style.scss");
 
@@ -15,7 +16,6 @@ type Props = {
     allowVideo: boolean;
     allowAudio: boolean;
     stream?: MediaStream | undefined;
-    translate: (value: string) => string;
 };
 
 type State = {
@@ -242,7 +242,7 @@ export class Settings extends Component<Props, State> {
     };
 
     render() {
-        const { stream, allowAudio, allowVideo, translate } = this.props;
+        const { stream, allowAudio, allowVideo } = this.props;
         const {
             isOpen,
             showCameraSettings,
@@ -252,6 +252,7 @@ export class Settings extends Component<Props, State> {
             cameraOn,
             audioOn
         } = this.state;
+        const translator = Translator.getTranslator();
 
         let devicesSettings = null;
         if (showAudioSettings || showCameraSettings) {
@@ -272,7 +273,6 @@ export class Settings extends Component<Props, State> {
                             showCameraSettings ? ResourceTypes.VIDEO : ResourceTypes.AUDIO
                         );
                     }}
-                    translate={translate}
                 />
             );
         }
@@ -293,7 +293,7 @@ export class Settings extends Component<Props, State> {
                         onKeyPress={this.handleMenuIconKeyPressed}
                         aria-haspopup="true"
                         aria-expanded={isOpen}
-                        aria-label={translate("Settings")}
+                        aria-label={translator.translate("Settings")}
                         aria-controls="recorder-settings-menu"
                         tabIndex={0}
                     >
@@ -312,7 +312,7 @@ export class Settings extends Component<Props, State> {
                                 aria-labelledby="dropdownMenu"
                             >
                                 <a
-                                    aria-label={translate("Camera Settings")}
+                                    aria-label={translator.translate("Camera Settings")}
                                     className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(ResourceTypes.VIDEO);
@@ -324,7 +324,7 @@ export class Settings extends Component<Props, State> {
                                 >
                                     <div className={styles["resources-item"]}>
                                         <div className={styles["resources-name"]}>
-                                            {translate("Camera")}
+                                            {translator.translate("Camera")}
                                         </div>
                                         <div className={styles["resource-label"]}>
                                             {selectedCamera ? selectedCamera.label : ""}
@@ -335,7 +335,7 @@ export class Settings extends Component<Props, State> {
                                     </div>
                                 </a>
                                 <a
-                                    aria-label={translate("Audio Settings")}
+                                    aria-label={translator.translate("Audio Settings")}
                                     className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(ResourceTypes.AUDIO);
@@ -347,7 +347,7 @@ export class Settings extends Component<Props, State> {
                                 >
                                     <div className={styles["resources-item"]}>
                                         <div className={styles["resources-name"]}>
-                                            {translate("Audio")}
+                                            {translator.translate("Audio")}
                                             {stream && (
                                                 <div className={styles["settings-audio-indicator"]}>
                                                     <AudioIndicator

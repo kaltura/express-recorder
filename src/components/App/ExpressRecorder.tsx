@@ -11,6 +11,7 @@ import { RecorderEvents } from "./RecorderEvents";
 import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
 import { UploadUI } from "../Uploader/UploadUI";
 import { UploadManager } from "../Uploader/UploadManager";
+import { Translator } from "../Translator/Translator";
 const styles = require("./style.scss");
 // player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
@@ -66,6 +67,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
     kClient: KalturaClient | undefined;
     dispatcher: PubSub = new PubSub(this);
+    translator: Translator;
 
     constructor(props: ExpressRecorderProps) {
         super(props);
@@ -91,6 +93,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             },
             uploadStatus: { loaded: 0, total: 0 }
         };
+
+        this.translator = Translator.getTranslator();
+        this.translator.init(props.translations);
 
         this.handleError = this.handleError.bind(this);
         this.initiateUpload = this.initiateUpload.bind(this);
@@ -351,9 +356,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     getDefaultEntryName() {
         const { constraints } = this.state;
         if (constraints.video) {
-            return this.translate("Video Recording") + " - " + new Date();
+            return this.translator.translate("Video Recording") + " - " + new Date();
         }
-        return this.translate("Audio Recording") + " - " + new Date();
+        return this.translator.translate("Audio Recording") + " - " + new Date();
     }
 
     handleStartClick = () => {
@@ -433,7 +438,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     createStream = (constraints: MediaStreamConstraints) => {
         if (!constraints.video && !constraints.audio) {
             this.setState({
-                error: this.translate(
+                error: this.translator.translate(
                     "Video and audio are disabled, at least one of them must be enabled."
                 )
             });
@@ -528,13 +533,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ uploadStatus: status });
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, status);
     };
-    translate = (value: string): string => {
-        const { translations } = this.props;
-        if (translations && translations[value]) {
-            return translations[value];
-        }
-        return value;
-    };
 
     render(props: ExpressRecorderProps, state: State) {
         const {
@@ -597,7 +595,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             total={uploadStatus.total}
                             abort={abortUpload}
                             onCancel={this.cancelUpload}
-                            translate={this.translate}
                         />
                     )}
                 </div>
@@ -614,7 +611,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             allowAudio={allowAudio!}
                             onSettingsChanged={this.handleSettingsChange}
                             stream={stream}
-                            translate={this.translate}
                         />
                     )}
                 </div>
@@ -645,7 +641,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             className={`xr_controls__start ${styles["controls__start"]}`}
                             id="startRecord"
                             onClick={this.handleStartClick}
-                            aria-label={this.translate("Start Recording")}
+                            aria-label={this.translator.translate("Start Recording")}
                             tabIndex={0}
                         />
                     )}
@@ -661,7 +657,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             onClick={this.handleCancelClick}
                             tabIndex={0}
                         >
-                            {this.translate("Cancel")}
+                            {this.translator.translate("Cancel")}
                         </button>
                     )}
                     {showUploadUI &&
@@ -674,21 +670,21 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                     onClick={this.saveFile}
                                     tabIndex={0}
                                 >
-                                    {this.translate("Download a Copy")}
+                                    {this.translator.translate("Download a Copy")}
                                 </button>
                                 <button
                                     className={`xr_btn xr_btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
                                     onClick={this.recordAgain}
                                     tabIndex={0}
                                 >
-                                    {this.translate("Record Again")}
+                                    {this.translator.translate("Record Again")}
                                 </button>
                                 <button
                                     className={`xr_btn xr_btn-primary xr_btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
                                     onClick={this.initiateUpload}
                                     tabIndex={0}
                                 >
-                                    {this.translate("Use This")}
+                                    {this.translator.translate("Use This")}
                                 </button>
                             </div>
                         )}

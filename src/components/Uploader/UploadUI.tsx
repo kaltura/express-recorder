@@ -1,5 +1,7 @@
 import { Component, h } from "preact";
 import { ProgressBar } from "../Progress-bar/ProgressBar";
+import { Translator } from "../Translator/Translator";
+
 const styles = require("./style.scss");
 
 type Props = {
@@ -7,7 +9,6 @@ type Props = {
     total: number;
     abort: boolean;
     onCancel: () => void;
-    translate: (value: string) => string;
 };
 
 type State = {};
@@ -17,8 +18,9 @@ type State = {};
  */
 export class UploadUI extends Component<Props, State> {
     render() {
-        const { loaded, total, abort, onCancel, translate } = this.props;
+        const { loaded, total, abort, onCancel } = this.props;
         const disableCancel = abort || loaded >= total;
+        const translator = Translator.getTranslator();
 
         return (
             <div className={`xr_uploader ${styles["uploader"]}`}>
@@ -36,7 +38,7 @@ export class UploadUI extends Component<Props, State> {
                             onClick={disableCancel ? undefined : onCancel}
                             disabled={disableCancel}
                         >
-                            {translate("Cancel")}
+                            {translator.translate("Cancel")}
                         </button>
                     )}
                 </div>
@@ -51,7 +53,7 @@ export class UploadUI extends Component<Props, State> {
                     <div
                         className={`xr_upload-success-message ${styles["upload-success-message"]}`}
                     >
-                        <strong>{translate("Upload Completed!")}</strong>
+                        <strong>{translator.translate("Upload Completed!")}</strong>
                     </div>
                 )}
             </div>
