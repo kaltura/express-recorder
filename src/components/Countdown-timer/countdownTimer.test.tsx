@@ -1,6 +1,6 @@
 import { h, render } from "preact";
 //import render from "preact-render-to-string";
-import { CountdownTimer } from "./countdownTimer";
+import { CountdownTimer } from "./CountdownTimer";
 
 describe("Hello logic", () => {
     it("should be able to run tests", () => {

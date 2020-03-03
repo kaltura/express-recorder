@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { storiesOf } from "@storybook/react";
-import { ProgressBar } from "./progressBar";
+import { ProgressBar } from "./ProgressBar";
 
 
 

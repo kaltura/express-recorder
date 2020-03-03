@@ -2,15 +2,16 @@ import { Component, h } from "preact";
 import { KalturaMediaType } from "kaltura-typescript-client/api/types/KalturaMediaType";
 import { KalturaConversionProfileType } from "kaltura-typescript-client/api/types/KalturaConversionProfileType";
 import { KalturaClient } from "kaltura-typescript-client";
-import { Recorder } from "../recorder/recorder";
-import { CountdownTimer } from "../countdown-timer/countdownTimer";
-import { RecordingTimer } from "../recording-timer/recordingTimer";
-import { ErrorScreen } from "../error-screen/errorScreen";
-import { Settings } from "../settings/settings";
+import { Recorder } from "../Recorder/Recorder";
+import { CountdownTimer } from "../Countdown-timer/CountdownTimer";
+import { RecordingTimer } from "../Recording-timer/RecordingTimer";
+import { ErrorScreen } from "../Error-screen/ErrorScreen";
+import { Settings } from "../Settings/Settings";
 import { RecorderEvents } from "./RecorderEvents";
 import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
-import { UploadUI } from "../uploader/uploadUI";
-import { UploadManager } from "../uploader/uploadManager";
+import { UploadUI } from "../Uploader/UploadUI";
+import { UploadManager } from "../Uploader/UploadManager";
+import { Translator } from "../Translator/Translator";
 const styles = require("./style.scss");
 // player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
@@ -29,6 +30,7 @@ export type ExpressRecorderProps = {
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
     showUploadUI?: boolean;
+    translations?: Record<string, string>;
 };
 
 type State = {
@@ -65,6 +67,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
     kClient: KalturaClient | undefined;
     dispatcher: PubSub = new PubSub(this);
+    translator: Translator;
 
     constructor(props: ExpressRecorderProps) {
         super(props);
@@ -90,6 +93,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             },
             uploadStatus: { loaded: 0, total: 0 }
         };
+
+        this.translator = Translator.getTranslator();
+        this.translator.init(props.translations);
 
         this.handleError = this.handleError.bind(this);
         this.initiateUpload = this.initiateUpload.bind(this);
@@ -350,9 +356,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     getDefaultEntryName() {
         const { constraints } = this.state;
         if (constraints.video) {
-            return "Video Recording - " + new Date();
+            return this.translator.translate("Video Recording") + " - " + new Date();
         }
-        return "Audio Recording - " + new Date();
+        return this.translator.translate("Audio Recording") + " - " + new Date();
     }
 
     handleStartClick = () => {
@@ -432,7 +438,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     createStream = (constraints: MediaStreamConstraints) => {
         if (!constraints.video && !constraints.audio) {
             this.setState({
-                error: "Video and audio are disabled, at least one of them must be enabled."
+                error: this.translator.translate(
+                    "Video and audio are disabled, at least one of them must be enabled."
+                )
             });
             return;
         }
@@ -633,7 +641,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             className={`xr_controls__start ${styles["controls__start"]}`}
                             id="startRecord"
                             onClick={this.handleStartClick}
-                            aria-label={"Start Recording"}
+                            aria-label={this.translator.translate("Start Recording")}
                             tabIndex={0}
                         />
                     )}
@@ -649,7 +657,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             onClick={this.handleCancelClick}
                             tabIndex={0}
                         >
-                            Cancel
+                            {this.translator.translate("Cancel")}
                         </button>
                     )}
                     {showUploadUI &&
@@ -662,21 +670,21 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                     onClick={this.saveFile}
                                     tabIndex={0}
                                 >
-                                    Download a Copy
+                                    {this.translator.translate("Download a Copy")}
                                 </button>
                                 <button
                                     className={`xr_btn xr_btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
                                     onClick={this.recordAgain}
                                     tabIndex={0}
                                 >
-                                    Record Again
+                                    {this.translator.translate("Record Again")}
                                 </button>
                                 <button
                                     className={`xr_btn xr_btn-primary xr_btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
                                     onClick={this.initiateUpload}
                                     tabIndex={0}
                                 >
-                                    Use This
+                                    {this.translator.translate("Use This")}
                                 </button>
                             </div>
                         )}

@@ -1,7 +1,8 @@
 import { Component, h } from "preact";
-import { SettingsDevices } from "./settings-devices";
+import { SettingsDevices } from "./Settings-devices";
 import SettingsIcon from "./settings.svg";
-import { AudioIndicator } from "../audioIndicator/AudioIndicator";
+import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
+import { Translator } from "../Translator/Translator";
 
 const styles = require("./style.scss");
 
@@ -251,6 +252,7 @@ export class Settings extends Component<Props, State> {
             cameraOn,
             audioOn
         } = this.state;
+        const translator = Translator.getTranslator();
 
         let devicesSettings = null;
         if (showAudioSettings || showCameraSettings) {
@@ -291,7 +293,7 @@ export class Settings extends Component<Props, State> {
                         onKeyPress={this.handleMenuIconKeyPressed}
                         aria-haspopup="true"
                         aria-expanded={isOpen}
-                        aria-label={"Settings"}
+                        aria-label={translator.translate("Settings")}
                         aria-controls="recorder-settings-menu"
                         tabIndex={0}
                     >
@@ -310,7 +312,7 @@ export class Settings extends Component<Props, State> {
                                 aria-labelledby="dropdownMenu"
                             >
                                 <a
-                                    aria-label="Camera Settings"
+                                    aria-label={translator.translate("Camera Settings")}
                                     className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(ResourceTypes.VIDEO);
@@ -321,7 +323,9 @@ export class Settings extends Component<Props, State> {
                                     tabIndex={0}
                                 >
                                     <div className={styles["resources-item"]}>
-                                        <div className={styles["resources-name"]}>Camera</div>
+                                        <div className={styles["resources-name"]}>
+                                            {translator.translate("Camera")}
+                                        </div>
                                         <div className={styles["resource-label"]}>
                                             {selectedCamera ? selectedCamera.label : ""}
                                         </div>
@@ -331,7 +335,7 @@ export class Settings extends Component<Props, State> {
                                     </div>
                                 </a>
                                 <a
-                                    aria-label="Audio Settings"
+                                    aria-label={translator.translate("Audio Settings")}
                                     className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(ResourceTypes.AUDIO);
@@ -343,7 +347,7 @@ export class Settings extends Component<Props, State> {
                                 >
                                     <div className={styles["resources-item"]}>
                                         <div className={styles["resources-name"]}>
-                                            Audio
+                                            {translator.translate("Audio")}
                                             {stream && (
                                                 <div className={styles["settings-audio-indicator"]}>
                                                     <AudioIndicator

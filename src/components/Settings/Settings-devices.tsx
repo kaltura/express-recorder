@@ -1,5 +1,7 @@
 import { Component, h } from "preact";
-import { ToggleButton } from "../toggle-button/toggleButton";
+import { ToggleButton } from "../Toggle-button/ToggleButton";
+import { Translator } from "../Translator/Translator";
+
 const styles = require("./style.scss");
 
 type Props = {
@@ -86,6 +88,7 @@ export class SettingsDevices extends Component<Props, State> {
     render() {
         const { resourceName, devices, disabled } = this.props;
         const { isOn, selectedDevice } = this.state;
+        const translator = Translator.getTranslator();
 
         const resourcesList = devices.map((item: MediaDeviceInfo, index: number) => {
             let selectedClass = "";
@@ -118,7 +121,7 @@ export class SettingsDevices extends Component<Props, State> {
         return (
             <div>
                 <a
-                    aria-label="Back to Settings"
+                    aria-label={translator.translate("Back to Settings")}
                     onClick={this.handleBack}
                     onKeyPress={this.handleBackIconKeyPressed}
                     className={styles["settings-arrow-wrap"]}
@@ -128,7 +131,7 @@ export class SettingsDevices extends Component<Props, State> {
                 </a>
                 <ToggleButton
                     id={resourceName}
-                    text={resourceName}
+                    text={translator.translate(resourceName)}
                     onClick={this.handleToggleClick}
                     isToggleOn={isOn}
                     disabled={disabled}

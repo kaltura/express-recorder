@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { storiesOf } from "@storybook/react";
-import { ExpressRecorder } from "./expressRecorder";
+import { ExpressRecorder } from "./ExpressRecorder";
 
 storiesOf("Main App", module)
     .addDecorator(story => <div style={{ width: 858, height: 483}}>{story()}</div>)

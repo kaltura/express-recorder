@@ -1,6 +1,6 @@
  import { h } from "preact";
 import { storiesOf } from "@storybook/react";
-import {CountdownTimer} from "./countdownTimer";
+import {CountdownTimer} from "./CountdownTimer";
 
 storiesOf("Countdown Timer", module)
     .addDecorator(story => <div style={{ backgroundColor: '#333', width: '100%', height:'100%' }}>{story()}</div>)

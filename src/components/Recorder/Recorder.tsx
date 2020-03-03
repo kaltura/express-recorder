@@ -1,6 +1,6 @@
 import { h, Component } from "preact";
-import { Playback } from "../playback/playback";
-import { AudioIndicator } from "../audioIndicator/AudioIndicator";
+import { Playback } from "../Playback/Playback";
+import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 const styles = require("./style.scss");
 type Props = {
     video: boolean;
