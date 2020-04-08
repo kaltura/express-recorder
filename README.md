@@ -41,7 +41,7 @@ execute - "npm run serve"
     </tr>
     <tr>
         <td>ks</td>
-        <td>kaltura session key</td> 
+        <td>kaltura session key (should be user session with 'editadmintags:*' privilege)</td> 
         <td>string</td>
         <td>yes</td>
         <td>---</td>
