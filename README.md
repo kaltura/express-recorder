@@ -181,4 +181,4 @@ Copyright © Kaltura Inc. All rights reserved.
 Authors and contributors: See [GitHub contributors list](https://github.com/kaltura/YOURREPONAME/graphs/contributors).  
 
 ### Open Source Libraries
-Review the [list of Open Source 3rd party libraries](open-source-libraries.md) used in this project.
+Review the [list of Open Source 3rd party libraries](https://github.com/kaltura/express-recorder/network/dependencies) used in this project.
