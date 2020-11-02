@@ -12,6 +12,8 @@ type Props = {
     doPlayback: boolean;
     partnerId: number;
     uiConfId: number;
+    isCanvas: boolean;
+    canvasId: string | undefined;
 };
 
 type State = {};
@@ -38,9 +40,16 @@ export class Recorder extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { stream, doRecording, discard, doPlayback } = this.props;
+        const { stream, doRecording, discard, doPlayback, isCanvas, canvasId } = this.props;
 
-        if (!doPlayback) {
+        if (doPlayback && typeof canvasId !== "undefined") {
+            var canvas = document.getElementById(canvasId);
+            if (canvas != null) {
+                canvas.style.display = "none";
+            }
+        }
+
+        if (!doPlayback && !isCanvas) {
             this.videoRef!.srcObject = stream;
         }
 
@@ -116,7 +125,7 @@ export class Recorder extends Component<Props, State> {
     };
 
     render(props: Props) {
-        const { doPlayback, partnerId, uiConfId, video, stream } = this.props;
+        const { doPlayback, partnerId, uiConfId, video, stream, isCanvas } = this.props;
         let noVideoClass = !video ? "__no-video" : "";
 
         if (doPlayback && this.recordedBlobs.length > 0) {
@@ -138,29 +147,33 @@ export class Recorder extends Component<Props, State> {
                 </div>
             );
         }
-
-        return (
-            <div class={`xr_video-object-wrap ${styles["video-object-wrap"]}`}>
-                {!video && (
-                    <div class={`xr_no-video-text ${styles["no-video-text"]}`}>
-                        Recording Audio Only
-                        {stream && (
-                            <div class={styles["audio-indicator"]}>
-                                <AudioIndicator stream={stream} />
-                            </div>
-                        )}
-                    </div>
-                )}
-                <video
-                    id="recorder"
-                    className={`express-recorder__recorder ${
-                        styles["express-recorder__recorder" + noVideoClass]
-                    }`}
-                    muted={true}
-                    autoPlay={true}
-                    ref={node => (this.videoRef = node as HTMLMediaElement)}
-                />
-            </div>
-        );
+        if (!isCanvas) {
+            return (
+                <div class={`xr_video-object-wrap ${styles["video-object-wrap"]}`}>
+                    {!video && (
+                        <div class={`xr_no-video-text ${styles["no-video-text"]}`}>
+                            Recording Audio Only
+                            {stream && (
+                                <div class={styles["audio-indicator"]}>
+                                    <AudioIndicator stream={stream} />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    <video
+                        id="recorder"
+                        className={`express-recorder__recorder ${
+                            styles["express-recorder__recorder" + noVideoClass]
+                        }`}
+                        muted={true}
+                        autoPlay={true}
+                        ref={node => (this.videoRef = node as HTMLMediaElement)}
+                    />
+                </div>
+            );
+        } else {
+            //canvas does not need video element.
+            return "";
+        }
     }
 }
