@@ -7,6 +7,16 @@
     font-family: Helvetica;
     background-color: black;
 }
+
+.express-recorder-canvas {
+    position: relative;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    border-radius: 4px;
+    font-family: Helvetica;
+}
+
 .controls__start {
     height: 72px;
     width: 72px;

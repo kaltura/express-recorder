@@ -16,6 +16,10 @@ const styles = require("./style.scss");
 // player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
 
+declare interface CanvasElement extends HTMLCanvasElement {
+    captureStream(frameRate?: number): MediaStream;
+}
+
 export type ExpressRecorderProps = {
     ks: string;
     serviceUrl: string;
@@ -31,6 +35,7 @@ export type ExpressRecorderProps = {
     maxRecordingTime?: number;
     showUploadUI?: boolean;
     translations?: Record<string, string>;
+    canvasId?: string;
 };
 
 type State = {
@@ -45,6 +50,7 @@ type State = {
     error: string;
     constraints: MediaStreamConstraints;
     uploadStatus: { loaded: number; total: number };
+    isCanvas: boolean;
 };
 
 const VIDEO_CONSTRAINT = {
@@ -91,7 +97,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         : false,
                 audio: props.allowAudio !== false
             },
-            uploadStatus: { loaded: 0, total: 0 }
+            uploadStatus: { loaded: 0, total: 0 },
+            isCanvas: typeof props.canvasId !== "undefined"
         };
 
         this.translator = Translator.getTranslator();
@@ -199,6 +206,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.dispatcher.removeEventListener(type, callback);
     }
 
+    showCanvas() {
+        if (typeof this.props.canvasId !== "undefined") {
+            var canvas = document.getElementById(this.props.canvasId);
+            if (canvas != null) {
+                canvas.style.display = "block";
+            }
+        }
+    }
+
     componentDidMount() {
         const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
         this.checkProps();
@@ -300,6 +316,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     resetApp = () => {
         this.uploadedOnce = false;
+        this.showCanvas();
         this.setState(
             {
                 doUpload: false,
@@ -381,7 +398,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ doCountdown: false });
         this.dispatcher.dispatchEvent(RecorderEvents.recordingCancelled);
     };
+
     recordAgain = () => {
+        //show again as it was hidden in Recorder
+        this.showCanvas();
+
         this.setState({
             recordedBlobs: [],
             doCountdown: true,
@@ -447,7 +468,16 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         navigator.mediaDevices
             .getUserMedia(constraints)
             .then((stream: MediaStream) => {
-                this.setState({ stream: stream, constraints: constraints });
+                if (typeof this.props.canvasId !== "undefined") {
+                    var canvas = document.getElementById(this.props.canvasId) as CanvasElement;
+                    var combinedStream = new MediaStream();
+                    combinedStream.addTrack(stream.getAudioTracks()[0]);
+                    combinedStream.addTrack(canvas.captureStream().getVideoTracks()[0]);
+
+                    this.setState({ stream: combinedStream, constraints: constraints });
+                } else {
+                    this.setState({ stream: stream, constraints: constraints });
+                }
             })
             .catch(e => this.handleError("Failed to allocate resource: " + e.message));
     };
@@ -556,7 +586,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doPlayback,
             error,
             constraints,
-            uploadStatus
+            uploadStatus,
+            isCanvas
         } = state;
 
         if (doUpload && !this.uploadedOnce) {
@@ -601,9 +632,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             );
         }
         return (
-            <div className={`express-recorder ${styles["express-recorder"]}`}>
+            <div
+                className={`express-recorder 
+            ${!isCanvas && styles["express-recorder"]}
+            ${isCanvas && styles["express-recorder-canvas"]}
+            `}
+            >
                 <div className={styles["settings-wrap"]}>
-                    {!doPlayback && !doRecording && (
+                    {!doPlayback && !doRecording && !isCanvas && (
                         <Settings
                             selectedCameraDevice={stream ? stream.getVideoTracks()[0] : undefined}
                             selectedAudioDevice={stream ? stream.getAudioTracks()[0] : undefined}
@@ -624,6 +660,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     partnerId={partnerId}
                     uiConfId={uiConfId}
                     onError={this.handleError}
+                    isCanvas={isCanvas}
+                    canvasId={this.props.canvasId}
                 />
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
