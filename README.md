@@ -1,6 +1,10 @@
-# Express-recorder
-Web recorder based on <a href="https://webrtc.org/">WebRTC</a> and former project - <a href="https://github.com/kaltura/webrtc-krecord">webrtc-krecord</a>.<br />
-Supported browsers: Chrome, Firfox, Opera.
+# Kaltura Express Recorder
+Kaltura Express Recorder (aka Express Capture or kSelfie) enables recording videos directly from the browser without the need to install additional software. 
+Web recorder is based on <a href="https://webrtc.org/">WebRTC</a> and its predecessor project - <a href="https://github.com/kaltura/webrtc-krecord">webrtc-krecord</a>.<br />
+
+![Express Recorder Screenshot](https://github.com/kaltura/express-recorder/blob/master/examples/kselfie-screenshot.png?raw=true)
+
+Officially supported browsers: Chrome, Firfox, Opera.
 
 ## Dev install
 1. git clone
