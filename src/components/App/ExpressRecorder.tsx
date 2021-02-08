@@ -244,6 +244,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.createStream(this.state.constraints);
     }
 
+    componentDidUpdate() {
+        const button = document.querySelector("button");
+        button && button.focus();
+    }
+
     checkProps = () => {
         const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
 
