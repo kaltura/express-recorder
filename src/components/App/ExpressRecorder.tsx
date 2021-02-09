@@ -68,6 +68,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     kClient: KalturaClient | undefined;
     dispatcher: PubSub = new PubSub(this);
     translator: Translator;
+    cancelButtonRef: HTMLElement | null;
+    stopButtonRef: HTMLElement | null;
 
     constructor(props: ExpressRecorderProps) {
         super(props);
@@ -102,7 +104,12 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.handleStartClick = this.handleStartClick.bind(this);
         this.checkProps = this.checkProps.bind(this);
         this.isBrowserCompatible = this.isBrowserCompatible.bind(this);
+
+        this.cancelButtonRef = null;
+        this.stopButtonRef = null;
     }
+
+    setStopButtonRef = (ref: HTMLElement) => (this.stopButtonRef = ref);
 
     /* =====================================================================
      * start Public API
@@ -244,11 +251,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.createStream(this.state.constraints);
     }
 
-    componentDidUpdate() {
-        const button = document.querySelector("button");
-        button && button.focus();
-    }
-
     checkProps = () => {
         const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
 
@@ -264,6 +266,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             this.handleError(message);
         }
     };
+
+    componentDidUpdate() {
+        this.cancelButtonRef && this.cancelButtonRef.focus();
+        this.stopButtonRef && this.stopButtonRef.focus();
+    }
 
     isBrowserCompatible = () => {
         const notSupportedError = this.props.browserNotSupportedText
@@ -654,6 +661,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         <RecordingTimer
                             onButtonClick={this.handleStopClick}
                             maxRecordingTime={maxRecordingTime}
+                            setStopButtonRef={this.setStopButtonRef}
                         />
                     )}
                     {doCountdown && (
@@ -661,6 +669,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             className={`xr_controls__cancel ${styles["controls__cancel"]}`}
                             onClick={this.handleCancelClick}
                             tabIndex={0}
+                            ref={node => (this.cancelButtonRef = node as HTMLMediaElement)}
                         >
                             {this.translator.translate("Cancel")}
                         </button>
