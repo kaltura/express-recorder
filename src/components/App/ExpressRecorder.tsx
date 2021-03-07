@@ -387,6 +387,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doCountdown: true,
             doPlayback: false
         });
+        this.dispatcher.dispatchEvent(RecorderEvents.recordingStarted);
     };
     handleCountdownComplete = () => {
         if (this.state.doCountdown) {
