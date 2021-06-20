@@ -5,6 +5,7 @@ const styles = require("./style.scss");
 type Props = {
     onButtonClick: () => void;
     maxRecordingTime?: number;
+    setStopButtonRef: (ref: HTMLElement) => void;
 };
 
 type State = {
@@ -69,6 +70,7 @@ export class RecordingTimer extends Component<Props, State> {
                     className={`xr_timer-button ${styles["timer-button"]}`}
                     onClick={this.clickHandler}
                     tabIndex={0}
+                    ref={props.setStopButtonRef}
                 >
                     <StopIcon />
                     <span>{timeString}</span>
