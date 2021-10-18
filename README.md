@@ -4,7 +4,7 @@ Web recorder is based on <a href="https://webrtc.org/">WebRTC</a> and its predec
 
 ![Express Recorder Screenshot](https://github.com/kaltura/express-recorder/blob/master/examples/kselfie-screenshot.png?raw=true)
 
-Officially supported browsers: Chrome, Firfox, Opera.
+Officially supported browsers: Chrome, Firefox, Opera.
 
 ## Dev install
 1. git clone
