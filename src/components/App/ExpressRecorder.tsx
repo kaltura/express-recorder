@@ -448,20 +448,22 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     createStream = (constraints: MediaStreamConstraints) => {
-        if (!constraints.video && !constraints.audio) {
-            this.setState({
-                error: this.translator.translate(
-                    "Video and audio are disabled, at least one of them must be enabled."
-                )
-            });
-            return;
-        }
-        navigator.mediaDevices
-            .getUserMedia(constraints)
-            .then((stream: MediaStream) => {
-                this.setState({ stream: stream, constraints: constraints });
-            })
-            .catch(e => this.handleError("Failed to allocate resource: " + e.message));
+        this.modifyConstraints(constraints).then(finalConstraints => {
+            if (!finalConstraints.video && !finalConstraints.audio) {
+                this.setState({
+                    error: this.translator.translate(
+                        "Video and audio are disabled, at least one of them must be enabled."
+                    )
+                });
+                return;
+            }
+            navigator.mediaDevices
+                .getUserMedia(finalConstraints)
+                .then((stream: MediaStream) => {
+                    this.setState({ stream: stream, constraints: finalConstraints });
+                })
+                .catch(e => this.handleError("Failed to allocate resource: " + e.message));
+        });
     };
 
     setBeforeunload = (addMessage: boolean = false) => {
@@ -523,6 +525,24 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }, 100);
+    };
+
+    /**
+     * modify constraints according to client available devices (i.e video/audio inputs)
+     */
+    modifyConstraints = (constraints: MediaStreamConstraints) => {
+        return navigator.mediaDevices
+            .enumerateDevices()
+            .then((devices: MediaDeviceInfo[]) => {
+                constraints.video = !devices.some((item: any) => item.kind === "videoinput")
+                    ? false
+                    : constraints.video;
+                constraints.audio = !devices.some((item: any) => item.kind === "audioinput")
+                    ? false
+                    : constraints.audio;
+                return constraints;
+            })
+            .catch(() => constraints);
     };
 
     handleUploadStarted = (entryId: string) => {
