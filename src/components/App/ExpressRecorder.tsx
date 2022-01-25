@@ -670,6 +670,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             onClick={this.handleCancelClick}
                             tabIndex={0}
                             ref={node => (this.cancelButtonRef = node as HTMLMediaElement)}
+                            aria-label={this.translator.translate(
+                                "recording will start in a three seconds delay"
+                            )}
                         >
                             {this.translator.translate("Cancel")}
                         </button>
