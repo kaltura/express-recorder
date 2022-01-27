@@ -133,7 +133,7 @@ export class Recorder extends Component<Props, State> {
                         partnerId={partnerId}
                         uiconfId={uiConfId}
                         media={media}
-                        autoPlay={true}
+                        autoPlay={false}
                     />
                 </div>
             );
