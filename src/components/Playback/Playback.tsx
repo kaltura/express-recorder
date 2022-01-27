@@ -37,9 +37,7 @@ export class Playback extends Component<Props, State> {
     }
 
     setMedia(media: { blob: Blob; mimeType: string }) {
-        const { pictureInPicture } = this.props;
-        // autoPlay option cancelled according to https://kaltura.atlassian.net/browse/KMS-21626
-        const autoPlay = false;
+        const { autoPlay, pictureInPicture } = this.props;
         this.kalturaPlayer.setMedia({
             sources: {
                 dvr: true,
