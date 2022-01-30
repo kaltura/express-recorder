@@ -112,6 +112,11 @@ export class SettingsDevices extends Component<Props, State> {
                     tabIndex={0}
                 >
                     <span>{item.label}</span>
+                    {isSelected && (
+                        <span className="sr-only">
+                            {translator.translate("currently selected")}
+                        </span>
+                    )}
                     <div className={"device-label__popup " + styles["device-label__popup"]}>
                         {item.label}
                     </div>
@@ -126,6 +131,7 @@ export class SettingsDevices extends Component<Props, State> {
                     onKeyPress={this.handleBackIconKeyPressed}
                     className={styles["settings-arrow-wrap"]}
                     tabIndex={0}
+                    role="link"
                 >
                     <i className={styles["arrow-left"]} />
                 </a>
@@ -137,7 +143,9 @@ export class SettingsDevices extends Component<Props, State> {
                     disabled={disabled}
                 />
                 <hr className={styles["settings-line"]} />
-                <div className={styles["devices-list"]}>{resourcesList}</div>
+                <div className={styles["devices-list"]} aria-live="polite">
+                    {resourcesList}
+                </div>
             </div>
         );
     }

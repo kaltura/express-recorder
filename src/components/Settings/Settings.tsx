@@ -320,6 +320,7 @@ export class Settings extends Component<Props, State> {
                                         this.handleShowDeviceSettings(e, ResourceTypes.VIDEO);
                                     }}
                                     tabIndex={0}
+                                    role="menuitem"
                                 >
                                     <span className={styles["sr-only"]}>
                                         {translator.translate("Camera Settings")}
@@ -348,6 +349,7 @@ export class Settings extends Component<Props, State> {
                                         this.handleShowDeviceSettings(e, ResourceTypes.AUDIO);
                                     }}
                                     tabIndex={0}
+                                    role="menuitem"
                                 >
                                     <span className={styles["sr-only"]}>
                                         {translator.translate("Audio Settings")}
