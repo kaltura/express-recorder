@@ -312,7 +312,6 @@ export class Settings extends Component<Props, State> {
                                 aria-labelledby="dropdownMenu"
                             >
                                 <a
-                                    aria-label={translator.translate("Camera Settings")}
                                     className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(ResourceTypes.VIDEO);
@@ -322,8 +321,14 @@ export class Settings extends Component<Props, State> {
                                     }}
                                     tabIndex={0}
                                 >
+                                    <span className={styles["sr-only"]}>
+                                        {translator.translate("Camera Settings")}
+                                    </span>
                                     <div className={styles["resources-item"]}>
-                                        <div className={styles["resources-name"]}>
+                                        <div
+                                            className={styles["resources-name"]}
+                                            aria-hidden="true"
+                                        >
                                             {translator.translate("Camera")}
                                         </div>
                                         <div className={styles["resource-label"]}>
@@ -335,7 +340,6 @@ export class Settings extends Component<Props, State> {
                                     </div>
                                 </a>
                                 <a
-                                    aria-label={translator.translate("Audio Settings")}
                                     className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(ResourceTypes.AUDIO);
@@ -345,9 +349,14 @@ export class Settings extends Component<Props, State> {
                                     }}
                                     tabIndex={0}
                                 >
+                                    <span className={styles["sr-only"]}>
+                                        {translator.translate("Audio Settings")}
+                                    </span>
                                     <div className={styles["resources-item"]}>
                                         <div className={styles["resources-name"]}>
-                                            {translator.translate("Audio")}
+                                            <span aria-hidden="true">
+                                                {translator.translate("Audio")}
+                                            </span>
                                             {stream && (
                                                 <div className={styles["settings-audio-indicator"]}>
                                                     <AudioIndicator
