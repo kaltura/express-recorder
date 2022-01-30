@@ -321,6 +321,7 @@ export class Settings extends Component<Props, State> {
                                         this.handleShowDeviceSettings(e, ResourceTypes.VIDEO);
                                     }}
                                     tabIndex={0}
+                                    role="menuitem"
                                 >
                                     <div className={styles["resources-item"]}>
                                         <div className={styles["resources-name"]}>
@@ -344,6 +345,7 @@ export class Settings extends Component<Props, State> {
                                         this.handleShowDeviceSettings(e, ResourceTypes.AUDIO);
                                     }}
                                     tabIndex={0}
+                                    role="menuitem"
                                 >
                                     <div className={styles["resources-item"]}>
                                         <div className={styles["resources-name"]}>
