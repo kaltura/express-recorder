@@ -9,6 +9,7 @@ type Props = {
     onClick?: (isOn: boolean) => void;
     isToggleOn: boolean;
     disabled?: boolean;
+    onKeyPress?: () => void;
 };
 
 type State = {
@@ -38,6 +39,16 @@ export class ToggleButton extends Component<Props, State> {
             this.props.onClick(!isToggleOn);
         }
         this.setState({ isToggleOn: !isToggleOn });
+    };
+
+    handleKeyPress = (e: KeyboardEvent) => {
+        if (e.key !== "Space") {
+            return;
+        }
+        this.handleClick();
+        if (this.props.onKeyPress) {
+            this.props.onKeyPress();
+        }
     };
 
     render(props: Props) {
@@ -70,6 +81,7 @@ export class ToggleButton extends Component<Props, State> {
                             checked={isToggleOn}
                             tabIndex={0}
                             disabled={disabled}
+                            onKeyDown={this.handleKeyPress}
                         />
                         <label
                             for={id}

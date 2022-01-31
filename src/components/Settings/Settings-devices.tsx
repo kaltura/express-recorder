@@ -91,6 +91,10 @@ export class SettingsDevices extends Component<Props, State> {
         }
     };
 
+    handleKeyPress = () => {
+        this.handleToggleClick(this.state.isOn);
+    };
+
     handleKeyboardInput = (e: KeyboardEvent) => {
         switch (e.key) {
             case "ArrowDown":
@@ -165,6 +169,7 @@ export class SettingsDevices extends Component<Props, State> {
                     onClick={this.handleToggleClick}
                     isToggleOn={isOn}
                     disabled={disabled}
+                    onKeyPress={this.handleKeyPress}
                 />
                 <hr className={styles["settings-line"]} />
                 <div
