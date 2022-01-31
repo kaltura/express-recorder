@@ -28,6 +28,8 @@ export class SettingsDevices extends Component<Props, State> {
         disabled: false
     };
 
+    menuRef: HTMLElement | undefined;
+
     constructor(props: Props) {
         super(props);
 
@@ -39,6 +41,9 @@ export class SettingsDevices extends Component<Props, State> {
 
     componentDidMount() {
         this.removeRedundantPopups();
+        if (this.menuRef) {
+            (this.menuRef.children[0] as HTMLElement).focus();
+        }
     }
 
     removeRedundantPopups = () => {
@@ -65,6 +70,7 @@ export class SettingsDevices extends Component<Props, State> {
         if (e.key === "Enter") {
             this.handleItemClick(item);
         }
+        this.handleKeyboardInput(e);
     };
 
     handleToggleClick = (isOn: boolean) => {
@@ -85,6 +91,24 @@ export class SettingsDevices extends Component<Props, State> {
         }
     };
 
+    handleKeyboardInput = (e: KeyboardEvent) => {
+        switch (e.key) {
+            case "ArrowDown":
+                const nextMenuItem = (e.target as HTMLElement).nextSibling;
+                if (nextMenuItem) {
+                    (nextMenuItem as HTMLElement).focus();
+                }
+                break;
+            case "ArrowUp":
+                const prevMenuItem = (e.target as HTMLElement).previousSibling;
+                if (prevMenuItem) {
+                    (prevMenuItem as HTMLElement).focus();
+                }
+                break;
+            default:
+        }
+    };
+
     render() {
         const { resourceName, devices, disabled } = this.props;
         const { isOn, selectedDevice } = this.state;
@@ -101,7 +125,7 @@ export class SettingsDevices extends Component<Props, State> {
                 <div
                     key={index.toString()}
                     onClick={isOn && !isSelected ? () => this.handleItemClick(item) : undefined}
-                    onKeyPress={e => this.handleItemPress(e, item)}
+                    onKeyDown={e => this.handleItemPress(e, item)}
                     className={
                         selectedClass +
                         " device-label " +
@@ -143,7 +167,11 @@ export class SettingsDevices extends Component<Props, State> {
                     disabled={disabled}
                 />
                 <hr className={styles["settings-line"]} />
-                <div className={styles["devices-list"]} aria-live="polite">
+                <div
+                    className={styles["devices-list"]}
+                    aria-live="polite"
+                    ref={node => (this.menuRef = node)}
+                >
                     {resourcesList}
                 </div>
             </div>
