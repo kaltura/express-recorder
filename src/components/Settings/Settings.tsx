@@ -112,6 +112,16 @@ export class Settings extends Component<Props, State> {
         ) {
             this.getDevices();
         }
+
+        if (
+            (prevState.showAudioSettings || prevState.showCameraSettings) &&
+            !this.state.showAudioSettings &&
+            !this.state.showCameraSettings
+        ) {
+            if (this.mainMenuRef) {
+                (this.mainMenuRef.children[0] as HTMLElement).focus();
+            }
+        }
     }
 
     componentWillUnmount() {
