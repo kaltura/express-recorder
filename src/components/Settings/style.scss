@@ -154,7 +154,7 @@
 }
 .resource-link {
     color: white;
-    &:hover {
+    &:hover, &:focus {
         color: white;
         text-decoration: none;
     }
