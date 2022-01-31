@@ -141,7 +141,7 @@ export class SettingsDevices extends Component<Props, State> {
                 >
                     <span>{item.label}</span>
                     {isSelected && (
-                        <span className="sr-only">
+                        <span className={styles["sr-only"]}>
                             {translator.translate("currently selected")}
                         </span>
                     )}
