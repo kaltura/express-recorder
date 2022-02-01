@@ -40,6 +40,7 @@ export class Settings extends Component<Props, State> {
     cameraDevicesInfo: MediaDeviceInfo[];
     audioDevicesInfo: MediaDeviceInfo[];
     menuBoxRef: Element | undefined;
+    mainMenuRef: HTMLElement | undefined;
 
     constructor(props: Props) {
         super(props);
@@ -111,6 +112,16 @@ export class Settings extends Component<Props, State> {
         ) {
             this.getDevices();
         }
+
+        if (
+            (prevState.showAudioSettings || prevState.showCameraSettings) &&
+            !this.state.showAudioSettings &&
+            !this.state.showCameraSettings
+        ) {
+            if (this.mainMenuRef) {
+                (this.mainMenuRef.children[0] as HTMLElement).focus();
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -151,6 +162,9 @@ export class Settings extends Component<Props, State> {
             } else {
                 // handle drop down toggle click
                 document.addEventListener("click", this.handleExternalClick, true);
+                if (this.mainMenuRef) {
+                    (this.mainMenuRef.children[0] as HTMLElement).focus();
+                }
             }
         });
     };
@@ -235,9 +249,25 @@ export class Settings extends Component<Props, State> {
         });
     };
 
-    handleShowDeviceSettings = (e: KeyboardEvent, type: ResourceTypes) => {
-        if (e.key === "Enter") {
-            this.getResourceSettings(type);
+    handleKeyboardInput = (e: KeyboardEvent, type: ResourceTypes) => {
+        switch (e.key) {
+            case "Enter":
+            case "ArrowRight":
+                this.getResourceSettings(type);
+                break;
+            case "ArrowDown":
+                const nextMenuItem = (e.target as HTMLElement).nextSibling;
+                if (nextMenuItem) {
+                    (nextMenuItem as HTMLElement).focus();
+                }
+                break;
+            case "ArrowUp":
+                const prevMenuItem = (e.target as HTMLElement).previousSibling;
+                if (prevMenuItem) {
+                    (prevMenuItem as HTMLElement).focus();
+                }
+                break;
+            default:
         }
     };
 
@@ -310,14 +340,15 @@ export class Settings extends Component<Props, State> {
                                 className={styles["resources-list"]}
                                 role="menu"
                                 aria-labelledby="dropdownMenu"
+                                ref={node => (this.mainMenuRef = node)}
                             >
                                 <a
                                     className={styles["resource-link"]}
                                     onClick={() => {
                                         this.getResourceSettings(ResourceTypes.VIDEO);
                                     }}
-                                    onKeyPress={e => {
-                                        this.handleShowDeviceSettings(e, ResourceTypes.VIDEO);
+                                    onKeyDown={e => {
+                                        this.handleKeyboardInput(e, ResourceTypes.VIDEO);
                                     }}
                                     tabIndex={0}
                                     role="menuitem"
@@ -345,8 +376,8 @@ export class Settings extends Component<Props, State> {
                                     onClick={() => {
                                         this.getResourceSettings(ResourceTypes.AUDIO);
                                     }}
-                                    onKeyPress={e => {
-                                        this.handleShowDeviceSettings(e, ResourceTypes.AUDIO);
+                                    onKeyDown={e => {
+                                        this.handleKeyboardInput(e, ResourceTypes.AUDIO);
                                     }}
                                     tabIndex={0}
                                     role="menuitem"
