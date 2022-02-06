@@ -653,7 +653,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             className={`xr_controls__start ${styles["controls__start"]}`}
                             id="startRecord"
                             onClick={this.handleStartClick}
-                            aria-label={this.translator.translate("Start Recording")}
+                            aria-label={this.translator.translate(
+                                "Start Recording. recording will start in a three seconds delay"
+                            )}
                             tabIndex={0}
                         />
                     )}
@@ -670,9 +672,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             onClick={this.handleCancelClick}
                             tabIndex={0}
                             ref={node => (this.cancelButtonRef = node as HTMLMediaElement)}
-                            aria-label={this.translator.translate(
-                                "recording will start in a three seconds delay"
-                            )}
                         >
                             {this.translator.translate("Cancel")}
                         </button>
