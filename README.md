@@ -10,6 +10,9 @@ Officially supported browsers: Chrome, Firefox, Opera.
 1. git clone
 2. npm install
 
+## IMPORTANT NOTE!
+If npm install fails make sure you are using node 14 (node-sass is dependant on it). You can download nvm and use it to set the node engine to be the proper one 'nvm use 14'
+
 ## Run the project
 clone index.template.ejs into index.ejs (Same dir) and fill in the needed properties.
 
