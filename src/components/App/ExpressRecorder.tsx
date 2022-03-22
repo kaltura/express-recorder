@@ -396,7 +396,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     recordAgain = () => {
         this.setState({
             recordedBlobs: [],
-            doCountdown: true,
+            doCountdown: false,
             doPlayback: false
         });
     };
