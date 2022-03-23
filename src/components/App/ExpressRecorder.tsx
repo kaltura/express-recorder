@@ -516,8 +516,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     saveFile = () => {
-        const blob = new Blob(this.state.recordedBlobs, { type: "video/webm" });
-        const url = window.URL.createObjectURL(blob);
+        const url = window.URL.createObjectURL(this.state.blob);
         const a = document.createElement("a");
         const entryName = this.props.entryName ? this.props.entryName : this.getDefaultEntryName();
 
