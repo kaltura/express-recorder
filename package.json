@@ -57,8 +57,9 @@
     "webpack-dev-server": "^3.2.1"
   },
   "dependencies": {
-    "preact": "^8.4.2",
-    "kaltura-typescript-client": "file:libs/kaltura-typescript-client-6.4.2-v20181223-153243.tgz"
+    "fix-webm-duration": "^1.0.5",
+    "kaltura-typescript-client": "file:libs/kaltura-typescript-client-6.4.2-v20181223-153243.tgz",
+    "preact": "^8.4.2"
   },
   "files": [
     "dist"

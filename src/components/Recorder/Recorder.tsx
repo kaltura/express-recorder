@@ -7,11 +7,12 @@ type Props = {
     stream: MediaStream;
     onError?: (error: string) => void;
     doRecording: boolean;
-    onRecordingEnd: (recorderBlobs: Blob[]) => void;
+    onRecordingEnd: (recorderBlobs: Blob[], duration: number) => void;
     discard?: boolean;
     doPlayback: boolean;
     partnerId: number;
     uiConfId: number;
+    blob: Blob;
 };
 
 type State = {};
@@ -29,12 +30,15 @@ export class Recorder extends Component<Props, State> {
     mediaRecorder: any;
     recordedBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
+    startTime: number;
+    blob: Blob | undefined;
 
     constructor(props: Props) {
         super(props);
         this.mediaRecorder = null;
         this.videoRef = null;
         this.recordedBlobs = [];
+        this.startTime = 0;
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -102,12 +106,13 @@ export class Recorder extends Component<Props, State> {
 
         this.mediaRecorder.ondataavailable = this.handleDataAvailable;
         this.mediaRecorder.start(10); // collect 10ms of data
+        this.startTime = Date.now();
     };
 
     stopRecording = () => {
         this.mediaRecorder.stop();
         if (this.props.onRecordingEnd) {
-            this.props.onRecordingEnd(this.recordedBlobs);
+            this.props.onRecordingEnd(this.recordedBlobs, Date.now() - this.startTime);
         }
     };
 
@@ -123,7 +128,7 @@ export class Recorder extends Component<Props, State> {
 
         if (doPlayback && this.recordedBlobs.length > 0) {
             const media = {
-                blob: new Blob(this.recordedBlobs, { type: "video/webm" }),
+                blob: this.props.blob,
                 mimeType: "video/webm"
             };
 

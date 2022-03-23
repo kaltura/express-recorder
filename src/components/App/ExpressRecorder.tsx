@@ -12,6 +12,7 @@ import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
 import { UploadUI } from "../Uploader/UploadUI";
 import { UploadManager } from "../Uploader/UploadManager";
 import { Translator } from "../Translator/Translator";
+import fixWebmDuration from "fix-webm-duration";
 const styles = require("./style.scss");
 // player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
@@ -42,6 +43,7 @@ type State = {
     doPlayback: boolean;
     abortUpload: boolean;
     recordedBlobs: Blob[];
+    blob: Blob;
     error: string;
     constraints: MediaStreamConstraints;
     uploadStatus: { loaded: number; total: number };
@@ -82,6 +84,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doCountdown: false,
             abortUpload: false,
             recordedBlobs: [],
+            blob: new Blob(),
             doPlayback: false,
             error: "",
             constraints: {
@@ -360,9 +363,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * triggered when recording is finished
      * @param recordedBlobs
      */
-    handleRecordingEnd = (recordedBlobs: Blob[]) => {
-        this.setState({ recordedBlobs: recordedBlobs });
-        this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+    handleRecordingEnd = (recordedBlobs: Blob[], duration: number) => {
+        const blob = new Blob(recordedBlobs, { type: "video/webm" });
+        const self = this;
+        // handle chrome blob duration issue
+        fixWebmDuration(blob, duration, function(fixedBlob: Blob) {
+            self.setState({ recordedBlobs: recordedBlobs, blob: fixedBlob });
+            self.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+        });
     };
 
     getDefaultEntryName() {
@@ -507,8 +515,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     saveFile = () => {
-        const blob = new Blob(this.state.recordedBlobs, { type: "video/webm" });
-        const url = window.URL.createObjectURL(blob);
+        const url = window.URL.createObjectURL(this.state.blob);
         const a = document.createElement("a");
         const entryName = this.props.entryName ? this.props.entryName : this.getDefaultEntryName();
 
@@ -587,7 +594,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doPlayback,
             error,
             constraints,
-            uploadStatus
+            uploadStatus,
+            blob
         } = state;
 
         if (doUpload && !this.uploadedOnce) {
@@ -655,6 +663,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     partnerId={partnerId}
                     uiConfId={uiConfId}
                     onError={this.handleError}
+                    blob={blob}
                 />
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
