@@ -170,7 +170,7 @@ export class Settings extends Component<Props, State> {
     };
 
     handleMenuIconKeyPressed = (e: KeyboardEvent) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" || e.key === " ") {
             this.toggleMenu();
         }
     };
@@ -253,6 +253,7 @@ export class Settings extends Component<Props, State> {
         switch (e.key) {
             case "Enter":
             case "ArrowRight":
+            case " ":
                 this.getResourceSettings(type);
                 break;
             case "ArrowDown":

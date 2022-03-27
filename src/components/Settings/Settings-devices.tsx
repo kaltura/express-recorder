@@ -67,7 +67,7 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     handleItemPress = (e: KeyboardEvent, item: MediaDeviceInfo) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" || e.key === " ") {
             this.handleItemClick(item);
         }
         this.handleKeyboardInput(e);
@@ -86,7 +86,7 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     handleBackIconKeyPressed = (e: KeyboardEvent) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" || e.key === " ") {
             this.handleBack();
         }
     };
