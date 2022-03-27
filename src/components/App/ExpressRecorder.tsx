@@ -127,7 +127,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (recordedBlobs.length) {
             this.recordAgain();
         }
-        this.handleStartClick();
     };
 
     /**
