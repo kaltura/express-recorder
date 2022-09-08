@@ -41,7 +41,7 @@ export class SettingsDevices extends Component<Props, State> {
 
     componentDidMount() {
         this.removeRedundantPopups();
-        if (this.menuRef) {
+        if (this.menuRef && this.menuRef.children[0]) {
             (this.menuRef.children[0] as HTMLElement).focus();
         }
     }
