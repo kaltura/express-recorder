@@ -5,14 +5,21 @@ const styles = require("./style.scss");
 type Props = {
     video: boolean;
     stream: MediaStream;
+    screenStream: MediaStream | undefined;
+    screenShareOn: boolean;
     onError?: (error: string) => void;
     doRecording: boolean;
-    onRecordingEnd: (recorderBlobs: Blob[], duration: number) => void;
+    onRecordingEnd: (
+        recorderBlobs: Blob[],
+        duration: number,
+        screenBlobs: Blob[] | undefined
+    ) => void;
     discard?: boolean;
     doPlayback: boolean;
     partnerId: number;
     uiConfId: number;
     blob: Blob;
+    screenBlob: Blob;
 };
 
 type State = {};
@@ -28,24 +35,31 @@ export class Recorder extends Component<Props, State> {
     };
 
     mediaRecorder: any;
+    screenRecorder: any;
     recordedBlobs: Blob[];
+    screenBlobs: Blob[];
     videoRef: HTMLMediaElement | null;
+    screenRef: HTMLMediaElement | null;
     startTime: number;
-    blob: Blob | undefined;
 
     constructor(props: Props) {
         super(props);
         this.mediaRecorder = null;
+        this.screenRecorder = null;
         this.videoRef = null;
+        this.screenRef = null;
         this.recordedBlobs = [];
+        this.screenBlobs = [];
         this.startTime = 0;
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { stream, doRecording, discard, doPlayback } = this.props;
-
+        const { stream, screenStream, doRecording, discard, doPlayback } = this.props;
         if (!doPlayback) {
             this.videoRef!.srcObject = stream;
+            if (screenStream && this.screenRef) {
+                this.screenRef.srcObject = screenStream;
+            }
         }
 
         if (doRecording !== prevProps.doRecording) {
@@ -54,6 +68,7 @@ export class Recorder extends Component<Props, State> {
 
         if (discard) {
             this.recordedBlobs = [];
+            this.screenBlobs = [];
         }
     }
 
@@ -67,7 +82,7 @@ export class Recorder extends Component<Props, State> {
     };
 
     startRecording = () => {
-        const { stream } = this.props;
+        const { stream, screenStream, screenShareOn } = this.props;
 
         const mimeTypes = [
             "video/webm;codecs=vp9,opus",
@@ -97,6 +112,15 @@ export class Recorder extends Component<Props, State> {
 
         try {
             this.mediaRecorder = new MediaRecorder(stream, options);
+            this.mediaRecorder.ondataavailable = (event: any) =>
+                this.handleDataAvailable(event, "video");
+            this.mediaRecorder.start(10); // collect 10ms of data
+            if (screenShareOn && screenStream) {
+                this.screenRecorder = new MediaRecorder(screenStream, options);
+                this.screenRecorder.ondataavailable = (event: any) =>
+                    this.handleDataAvailable(event, "screen");
+                this.screenRecorder.start(10);
+            }
         } catch (e) {
             if (this.props.onError) {
                 this.props.onError("Browser not supported: " + e.message);
@@ -104,33 +128,51 @@ export class Recorder extends Component<Props, State> {
             return;
         }
 
-        this.mediaRecorder.ondataavailable = this.handleDataAvailable;
-        this.mediaRecorder.start(10); // collect 10ms of data
         this.startTime = Date.now();
     };
 
     stopRecording = () => {
+        const { screenStream, screenShareOn } = this.props;
+
         this.mediaRecorder.stop();
+        if (screenStream && screenShareOn) {
+            this.screenRecorder.stop();
+        }
         if (this.props.onRecordingEnd) {
-            this.props.onRecordingEnd(this.recordedBlobs, Date.now() - this.startTime);
+            this.props.onRecordingEnd(
+                this.recordedBlobs,
+                Date.now() - this.startTime,
+                this.screenBlobs
+            );
         }
     };
 
-    handleDataAvailable = (event: any) => {
+    handleDataAvailable = (event: any, dataType: "video" | "screen") => {
         if (event.data && event.data.size > 0) {
-            this.recordedBlobs.push(event.data);
+            if (dataType === "video") {
+                this.recordedBlobs.push(event.data);
+            } else {
+                this.screenBlobs.push(event.data);
+            }
         }
     };
 
     render(props: Props) {
-        const { doPlayback, partnerId, uiConfId, video, stream } = this.props;
-        let noVideoClass = !video ? "__no-video" : "";
+        const { doPlayback, partnerId, uiConfId, video, stream, screenShareOn } = this.props;
+        const noVideoClass = !video ? "__no-video" : "";
+        const shareScreenClass = screenShareOn ? "express-recorder__recorder__share-screen" : "";
 
         if (doPlayback && this.recordedBlobs.length > 0) {
             const media = {
                 blob: this.props.blob,
                 mimeType: "video/webm"
             };
+            const screenMedia = screenShareOn
+                ? {
+                      blob: this.props.screenBlob,
+                      mimeType: "video/webm"
+                  }
+                : undefined;
 
             return (
                 <div
@@ -140,6 +182,7 @@ export class Recorder extends Component<Props, State> {
                         partnerId={partnerId}
                         uiconfId={uiConfId}
                         media={media}
+                        screenMedia={screenMedia}
                         autoPlay={false}
                     />
                 </div>
@@ -148,6 +191,15 @@ export class Recorder extends Component<Props, State> {
 
         return (
             <div class={`xr_video-object-wrap ${styles["video-object-wrap"]}`}>
+                <video
+                    id={"screenShare"}
+                    className={`express-recorder__screen ${styles["express-recorder__screen"]} ${
+                        !screenShareOn ? "hidden" : ""
+                    }`}
+                    muted={true}
+                    autoPlay={true}
+                    ref={node => (this.screenRef = node as HTMLMediaElement)}
+                />
                 {!video && (
                     <div class={`xr_no-video-text ${styles["no-video-text"]}`}>
                         Recording Audio Only
@@ -162,7 +214,7 @@ export class Recorder extends Component<Props, State> {
                     id="recorder"
                     className={`express-recorder__recorder ${
                         styles["express-recorder__recorder" + noVideoClass]
-                    }`}
+                    } ${styles[shareScreenClass]}`}
                     muted={true}
                     autoPlay={true}
                     ref={node => (this.videoRef = node as HTMLMediaElement)}
