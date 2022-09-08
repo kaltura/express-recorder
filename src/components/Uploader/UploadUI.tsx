@@ -9,6 +9,8 @@ type Props = {
     total: number;
     abort: boolean;
     onCancel: () => void;
+    additionalText?: string;
+    uploadDone: boolean;
 };
 
 type State = {};
@@ -18,14 +20,14 @@ type State = {};
  */
 export class UploadUI extends Component<Props, State> {
     render() {
-        const { loaded, total, abort, onCancel } = this.props;
+        const { loaded, total, abort, onCancel, additionalText, uploadDone } = this.props;
         const disableCancel = abort || loaded >= total;
         const translator = Translator.getTranslator();
 
         return (
             <div className={`xr_uploader ${styles["uploader"]}`}>
                 <div className={`xr_cancel-wrap ${styles["cancel-wrap"]}`}>
-                    {loaded < total && (
+                    {!uploadDone && (
                         <button
                             className={`xr_btn xr_btn-cancel ${styles["btn"]} ${
                                 styles["btn-cancel"]
@@ -43,13 +45,14 @@ export class UploadUI extends Component<Props, State> {
                     )}
                 </div>
                 <div className={`xr_progress-bar-wrap ${styles["progress-bar-wrap"]}`}>
-                    {loaded < total && (
+                    {additionalText}
+                    {!uploadDone && (
                         <div className={`xr_progress-bar ${styles["progress-bar"]}`}>
                             <ProgressBar loaded={loaded} total={total} />{" "}
                         </div>
                     )}
                 </div>
-                {loaded >= total && total > 0 && (
+                {uploadDone && (
                     <div
                         className={`xr_upload-success-message ${styles["upload-success-message"]}`}
                     >

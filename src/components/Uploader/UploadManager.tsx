@@ -14,6 +14,7 @@ import {
     KalturaMultiResponse
 } from "kaltura-typescript-client";
 import { KalturaUploadToken } from "kaltura-typescript-client/api/types";
+import { UploadUI } from "./UploadUI";
 
 type Props = {
     client: KalturaClient | undefined;
@@ -29,11 +30,17 @@ type Props = {
     ks: string;
     conversionProfileId?: number;
     abortUpload?: boolean;
+    childRecordedBlobs?: Blob[];
+    showUploadUI?: boolean;
+    onCancel: () => void;
 };
 
 type State = {
     loaded: number;
     abort: boolean;
+    total: number;
+    doChildUpload: boolean;
+    uploadDone: boolean;
 };
 
 /**
@@ -44,23 +51,23 @@ export class UploadManager extends Component<Props, State> {
         abortUpload: false
     };
 
+    childEntryId: string;
     entryId: string;
-    totalSize: number;
-    tokenId: string;
+
     cancellableUploadAction: CancelableAction<KalturaUploadToken> | undefined;
 
     constructor(props: Props) {
         super(props);
 
         this.entryId = "";
-        this.totalSize = new Blob(props.recordedBlobs, {
-            type: "video/webm"
-        }).size;
-        this.tokenId = "";
+        this.childEntryId = "";
 
         this.state = {
             loaded: 0,
-            abort: false
+            abort: false,
+            doChildUpload: false,
+            uploadDone: false,
+            total: 0
         };
         this.addMedia = this.addMedia.bind(this);
     }
@@ -69,6 +76,9 @@ export class UploadManager extends Component<Props, State> {
         // if abort upload is externally requested
         if (this.props.abortUpload && !prevProps.abortUpload && !this.state.abort) {
             this.handleCancel();
+        }
+        if (this.state.doChildUpload && this.state.doChildUpload !== prevState.doChildUpload) {
+            this.upload();
         }
     }
 
@@ -84,6 +94,7 @@ export class UploadManager extends Component<Props, State> {
      */
     upload() {
         const { mediaType, entryName, conversionProfileId, onUploadStarted, client } = this.props;
+        const { doChildUpload } = this.state;
 
         if (!client) {
             this.throwError(new Error("Cannot connect to Kaltura server"));
@@ -96,6 +107,7 @@ export class UploadManager extends Component<Props, State> {
         entry.name = entryName;
         entry.mediaType = mediaType;
         entry.adminTags = "expressrecorder";
+        entry.parentEntryId = doChildUpload ? this.entryId : "";
 
         // 1.Add entry
         requests.requests.push(
@@ -131,15 +143,18 @@ export class UploadManager extends Component<Props, State> {
                         );
                     } else {
                         // 4.Upload token with media
-                        this.entryId = data[0].result.id;
-                        this.tokenId = data[1].result.id;
-                        if (onUploadStarted) {
+                        if (doChildUpload) {
+                            this.childEntryId = data[0].result.id;
+                        } else {
+                            this.entryId = data[0].result.id;
+                        }
+                        if (onUploadStarted && !doChildUpload) {
                             onUploadStarted(this.entryId);
                         }
                         if (this.state.abort) {
                             this.handleCancel();
                         }
-                        this.addMedia(this.tokenId);
+                        this.addMedia(data[1].result.id);
                     }
                 },
                 (err: Error) => {
@@ -156,10 +171,17 @@ export class UploadManager extends Component<Props, State> {
     }
 
     /**
-     * Upload media file with given tokenId. Uses chunks if needed (file above 5MB)
+     * Upload media file with given tokenId. Use chunks if needed (file above 5MB)
      */
     addMedia(tokenId: string) {
-        const { client, onUploadEnded, onUploadProgress } = this.props;
+        const {
+            client,
+            onUploadEnded,
+            onUploadProgress,
+            recordedBlobs,
+            childRecordedBlobs
+        } = this.props;
+        const { doChildUpload } = this.state;
         if (!client) {
             this.throwError(new Error("Missing client object"));
             return;
@@ -168,7 +190,9 @@ export class UploadManager extends Component<Props, State> {
             return;
         }
 
-        const blob = new Blob(this.props.recordedBlobs, { type: "video/webm" });
+        const blob = new Blob(doChildUpload ? childRecordedBlobs : recordedBlobs, {
+            type: "video/webm"
+        });
         const file = new File([blob], "name.webm");
         // keep request so it can be canceled
         const addMediaRequest = new UploadTokenUploadAction({
@@ -179,7 +203,7 @@ export class UploadManager extends Component<Props, State> {
         this.cancellableUploadAction = client.request(
             addMediaRequest.setProgress((loaded: number, total: number) => {
                 if (!this.state.abort) {
-                    this.setState({ loaded: loaded }); // loaded bytes until now
+                    this.setState({ loaded: loaded, total: total }); // loaded bytes until now
                     if (onUploadProgress) {
                         onUploadProgress(loaded, total);
                     }
@@ -188,7 +212,12 @@ export class UploadManager extends Component<Props, State> {
         );
         this.cancellableUploadAction.then(
             data => {
+                if (childRecordedBlobs && !doChildUpload) {
+                    this.setState({ doChildUpload: true, loaded: 0, total: 0 });
+                    return;
+                }
                 if (onUploadEnded) {
+                    this.setState({ uploadDone: true });
                     onUploadEnded(this.entryId);
                 }
             },
@@ -223,14 +252,42 @@ export class UploadManager extends Component<Props, State> {
     deleteEntry = () => {
         const { client } = this.props;
         if (client) {
+            const requests: KalturaMultiRequest = new KalturaMultiRequest();
+
             if (this.entryId) {
-                const request = new BaseEntryDeleteAction({
-                    entryId: this.entryId
-                });
-                client.request(request).catch((e: Error) => {
-                    this.throwError(e);
-                });
+                requests.requests.push(
+                    new BaseEntryDeleteAction({
+                        entryId: this.entryId
+                    })
+                );
             }
+            if (this.childEntryId) {
+                requests.requests.push(
+                    new BaseEntryDeleteAction({
+                        entryId: this.childEntryId
+                    })
+                );
+            }
+
+            client
+                .multiRequest(requests)
+                .then(
+                    (data: KalturaMultiResponse | null) => null,
+                    (err: Error) => {
+                        this.throwError(
+                            new Error(
+                                "Failed to delete media entry - reject request: " + err.message
+                            )
+                        );
+                    }
+                )
+                .catch((err: Error) => {
+                    this.throwError(
+                        new Error(
+                            "Failed to delete media entry - multirequest failed: " + err.message
+                        )
+                    );
+                });
         }
     };
 
@@ -241,6 +298,25 @@ export class UploadManager extends Component<Props, State> {
     }
 
     render() {
+        const { showUploadUI, onCancel, childRecordedBlobs } = this.props;
+        const { loaded, total, abort, doChildUpload, uploadDone } = this.state;
+        let text = "";
+        if (childRecordedBlobs && childRecordedBlobs.length) {
+            text = !doChildUpload ? "1/2" : "2/2";
+        }
+
+        if (showUploadUI) {
+            return (
+                <UploadUI
+                    loaded={loaded}
+                    total={total}
+                    abort={abort}
+                    uploadDone={uploadDone}
+                    onCancel={onCancel}
+                    additionalText={text}
+                />
+            );
+        }
         return <div />;
     }
 }
