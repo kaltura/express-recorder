@@ -390,12 +390,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             self.setState({ recordedBlobs: recordedBlobs, blob: fixedBlob });
             self.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
         });
-        if (recordedBlobs) {
-            const screenBlobObject = screenBlobs
-                ? new Blob(screenBlobs, { type: "video/webm" })
-                : undefined;
-            fixWebmDuration(screenBlobObject!, duration, function(fixedBlob: Blob) {
-                self.setState({ screenRecordedBlobs: screenBlobs!, screenRecordedBlob: fixedBlob });
+        if (screenBlobs) {
+            const screenBlobObject = new Blob(screenBlobs, { type: "video/webm" });
+            const self = this;
+            fixWebmDuration(screenBlobObject, duration, function(fixedBlob: Blob) {
+                self.setState({ screenRecordedBlobs: screenBlobs, screenRecordedBlob: fixedBlob });
             });
         }
     };
