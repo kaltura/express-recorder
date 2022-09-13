@@ -318,7 +318,7 @@ export class Settings extends Component<Props, State> {
                     devices={[]}
                     isOn={screenOn}
                     disabled={false} // can only turn off if both are available, so we won't end up with none
-                    selected={false} // TODO
+                    selected={false}
                     onBack={() => {
                         this.handleBack();
                     }}
