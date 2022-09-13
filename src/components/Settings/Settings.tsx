@@ -5,7 +5,6 @@ import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 import { Translator } from "../Translator/Translator";
 
 const styles = require("./style.scss");
-// TODO - make prop object for each resource
 type Props = {
     onSettingsChanged?: (
         selectedCamera: MediaDeviceInfo | false,
@@ -20,7 +19,6 @@ type Props = {
     allowScreenShare: boolean;
     stream?: MediaStream | undefined;
 };
-// TODO - make state object for each resource
 type State = {
     isOpen: boolean;
     selectedCamera: MediaDeviceInfo | false;
@@ -298,7 +296,7 @@ export class Settings extends Component<Props, State> {
     };
 
     render() {
-        const { stream, allowAudio, allowVideo } = this.props;
+        const { stream, allowAudio, allowVideo, allowScreenShare } = this.props;
         const {
             isOpen,
             showCameraSettings,
@@ -452,35 +450,37 @@ export class Settings extends Component<Props, State> {
                                         </div>
                                     </div>
                                 </a>
-                                <a
-                                    className={styles["resource-link"]}
-                                    onClick={() => {
-                                        this.getResourceSettings(ResourceTypes.SCREEN_SHARE);
-                                    }}
-                                    onKeyDown={e => {
-                                        this.handleKeyboardInput(e, ResourceTypes.SCREEN_SHARE);
-                                    }}
-                                    tabIndex={0}
-                                    role="menuitem"
-                                >
-                                    <span className={styles["sr-only"]}>
-                                        {translator.translate("Screen Share Settings")}
-                                    </span>
-                                    <div className={styles["resources-item"]}>
-                                        <div
-                                            className={styles["resources-name"]}
-                                            aria-hidden="true"
-                                        >
-                                            {translator.translate("Screen Share")}
+                                {allowScreenShare && (
+                                    <a
+                                        className={styles["resource-link"]}
+                                        onClick={() => {
+                                            this.getResourceSettings(ResourceTypes.SCREEN_SHARE);
+                                        }}
+                                        onKeyDown={e => {
+                                            this.handleKeyboardInput(e, ResourceTypes.SCREEN_SHARE);
+                                        }}
+                                        tabIndex={0}
+                                        role="menuitem"
+                                    >
+                                        <span className={styles["sr-only"]}>
+                                            {translator.translate("Screen Share Settings")}
+                                        </span>
+                                        <div className={styles["resources-item"]}>
+                                            <div
+                                                className={styles["resources-name"]}
+                                                aria-hidden="true"
+                                            >
+                                                {translator.translate("Screen Share")}
+                                            </div>
+                                            <div className={styles["resource-label"]}>
+                                                {"TODO - resource"}
+                                            </div>
+                                            <div className={styles["arrow-wrap"]}>
+                                                <i className={styles["arrow-right"]} />
+                                            </div>
                                         </div>
-                                        <div className={styles["resource-label"]}>
-                                            {"TODO - resource"}
-                                        </div>
-                                        <div className={styles["arrow-wrap"]}>
-                                            <i className={styles["arrow-right"]} />
-                                        </div>
-                                    </div>
-                                </a>
+                                    </a>
+                                )}
                             </div>
                         )}
                         {devicesSettings}

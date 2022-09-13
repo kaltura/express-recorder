@@ -66,7 +66,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
         allowAudio: true,
-        allowScreenShare: true,
+        allowScreenShare: false,
         showUploadUI: true
     };
 
@@ -390,12 +390,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             self.setState({ recordedBlobs: recordedBlobs, blob: fixedBlob });
             self.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
         });
-        if (recordedBlobs) {
-            const screenBlobObject = screenBlobs
-                ? new Blob(screenBlobs, { type: "video/webm" })
-                : undefined;
-            fixWebmDuration(screenBlobObject!, duration, function(fixedBlob: Blob) {
-                self.setState({ screenRecordedBlobs: screenBlobs!, screenRecordedBlob: fixedBlob });
+        if (screenBlobs) {
+            const screenBlobObject = new Blob(screenBlobs, { type: "video/webm" });
+            const self = this;
+            fixWebmDuration(screenBlobObject, duration, function(fixedBlob: Blob) {
+                self.setState({ screenRecordedBlobs: screenBlobs, screenRecordedBlob: fixedBlob });
             });
         }
     };
@@ -637,7 +636,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             showUploadUI,
             allowVideo,
             allowAudio,
-            allowScreenShare
+            allowScreenShare = false
         } = props;
         const {
             doCountdown,
@@ -701,7 +700,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             selectedAudioDevice={stream ? stream.getAudioTracks()[0] : undefined}
                             allowVideo={allowVideo!}
                             allowAudio={allowAudio!}
-                            allowScreenShare={allowScreenShare!}
+                            allowScreenShare={allowScreenShare}
                             onSettingsChanged={this.handleSettingsChange}
                             stream={stream}
                             screenShareOn={shareScreenOn}

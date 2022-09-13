@@ -50,6 +50,10 @@ module.exports = (env, options) => {
           enforce: 'pre'
         },
         {
+          test: /\.css$/i,
+          use: ["style-loader", "css-loader"],
+        },
+        {
           test: /\.tsx?$/,
           loader: "awesome-typescript-loader"
         },
