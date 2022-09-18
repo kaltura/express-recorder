@@ -4,8 +4,8 @@ declare var KalturaPlayer: any;
 import "./player.css";
 
 type Props = {
-    media: { blob: Blob; mimeType: string }; // the actual recorded media
-    screenMedia?: { blob: Blob; mimeType: string }; // the actual recorded media
+    media: { blob: Blob; mimeType: string }; // recorded media for video with or without audio
+    screenMedia?: { blob: Blob; mimeType: string }; // recorded media for screen sharing
     partnerId: number;
     uiconfId: number; // must be v3
     autoPlay?: boolean;
