@@ -700,8 +700,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 </div>
                 <Recorder
                     video={constraints.video !== false}
-                    stream={stream!}
-                    screenStream={screenStream!}
+                    stream={stream || new MediaStream()}
+                    screenStream={screenStream || new MediaStream()}
                     onRecordingEnd={this.handleRecordingEnd}
                     doRecording={doRecording}
                     discard={doCountdown}
