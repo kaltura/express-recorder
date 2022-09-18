@@ -36,8 +36,8 @@ export type ExpressRecorderProps = {
 
 type State = {
     destroyed: boolean;
-    stream: MediaStream | undefined;
-    screenStream: MediaStream | undefined;
+    stream?: MediaStream;
+    screenStream?: MediaStream;
     doUpload: boolean;
     doRecording: boolean;
     doCountdown: boolean;
