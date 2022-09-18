@@ -23,8 +23,8 @@ export class Playback extends Component<Props, State> {
         autoplay: false,
         pictureInPicture: false
     };
-    kalturaPlayer: any;
-    kalturaPlayerScreen: any;
+    kalturaVideoPlayer: any;
+    kalturaScreenPlayer: any;
 
     componentDidMount(): void {
         this.embedPlayer();
@@ -35,10 +35,10 @@ export class Playback extends Component<Props, State> {
         const { media, screenMedia } = this.props;
         if (previousProps.media !== media) {
             // play the new media
-            this.setMedia(media, this.kalturaPlayer);
+            this.setMedia(media, this.kalturaVideoPlayer);
         }
         if (screenMedia && previousProps.screenMedia !== screenMedia) {
-            this.setMedia(screenMedia, this.kalturaPlayerScreen);
+            this.setMedia(screenMedia, this.kalturaScreenPlayer);
         }
     }
 
@@ -66,7 +66,7 @@ export class Playback extends Component<Props, State> {
     async embedPlayer() {
         const { partnerId, uiconfId, media, screenMedia } = this.props;
         try {
-            this.kalturaPlayer = KalturaPlayer.setup({
+            this.kalturaVideoPlayer = KalturaPlayer.setup({
                 targetId: "player-wrap_" + uniqueId,
                 provider: {
                     partnerId: partnerId,
@@ -74,24 +74,26 @@ export class Playback extends Component<Props, State> {
                 }
             });
             if (screenMedia) {
-                this.kalturaPlayerScreen = KalturaPlayer.setup({
+                this.kalturaScreenPlayer = KalturaPlayer.setup({
                     targetId: "player-wrap_screen" + uniqueId,
                     provider: {
                         partnerId: partnerId,
                         uiConfId: uiconfId
                     }
                 });
-                this.setMedia(screenMedia, this.kalturaPlayerScreen);
+                this.setMedia(screenMedia, this.kalturaScreenPlayer);
 
-                this.kalturaPlayer.addEventListener("play", () => this.kalturaPlayerScreen.play());
-                this.kalturaPlayer.addEventListener("pause", () =>
-                    this.kalturaPlayerScreen.pause()
+                this.kalturaVideoPlayer.addEventListener("play", () =>
+                    this.kalturaScreenPlayer.play()
+                );
+                this.kalturaVideoPlayer.addEventListener("pause", () =>
+                    this.kalturaScreenPlayer.pause()
                 );
                 KalturaPlayer.getPlayers()["player-wrap_0"].addEventListener("seeking", () => {
-                    this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
+                    this.kalturaScreenPlayer.currentTime = this.kalturaVideoPlayer.currentTime;
                 });
             }
-            this.setMedia(media, this.kalturaPlayer);
+            this.setMedia(media, this.kalturaVideoPlayer);
         } catch (e) {
             console.error(e.message);
         }
