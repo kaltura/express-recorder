@@ -63,7 +63,7 @@ export class Playback extends Component<Props, State> {
         });
     }
 
-    async embedPlayer() {
+    embedPlayer() {
         const { partnerId, uiconfId, media, screenMedia } = this.props;
         try {
             this.kalturaVideoPlayer = KalturaPlayer.setup({
