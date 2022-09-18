@@ -75,7 +75,7 @@ export class Playback extends Component<Props, State> {
             });
             if (screenMedia) {
                 this.kalturaPlayerScreen = KalturaPlayer.setup({
-                    targetId: "player-wrap_screen" + uniqueId,
+                    targetId: "player-wrap-screen_" + uniqueId,
                     provider: {
                         partnerId: partnerId,
                         uiConfId: uiconfId
@@ -87,9 +87,12 @@ export class Playback extends Component<Props, State> {
                 this.kalturaPlayer.addEventListener("pause", () =>
                     this.kalturaPlayerScreen.pause()
                 );
-                KalturaPlayer.getPlayers()["player-wrap_0"].addEventListener("seeking", () => {
-                    this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
-                });
+                KalturaPlayer.getPlayers()["player-wrap_" + uniqueId].addEventListener(
+                    "seeking",
+                    () => {
+                        this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
+                    }
+                );
             }
             this.setMedia(media, this.kalturaPlayer);
         } catch (e) {
@@ -110,7 +113,7 @@ export class Playback extends Component<Props, State> {
                 />
                 {screenMedia && (
                     <div
-                        id={"player-wrap_screen" + uniqueId}
+                        id={"player-wrap-screen_" + uniqueId}
                         className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]}`}
                     />
                 )}
