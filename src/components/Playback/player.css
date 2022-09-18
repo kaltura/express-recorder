@@ -1,9 +1,12 @@
 .player-wrap__main_controls .playkit-bottom-bar,
 .player-wrap__main_controls .playkit-pre-playback-play-overlay {
-    left: 50% !important;
+    width: 200% !important;
 }
 .player-wrap__main_controls .playkit-center-playback-controls {
     left: 100%;
+}
+.player-wrap__main_controls .playkit-bottom-bar {
+    top: -65px;
 }
 .player-wrap-screen .playkit-playback-controls,
 .player-wrap-screen .playkit-bottom-bar,
