@@ -447,9 +447,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         // check if something has been changed
         const { constraints, shareScreenOn } = this.state;
         if (
-            ((selectedCamera && constraints.video) || // check if video was turn on/off
+            ((selectedCamera && constraints.video) || // check if video has turned on/off
                 (!selectedCamera && !constraints.video)) &&
-            ((selectedAudio && constraints.audio) || // check if audio was turn on/off
+            ((selectedAudio && constraints.audio) || // check if audio has turned on/off
                 (!selectedAudio && !constraints.audio)) &&
             (!selectedCamera || // check if device id has been changed
                 (constraints.video &&
@@ -654,7 +654,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             screenRecordedBlob,
             screenRecordedBlobs
         } = state;
-
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
         }
@@ -693,20 +692,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         }
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
-                <div className={styles["settings-wrap"]}>
-                    {!doPlayback && !doRecording && (
-                        <Settings
-                            selectedCameraDevice={stream ? stream.getVideoTracks()[0] : undefined}
-                            selectedAudioDevice={stream ? stream.getAudioTracks()[0] : undefined}
-                            allowVideo={allowVideo!}
-                            allowAudio={allowAudio!}
-                            allowScreenShare={allowScreenShare}
-                            onSettingsChanged={this.handleSettingsChange}
-                            stream={stream}
-                            screenShareOn={shareScreenOn}
-                        />
-                    )}
-                </div>
                 <Recorder
                     video={constraints.video !== false}
                     stream={stream!}
@@ -733,17 +718,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 <div
                     className={`express-recorder__controls ${styles["express-recorder__controls"]}`}
                 >
-                    {!doRecording && !doCountdown && !doPlayback && (
-                        <button
-                            className={`xr_controls__start ${styles["controls__start"]}`}
-                            id="startRecord"
-                            onClick={this.handleStartClick}
-                            aria-label={this.translator.translate(
-                                "Start Recording. recording will start in a three seconds delay"
-                            )}
-                            tabIndex={0}
-                        />
-                    )}
                     {doRecording && (
                         <RecordingTimer
                             onButtonClick={this.handleStopClick}
@@ -751,6 +725,36 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             setStopButtonRef={this.setStopButtonRef}
                         />
                     )}
+                    <div className={styles["settings-wrap"]}>
+                        {!doPlayback && !doRecording && !doCountdown && (
+                            <Settings
+                                selectedCameraDevice={
+                                    stream && stream.getVideoTracks().length > 0
+                                        ? ({
+                                              kind: "videoinput",
+                                              label: stream.getVideoTracks()[0].label
+                                          } as MediaDeviceInfo)
+                                        : false
+                                }
+                                selectedAudioDevice={
+                                    stream && stream.getAudioTracks().length > 0
+                                        ? ({
+                                              kind: "audioinput",
+                                              label: stream.getAudioTracks()[0].label
+                                          } as MediaDeviceInfo)
+                                        : false
+                                }
+                                allowVideo={allowVideo!}
+                                allowAudio={allowAudio!}
+                                allowScreenShare={allowScreenShare}
+                                onSettingsChanged={this.handleSettingsChange}
+                                stream={stream}
+                                screenShareOn={shareScreenOn}
+                                onStartRecording={this.handleStartClick}
+                            />
+                        )}
+                    </div>
+
                     {doCountdown && (
                         <button
                             className={`xr_controls__cancel ${styles["controls__cancel"]}`}
