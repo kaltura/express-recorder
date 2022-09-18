@@ -36,8 +36,8 @@ export type ExpressRecorderProps = {
 
 type State = {
     destroyed: boolean;
-    stream: MediaStream | undefined;
-    screenStream: MediaStream | undefined;
+    stream?: MediaStream;
+    screenStream?: MediaStream;
     doUpload: boolean;
     doRecording: boolean;
     doCountdown: boolean;
@@ -66,7 +66,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
         allowAudio: true,
-        allowScreenShare: false,
         showUploadUI: true
     };
 
@@ -82,8 +81,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         this.state = {
             destroyed: false,
-            stream: undefined,
-            screenStream: undefined,
             doUpload: false,
             doRecording: false,
             doCountdown: false,
@@ -378,23 +375,17 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * @param duration
      * @param screenBlobs
      */
-    handleRecordingEnd = (
-        recordedBlobs: Blob[],
-        duration: number,
-        screenBlobs: Blob[] | undefined
-    ) => {
+    handleRecordingEnd = (recordedBlobs: Blob[], duration: number, screenBlobs?: Blob[]) => {
         const blob = new Blob(recordedBlobs, { type: "video/webm" });
-        const self = this;
         // handle chrome blob duration issue
-        fixWebmDuration(blob, duration, function(fixedBlob: Blob) {
-            self.setState({ recordedBlobs: recordedBlobs, blob: fixedBlob });
-            self.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+        fixWebmDuration(blob, duration, (fixedBlob: Blob) => {
+            this.setState({ recordedBlobs: recordedBlobs, blob: fixedBlob });
+            this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
         });
         if (screenBlobs) {
             const screenBlobObject = new Blob(screenBlobs, { type: "video/webm" });
-            const self = this;
-            fixWebmDuration(screenBlobObject, duration, function(fixedBlob: Blob) {
-                self.setState({ screenRecordedBlobs: screenBlobs, screenRecordedBlob: fixedBlob });
+            fixWebmDuration(screenBlobObject, duration, (fixedBlob: Blob) => {
+                this.setState({ screenRecordedBlobs: screenBlobs, screenRecordedBlob: fixedBlob });
             });
         }
     };
@@ -694,8 +685,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             <div className={`express-recorder ${styles["express-recorder"]}`}>
                 <Recorder
                     video={constraints.video !== false}
-                    stream={stream!}
-                    screenStream={screenStream!}
+                    stream={stream || new MediaStream()}
+                    screenStream={screenStream || new MediaStream()}
                     onRecordingEnd={this.handleRecordingEnd}
                     doRecording={doRecording}
                     discard={doCountdown}
