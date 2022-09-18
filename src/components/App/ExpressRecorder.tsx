@@ -66,7 +66,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
         allowAudio: true,
-        allowScreenShare: false,
         showUploadUI: true
     };
 
@@ -82,8 +81,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         this.state = {
             destroyed: false,
-            stream: undefined,
-            screenStream: undefined,
             doUpload: false,
             doRecording: false,
             doCountdown: false,
