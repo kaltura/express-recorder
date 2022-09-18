@@ -375,11 +375,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * @param duration
      * @param screenBlobs
      */
-    handleRecordingEnd = (
-        recordedBlobs: Blob[],
-        duration: number,
-        screenBlobs: Blob[] | undefined
-    ) => {
+    handleRecordingEnd = (recordedBlobs: Blob[], duration: number, screenBlobs?: Blob[]) => {
         const blob = new Blob(recordedBlobs, { type: "video/webm" });
         const self = this;
         // handle chrome blob duration issue
@@ -389,7 +385,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         });
         if (screenBlobs) {
             const screenBlobObject = new Blob(screenBlobs, { type: "video/webm" });
-            const self = this;
             fixWebmDuration(screenBlobObject, duration, function(fixedBlob: Blob) {
                 self.setState({ screenRecordedBlobs: screenBlobs, screenRecordedBlob: fixedBlob });
             });
