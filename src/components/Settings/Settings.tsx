@@ -1,8 +1,13 @@
 import { Component, h } from "preact";
 import { SettingsDevices } from "./Settings-devices";
-import SettingsIcon from "./settings.svg";
 import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 import { Translator } from "../Translator/Translator";
+import VideoIcon from "./assets/video.svg";
+import AudioIcon from "./assets/audio.svg";
+import ScreenIcon from "./assets/screen.svg";
+import NoVideoIcon from "./assets/noVideo.svg";
+import NoAudioIcon from "./assets/noAudio.svg";
+import NoScreenIcon from "./assets/noScreen.svg";
 
 const styles = require("./style.scss");
 type Props = {
@@ -11,21 +16,17 @@ type Props = {
         selectedAudio: MediaDeviceInfo | false,
         screenOn: boolean
     ) => void;
-    selectedCameraDevice?: MediaStreamTrack;
-    selectedAudioDevice?: MediaStreamTrack;
+    selectedCameraDevice: MediaDeviceInfo | false;
+    selectedAudioDevice: MediaDeviceInfo | false;
     allowVideo: boolean;
     allowAudio: boolean;
     screenShareOn: boolean;
     allowScreenShare: boolean;
     stream?: MediaStream | undefined;
+    onStartRecording: () => void;
 };
 type State = {
-    isOpen: boolean;
-    selectedCamera: MediaDeviceInfo | false;
-    selectedAudio: MediaDeviceInfo | false;
-    showCameraSettings: boolean;
-    showAudioSettings: boolean;
-    showScreenShareSettings: boolean;
+    showSettingsOf: false | ResourceTypes;
     cameraOn: boolean;
     audioOn: boolean;
     screenOn: boolean;
@@ -44,32 +45,12 @@ export class Settings extends Component<Props, State> {
     cameraDevicesInfo: MediaDeviceInfo[];
     audioDevicesInfo: MediaDeviceInfo[];
     menuBoxRef: Element | undefined;
-    mainMenuRef: HTMLElement | undefined;
 
     constructor(props: Props) {
         super(props);
 
-        let selectedCamera: any = false;
-        if (props.selectedCameraDevice) {
-            selectedCamera = {
-                kind: "videoinput",
-                label: props.selectedCameraDevice.label
-            };
-        }
-        let selectedAudio: any = false;
-        if (props.selectedAudioDevice) {
-            selectedAudio = {
-                kind: "audioinput",
-                label: props.selectedAudioDevice.label
-            };
-        }
         this.state = {
-            isOpen: false,
-            selectedCamera: selectedCamera,
-            selectedAudio: selectedAudio,
-            showAudioSettings: false,
-            showCameraSettings: false,
-            showScreenShareSettings: false,
+            showSettingsOf: false,
             cameraOn: props.allowVideo,
             audioOn: props.allowAudio,
             screenOn: props.screenShareOn
@@ -84,32 +65,6 @@ export class Settings extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
-        // get updated resources once stream is ready
-        if (
-            (!prevProps.selectedCameraDevice && this.props.selectedCameraDevice) ||
-            (!prevProps.selectedAudioDevice && this.props.selectedAudioDevice)
-        ) {
-            let selectedCamera: any = false;
-            if (this.props.selectedCameraDevice) {
-                selectedCamera = {
-                    kind: "videoinput",
-                    label: this.props.selectedCameraDevice.label
-                };
-            }
-            let selectedAudio: any = false;
-            if (this.props.selectedAudioDevice) {
-                selectedAudio = {
-                    kind: "audioinput",
-                    label: this.props.selectedAudioDevice.label
-                };
-            }
-
-            this.setState({
-                selectedCamera: selectedCamera,
-                selectedAudio: selectedAudio
-            });
-        }
-
         if (
             this.cameraDevicesInfo.length === 0 ||
             this.cameraDevicesInfo[0].label === "" ||
@@ -119,17 +74,8 @@ export class Settings extends Component<Props, State> {
             this.getDevices();
         }
 
-        if (
-            (prevState.showAudioSettings ||
-                prevState.showCameraSettings ||
-                prevState.showScreenShareSettings) &&
-            !this.state.showAudioSettings &&
-            !this.state.showCameraSettings &&
-            !this.state.showScreenShareSettings
-        ) {
-            if (this.mainMenuRef) {
-                (this.mainMenuRef.children[0] as HTMLElement).focus();
-            }
+        if (this.state.showSettingsOf) {
+            document.addEventListener("click", this.handleExternalClick, true);
         }
     }
 
@@ -163,69 +109,11 @@ export class Settings extends Component<Props, State> {
         }
     };
 
-    toggleMenu = () => {
-        const { isOpen } = this.state;
-        this.setState({ isOpen: !isOpen }, () => {
-            if (isOpen) {
-                this.handleClose();
-            } else {
-                // handle drop down toggle click
-                document.addEventListener("click", this.handleExternalClick, true);
-                if (this.mainMenuRef) {
-                    (this.mainMenuRef.children[0] as HTMLElement).focus();
-                }
-            }
-        });
-    };
-
-    handleMenuIconKeyPressed = (e: KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === " ") {
-            this.toggleMenu();
-        }
-    };
-
-    getResourceSettings = (type: ResourceTypes) => {
-        if (type === ResourceTypes.VIDEO) {
-            this.setState({
-                showCameraSettings: true,
-                showAudioSettings: false,
-                showScreenShareSettings: false
-            });
-        } else if (type === ResourceTypes.AUDIO) {
-            this.setState({
-                showCameraSettings: false,
-                showAudioSettings: true,
-                showScreenShareSettings: false
-            });
-        } else {
-            this.setState({
-                showCameraSettings: false,
-                showAudioSettings: false,
-                showScreenShareSettings: true
-            });
-        }
-    };
-
-    handleChooseDevice = (device: MediaDeviceInfo) => {
-        if (device.kind === "videoinput") {
-            this.setState({ selectedCamera: device }, () => {
-                this.saveSettings();
-            });
-        } else {
-            this.setState({ selectedAudio: device }, () => {
-                this.saveSettings();
-            });
-        }
-    };
-
     handleClose = () => {
         document.removeEventListener("click", this.handleExternalClick, true);
 
         this.setState({
-            isOpen: false,
-            showAudioSettings: false,
-            showCameraSettings: false,
-            showScreenShareSettings: false
+            showSettingsOf: false
         });
     };
 
@@ -235,41 +123,40 @@ export class Settings extends Component<Props, State> {
      * @param resourceType  ResourceTypes, the type of the control that changed
      */
     handleToggleChange = (isOn: boolean, resourceType: ResourceTypes) => {
-        let { cameraOn, audioOn } = this.state;
+        const { cameraOn, audioOn } = this.state;
+
+        let newCameraOn = resourceType === ResourceTypes.VIDEO ? isOn : cameraOn;
+        let newAudioOn = resourceType === ResourceTypes.AUDIO ? isOn : audioOn;
 
         // do not allow both camera and audio to be turned off
-        cameraOn = !isOn && resourceType === ResourceTypes.AUDIO ? true : cameraOn;
-        audioOn = !isOn && resourceType === ResourceTypes.VIDEO ? true : audioOn;
+        newCameraOn = !isOn && resourceType === ResourceTypes.AUDIO ? true : newCameraOn;
+        newAudioOn = !isOn && resourceType === ResourceTypes.VIDEO ? true : newAudioOn;
 
-        this.setState(
-            (prevState: State) => {
-                return {
-                    cameraOn: resourceType === ResourceTypes.VIDEO ? isOn : cameraOn,
-                    audioOn: resourceType === ResourceTypes.AUDIO ? isOn : audioOn,
-                    screenOn:
-                        resourceType === ResourceTypes.SCREEN_SHARE ? isOn : prevState.screenOn
-                };
-            },
-            () => {
-                this.saveSettings();
-            }
-        );
-    };
+        this.setState((prevState: State) => {
+            return {
+                cameraOn: newCameraOn,
+                audioOn: newAudioOn,
+                screenOn: resourceType === ResourceTypes.SCREEN_SHARE ? isOn : prevState.screenOn
+            };
+        });
 
-    saveSettings = () => {
         if (this.props.onSettingsChanged) {
-            const camera = this.state.cameraOn ? this.state.selectedCamera : false;
-            const audio = this.state.audioOn ? this.state.selectedAudio : false;
+            const camera = newCameraOn
+                ? this.props.selectedCameraDevice || this.cameraDevicesInfo[0]
+                : false;
+            const audio = newAudioOn
+                ? this.props.selectedAudioDevice || this.audioDevicesInfo[0]
+                : false;
             this.props.onSettingsChanged(camera, audio, this.state.screenOn);
         }
     };
 
-    handleBack = () => {
-        this.setState({
-            showAudioSettings: false,
-            showCameraSettings: false,
-            showScreenShareSettings: false
-        });
+    handleChooseDevice = (device: MediaDeviceInfo) => {
+        if (this.props.onSettingsChanged) {
+            const camera = device.kind === "videoinput" && this.state.cameraOn ? device : false;
+            const audio = device.kind === "audioinput" && this.state.audioOn ? device : false;
+            this.props.onSettingsChanged(camera, audio, this.state.screenOn);
+        }
     };
 
     handleKeyboardInput = (e: KeyboardEvent, type: ResourceTypes) => {
@@ -277,7 +164,7 @@ export class Settings extends Component<Props, State> {
             case "Enter":
             case "ArrowRight":
             case " ":
-                this.getResourceSettings(type);
+                this.setState({ showSettingsOf: type });
                 break;
             case "ArrowDown":
                 const nextMenuItem = (e.target as HTMLElement).nextSibling;
@@ -295,23 +182,31 @@ export class Settings extends Component<Props, State> {
         }
     };
 
+    toggleSettingsShow = (clickedResource: ResourceTypes) => {
+        const { showSettingsOf } = this.state;
+
+        if (showSettingsOf === clickedResource) {
+            this.setState({ showSettingsOf: false });
+            return;
+        }
+        this.setState({ showSettingsOf: clickedResource });
+    };
+
     render() {
-        const { stream, allowAudio, allowVideo, allowScreenShare } = this.props;
         const {
-            isOpen,
-            showCameraSettings,
-            showAudioSettings,
-            showScreenShareSettings,
-            selectedAudio,
-            selectedCamera,
-            cameraOn,
-            audioOn,
-            screenOn
-        } = this.state;
+            stream,
+            allowAudio,
+            allowVideo,
+            allowScreenShare,
+            onStartRecording,
+            selectedAudioDevice,
+            selectedCameraDevice
+        } = this.props;
+        const { cameraOn, audioOn, screenOn, showSettingsOf } = this.state;
         const translator = Translator.getTranslator();
 
         let devicesSettings = null;
-        if (showScreenShareSettings) {
+        if (showSettingsOf === ResourceTypes.SCREEN_SHARE) {
             devicesSettings = (
                 <SettingsDevices
                     resourceName={ResourceTypes.SCREEN_SHARE}
@@ -319,31 +214,42 @@ export class Settings extends Component<Props, State> {
                     isOn={screenOn}
                     disabled={false} // can only turn off if both are available, so we won't end up with none
                     selected={false}
-                    onBack={() => {
-                        this.handleBack();
-                    }}
                     onChooseDevice={this.handleChooseDevice}
                     onToggleChange={(isOn: boolean) => {
                         this.handleToggleChange(isOn, ResourceTypes.SCREEN_SHARE);
                     }}
                 />
             );
-        } else if (showAudioSettings || showCameraSettings) {
+        } else if (
+            showSettingsOf === ResourceTypes.AUDIO ||
+            showSettingsOf === ResourceTypes.VIDEO
+        ) {
             devicesSettings = (
                 <SettingsDevices
-                    resourceName={showCameraSettings ? ResourceTypes.VIDEO : ResourceTypes.AUDIO}
-                    devices={showCameraSettings ? this.cameraDevicesInfo : this.audioDevicesInfo}
-                    isOn={showCameraSettings ? cameraOn : audioOn}
+                    resourceName={
+                        showSettingsOf === ResourceTypes.VIDEO
+                            ? ResourceTypes.VIDEO
+                            : ResourceTypes.AUDIO
+                    }
+                    devices={
+                        showSettingsOf === ResourceTypes.VIDEO
+                            ? this.cameraDevicesInfo
+                            : this.audioDevicesInfo
+                    }
+                    isOn={showSettingsOf === ResourceTypes.VIDEO ? cameraOn : audioOn}
                     disabled={!(allowVideo && allowAudio)} // can only turn off if both are available, so we won't end up with none
-                    selected={showCameraSettings ? selectedCamera : selectedAudio}
-                    onBack={() => {
-                        this.handleBack();
-                    }}
+                    selected={
+                        showSettingsOf === ResourceTypes.VIDEO
+                            ? selectedCameraDevice
+                            : selectedAudioDevice
+                    }
                     onChooseDevice={this.handleChooseDevice}
                     onToggleChange={(isOn: boolean) => {
                         this.handleToggleChange(
                             isOn,
-                            showCameraSettings ? ResourceTypes.VIDEO : ResourceTypes.AUDIO
+                            showSettingsOf === ResourceTypes.VIDEO
+                                ? ResourceTypes.VIDEO
+                                : ResourceTypes.AUDIO
                         );
                     }}
                 />
@@ -355,137 +261,116 @@ export class Settings extends Component<Props, State> {
                 className={`express-recorder__settings ${styles["settings"]}`}
                 ref={node => (this.menuBoxRef = node)}
             >
+                {devicesSettings}
                 <div
-                    className={`${styles["settings-icon"]}  ${
-                        styles[isOpen ? "settings-icon-open" : "settings-icon-close"]
-                    }`}
-                    onClick={this.toggleMenu}
+                    className={styles["resources-list"]}
+                    role="menu"
+                    aria-labelledby="dropdownMenu"
                 >
-                    <a
-                        role={"button"}
-                        onKeyPress={this.handleMenuIconKeyPressed}
-                        aria-haspopup="true"
-                        aria-expanded={isOpen}
-                        aria-label={translator.translate("Settings")}
-                        aria-controls="recorder-settings-menu"
-                        tabIndex={0}
-                    >
-                        <SettingsIcon />
-                    </a>
-                </div>
-                {isOpen && (
                     <div
-                        id="recorder-settings-menu"
-                        className={`xr_settings-box ${styles["settings-box"]}`}
+                        className={styles["resource-link"]}
+                        onClick={() => {
+                            this.toggleSettingsShow(ResourceTypes.VIDEO);
+                        }}
+                        onKeyDown={e => {
+                            this.handleKeyboardInput(e, ResourceTypes.VIDEO);
+                        }}
+                        tabIndex={0}
+                        role="menuitem"
                     >
-                        {!showCameraSettings && !showAudioSettings && !showScreenShareSettings && (
-                            <div
-                                className={styles["resources-list"]}
-                                role="menu"
-                                aria-labelledby="dropdownMenu"
-                                ref={node => (this.mainMenuRef = node)}
-                            >
-                                <a
-                                    className={styles["resource-link"]}
-                                    onClick={() => {
-                                        this.getResourceSettings(ResourceTypes.VIDEO);
-                                    }}
-                                    onKeyDown={e => {
-                                        this.handleKeyboardInput(e, ResourceTypes.VIDEO);
-                                    }}
-                                    tabIndex={0}
-                                    role="menuitem"
-                                >
-                                    <span className={styles["sr-only"]}>
-                                        {translator.translate("Camera Settings")}
-                                    </span>
-                                    <div className={styles["resources-item"]}>
-                                        <div
-                                            className={styles["resources-name"]}
-                                            aria-hidden="true"
-                                        >
-                                            {translator.translate("Camera")}
-                                        </div>
-                                        <div className={styles["resource-label"]}>
-                                            {selectedCamera ? selectedCamera.label : ""}
-                                        </div>
-                                        <div className={styles["arrow-wrap"]}>
-                                            <i className={styles["arrow-right"]} />
-                                        </div>
-                                    </div>
-                                </a>
-                                <a
-                                    className={styles["resource-link"]}
-                                    onClick={() => {
-                                        this.getResourceSettings(ResourceTypes.AUDIO);
-                                    }}
-                                    onKeyDown={e => {
-                                        this.handleKeyboardInput(e, ResourceTypes.AUDIO);
-                                    }}
-                                    tabIndex={0}
-                                    role="menuitem"
-                                >
-                                    <span className={styles["sr-only"]}>
-                                        {translator.translate("Audio Settings")}
-                                    </span>
-                                    <div className={styles["resources-item"]}>
-                                        <div className={styles["resources-name"]}>
-                                            <span aria-hidden="true">
-                                                {translator.translate("Audio")}
-                                            </span>
-                                            {stream && (
-                                                <div className={styles["settings-audio-indicator"]}>
-                                                    <AudioIndicator
-                                                        stream={stream}
-                                                        audioOn={audioOn}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className={styles["resource-label"]}>
-                                            {selectedAudio ? selectedAudio.label : ""}
-                                        </div>
-                                        <div className={styles["arrow-wrap"]}>
-                                            <i className={styles["arrow-right"]} />
-                                        </div>
-                                    </div>
-                                </a>
-                                {allowScreenShare && (
-                                    <a
-                                        className={styles["resource-link"]}
-                                        onClick={() => {
-                                            this.getResourceSettings(ResourceTypes.SCREEN_SHARE);
-                                        }}
-                                        onKeyDown={e => {
-                                            this.handleKeyboardInput(e, ResourceTypes.SCREEN_SHARE);
-                                        }}
-                                        tabIndex={0}
-                                        role="menuitem"
-                                    >
-                                        <span className={styles["sr-only"]}>
-                                            {translator.translate("Screen Share Settings")}
-                                        </span>
-                                        <div className={styles["resources-item"]}>
-                                            <div
-                                                className={styles["resources-name"]}
-                                                aria-hidden="true"
-                                            >
-                                                {translator.translate("Screen Share")}
-                                            </div>
-                                            <div className={styles["resource-label"]}>
-                                                {"TODO - resource"}
-                                            </div>
-                                            <div className={styles["arrow-wrap"]}>
-                                                <i className={styles["arrow-right"]} />
-                                            </div>
-                                        </div>
-                                    </a>
+                        <span className={styles["sr-only"]}>
+                            {translator.translate("Camera Settings")}
+                        </span>
+                        <div className={styles["resources-item"]}>
+                            <div className={styles["resources-icon"]} aria-hidden="true">
+                                {cameraOn && <VideoIcon />}
+                                {!cameraOn && <NoVideoIcon />}
+                            </div>
+                            <div className={styles["arrow-wrap"]}>
+                                {showSettingsOf !== ResourceTypes.VIDEO && (
+                                    <i className={styles["arrow-up"]} />
+                                )}
+                                {showSettingsOf === ResourceTypes.VIDEO && (
+                                    <i className={styles["arrow-down"]} />
                                 )}
                             </div>
-                        )}
-                        {devicesSettings}
+                        </div>
                     </div>
-                )}
+                    <div
+                        className={styles["resource-link"]}
+                        onClick={() => {
+                            this.toggleSettingsShow(ResourceTypes.AUDIO);
+                        }}
+                        onKeyDown={e => {
+                            this.handleKeyboardInput(e, ResourceTypes.AUDIO);
+                        }}
+                        tabIndex={0}
+                        role="menuitem"
+                    >
+                        <span className={styles["sr-only"]}>
+                            {translator.translate("Audio Settings")}
+                        </span>
+                        <div className={styles["resources-item"]}>
+                            <div className={styles["resources-icon"]} aria-hidden="true">
+                                {audioOn && <AudioIcon />}
+                                {!audioOn && <NoAudioIcon />}
+                                {/*stream && (
+                                        <div className={styles["settings-audio-indicator"]}>
+                                            <AudioIndicator stream={stream} audioOn={audioOn} />
+                                        </div>
+                                    )*/}
+                            </div>
+                            <div className={styles["arrow-wrap"]}>
+                                {showSettingsOf !== ResourceTypes.AUDIO && (
+                                    <i className={styles["arrow-up"]} />
+                                )}
+                                {showSettingsOf === ResourceTypes.AUDIO && (
+                                    <i className={styles["arrow-down"]} />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    {allowScreenShare && (
+                        <div
+                            className={styles["resource-link"]}
+                            onClick={() => {
+                                this.toggleSettingsShow(ResourceTypes.SCREEN_SHARE);
+                            }}
+                            onKeyDown={e => {
+                                this.handleKeyboardInput(e, ResourceTypes.SCREEN_SHARE);
+                            }}
+                            tabIndex={0}
+                            role="menuitem"
+                        >
+                            <span className={styles["sr-only"]}>
+                                {translator.translate("Screen Share Settings")}
+                            </span>
+                            <div className={styles["resources-item"]}>
+                                <div className={styles["resources-icon"]}>
+                                    {screenOn && <ScreenIcon />}
+                                    {!screenOn && <NoScreenIcon />}
+                                </div>
+                                <div className={styles["arrow-wrap"]}>
+                                    {showSettingsOf !== ResourceTypes.SCREEN_SHARE && (
+                                        <i className={styles["arrow-up"]} />
+                                    )}
+                                    {showSettingsOf === ResourceTypes.SCREEN_SHARE && (
+                                        <i className={styles["arrow-down"]} />
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <button
+                        className={`xr_controls__start ${styles["controls__start"]}`}
+                        id="startRecord"
+                        onClick={onStartRecording}
+                        aria-label={translator.translate(
+                            "Start Recording. recording will start in a three seconds delay"
+                        )}
+                        tabIndex={0}
+                    />
+                </div>
             </div>
         );
     }
