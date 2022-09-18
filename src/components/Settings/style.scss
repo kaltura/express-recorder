@@ -1,62 +1,58 @@
-.settings-icon {
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 9px;
-    border-radius: 3px;
-    cursor: pointer;
-    svg {
-        vertical-align: middle;
-        &:hover {
-            transform: rotate(10deg);
-            transition: transform 0.3s ease-in-out;
-        }
-        transform: rotate(-10deg);
-        transition: transform 0.3s ease-in-out;
-    }
-}
 .settings {
-    position: absolute;
+    padding: 8px 24px 8px 32px;
+    width: 248px;
+    height: 40px;
+    background: #111111;
+    border-radius: 28px;
+}
+.controls__start {
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+    border: none;
+    background-image: linear-gradient(-180deg, #ef424e, #db1f26);
+    box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+
+    &:hover {
+        background-image: linear-gradient(-180deg, #ed2a38, #c51c22);
+    }
 }
 .resources-item {
     display: flex;
+    align-items: center;
 }
-.resources-list,
+.resources-icon {
+    width: 32px;
+    height: 32px;
+    svg {
+        vertical-align: bottom;
+    }
+    &:hover {
+        background-color: #666666;
+    }
+}
 .devices-list {
     list-style-type: none;
     padding: 0 0 8px 0;
 }
 .resources-list {
-    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
 }
-.arrow-right {
+.arrow-up, .arrow-down {
     border: solid #ffffff;
     border-width: 0 2px 2px 0;
     display: inline-block;
     padding: 3px;
-    transform: rotate(-45deg);
-    -webkit-transform: rotate(-45deg);
+    transform: rotate(-135deg);
 }
-.settings-box {
-    text-align: left;
-    margin-top: 4px;
-    padding: 4px 20px;
-    font-size: 16px;
-    line-height: 35px;
-    width: 280px;
-    position: absolute;
-    right: 0;
-    border-radius: 3px;
-    background: rgba(34,34,34,0.90);
-}
-.settings-icon-close {
-    background: rgba(0,0,0,0.60);
-    &:hover {
-        background: rgba(34,34,34,0.90);
-        box-shadow: 0 2px 8px 0 rgba(0,0,0,0.30);
-    }
-}
-.settings-icon-open {
-    background: rgba(34,34,34,0.90);
-}
+.arrow-down {
+     transform: rotate(45deg);
+    margin-bottom: 5px !important;
+ }
 .settings-line {
     height: 1px;
     opacity: 0.15;
@@ -72,7 +68,6 @@
         }
     }
 }
-.resource-label,
 .device-label {
     white-space: nowrap;
     overflow: hidden;
@@ -81,21 +76,8 @@
 }
 .device-label {
     width: 260px;
-    padding-left: 21px;
     cursor: pointer;
     font-size: 14px;
-}
-.resource-label {
-    width: 160px;
-    cursor: pointer;
-    font-size: 14px;
-}
-.resources-name {
-    width: 100px;
-    vertical-align: bottom;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
 }
 .device-label__popup {
     visibility: hidden;
@@ -134,19 +116,10 @@
     margin-left: -17px;
     margin-right: 11px;
 }
-.arrow-left {
-    border: solid #ffffff;
-    border-width: 0 2px 2px 0;
-    display: inline-block;
-    padding: 3px;
-    transform: rotate(135deg);
-    vertical-align: sub;
-    margin-right: 13px;
-    cursor: pointer;
-}
 .arrow-wrap {
     width: 20px;
     cursor: pointer;
+    margin-top: 3px;
     i {
         margin-left: 13px;
         margin-bottom: 2px;
@@ -154,19 +127,14 @@
 }
 .resource-link {
     color: white;
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
         color: white;
         text-decoration: none;
     }
 }
 .device-disabled {
     color: gray;
-}
-.settings-arrow-wrap {
-    cursor: pointer;
-    padding-left: 8px;
-    padding-bottom: 12px;
-    margin-left: -8px;
 }
 .settings-audio-indicator {
     position: relative;
@@ -182,4 +150,22 @@
     width: 1px;
     height: 1px;
     overflow: hidden;
+}
+.device-settings-wrap {
+    position: absolute;
+    left: -3px;
+    bottom: 61px;
+    text-align: left;
+    padding: 4px 20px;
+    font-size: 16px;
+    line-height: 35px;
+    width: 280px;
+    border-radius: 3px;
+    background: rgba(34, 34, 34, 0.9);
+    color: #ffffff;
+}
+.device-label__selected-icon {
+    right: 20px;
+    margin-top: 2px;
+    position: absolute;
 }
