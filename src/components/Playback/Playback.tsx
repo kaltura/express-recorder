@@ -113,12 +113,12 @@ export class Playback extends Component<Props, State> {
                         screenMedia ? "player-wrap__main_controls" : ""
                     }`}
                 />
-                {screenMedia && (
+                {screenMedia ? (
                     <div
                         id={"player-wrap-screen__" + uniqueId}
                         className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]}`}
                     />
-                )}
+                ) : null}
             </div>
         );
     }
