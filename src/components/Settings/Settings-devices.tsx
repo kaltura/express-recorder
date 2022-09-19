@@ -63,9 +63,7 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     handleToggleClick = () => {
-        if (this.props.onToggleChange) {
-            this.props.onToggleChange(!this.props.isOn);
-        }
+        this.props.onToggleChange(!this.props.isOn);
     };
 
     handleKeyboardInput = (e: KeyboardEvent) => {
