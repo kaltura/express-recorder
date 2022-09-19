@@ -67,7 +67,7 @@ export class Playback extends Component<Props, State> {
         const { partnerId, uiconfId, media, screenMedia } = this.props;
         try {
             this.kalturaPlayer = KalturaPlayer.setup({
-                targetId: "player-wrap_" + uniqueId,
+                targetId: "player-wrap__" + uniqueId,
                 provider: {
                     partnerId: partnerId,
                     uiConfId: uiconfId
@@ -75,7 +75,7 @@ export class Playback extends Component<Props, State> {
             });
             if (screenMedia) {
                 this.kalturaPlayerScreen = KalturaPlayer.setup({
-                    targetId: "player-wrap-screen_" + uniqueId,
+                    targetId: "player-wrap-screen__" + uniqueId,
                     provider: {
                         partnerId: partnerId,
                         uiConfId: uiconfId
@@ -87,7 +87,7 @@ export class Playback extends Component<Props, State> {
                 this.kalturaPlayer.addEventListener("pause", () =>
                     this.kalturaPlayerScreen.pause()
                 );
-                KalturaPlayer.getPlayers()["player-wrap_" + uniqueId].addEventListener(
+                KalturaPlayer.getPlayers()["player-wrap__" + uniqueId].addEventListener(
                     "seeking",
                     () => {
                         this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
@@ -106,14 +106,14 @@ export class Playback extends Component<Props, State> {
         return (
             <div className={`players-wrap ${styles["players-wrap"]}`}>
                 <div
-                    id={"player-wrap_" + uniqueId}
+                    id={"player-wrap__" + uniqueId}
                     className={`xr_player-wrap ${styles["player-wrap"]} ${
                         screenMedia ? "player-wrap__main_controls" : ""
                     }`}
                 />
                 {screenMedia && (
                     <div
-                        id={"player-wrap-screen_" + uniqueId}
+                        id={"player-wrap-screen__" + uniqueId}
                         className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]}`}
                     />
                 )}
