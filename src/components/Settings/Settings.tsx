@@ -118,6 +118,7 @@ export class Settings extends Component<Props, State> {
      */
     handleToggleChange = (isOn: boolean, resourceType: ResourceTypes) => {
         const { cameraOn, audioOn } = this.state;
+        const { selectedCameraDevice, onSettingsChanged, selectedAudioDevice } = this.props;
 
         let newCameraOn = resourceType === ResourceTypes.VIDEO ? isOn : cameraOn;
         let newAudioOn = resourceType === ResourceTypes.AUDIO ? isOn : audioOn;
@@ -134,14 +135,12 @@ export class Settings extends Component<Props, State> {
             };
         });
 
-        if (this.props.onSettingsChanged) {
+        if (onSettingsChanged) {
             const camera = newCameraOn
-                ? this.props.selectedCameraDevice || this.cameraDevicesInfo[0]
+                ? selectedCameraDevice || this.cameraDevicesInfo[0]
                 : undefined;
-            const audio = newAudioOn
-                ? this.props.selectedAudioDevice || this.audioDevicesInfo[0]
-                : undefined;
-            this.props.onSettingsChanged(this.state.screenOn, camera, audio);
+            const audio = newAudioOn ? selectedAudioDevice || this.audioDevicesInfo[0] : undefined;
+            onSettingsChanged(this.state.screenOn, camera, audio);
         }
     };
 
