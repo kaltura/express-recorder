@@ -489,7 +489,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             if (screenOn && screenOn !== shareScreenOn) {
                 navigator.mediaDevices
                     // @ts-ignore
-                    .getDisplayMedia({ audio: true, video: true })
+                    .getDisplayMedia({ video: true })
                     .then((screenStream: MediaStream) => {
                         this.setState({ screenStream: screenStream });
                     })
@@ -685,8 +685,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             <div className={`express-recorder ${styles["express-recorder"]}`}>
                 <Recorder
                     video={constraints.video !== false}
-                    stream={stream || new MediaStream()}
-                    screenStream={screenStream || new MediaStream()}
+                    stream={stream}
+                    screenStream={screenStream}
                     onRecordingEnd={this.handleRecordingEnd}
                     doRecording={doRecording}
                     discard={doCountdown}
