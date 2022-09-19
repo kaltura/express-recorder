@@ -17,11 +17,11 @@ type Props = {
     allowAudio: boolean;
     screenShareOn: boolean;
     allowScreenShare: boolean;
-    stream?: MediaStream | undefined;
+    stream?: MediaStream;
     onStartRecording: () => void;
 };
 type State = {
-    showSettingsOf: false | ResourceTypes;
+    showSettingsOf?: ResourceTypes;
     cameraOn: boolean;
     audioOn: boolean;
     screenOn: boolean;
@@ -45,7 +45,6 @@ export class Settings extends Component<Props, State> {
         super(props);
 
         this.state = {
-            showSettingsOf: false,
             cameraOn: props.allowVideo,
             audioOn: props.allowAudio,
             screenOn: props.screenShareOn
@@ -108,7 +107,7 @@ export class Settings extends Component<Props, State> {
         document.removeEventListener("click", this.handleExternalClick, true);
 
         this.setState({
-            showSettingsOf: false
+            showSettingsOf: undefined
         });
     };
 
@@ -181,7 +180,7 @@ export class Settings extends Component<Props, State> {
         const { showSettingsOf } = this.state;
 
         if (showSettingsOf === clickedResource) {
-            this.setState({ showSettingsOf: false });
+            this.setState({ showSettingsOf: undefined });
             return;
         }
         this.setState({ showSettingsOf: clickedResource });
