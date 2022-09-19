@@ -141,7 +141,7 @@ export class SettingsDevices extends Component<Props, State> {
                     disabled={disabled}
                     onKeyPress={this.handleToggleClick}
                 />
-                {resourcesList.length > 0 && <hr className={styles["settings-line"]} />}
+                {resourcesList.length > 0 ? <hr className={styles["settings-line"]} /> : null}
                 <div
                     className={styles["devices-list"]}
                     aria-live="polite"
