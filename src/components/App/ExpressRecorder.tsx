@@ -431,9 +431,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         }
     };
     handleSettingsChange = (
-        selectedCamera: MediaDeviceInfo | false,
-        selectedAudio: MediaDeviceInfo | false,
-        screenOn: boolean
+        screenOn: boolean,
+        selectedCamera?: MediaDeviceInfo,
+        selectedAudio?: MediaDeviceInfo
     ) => {
         // check if something has been changed
         const { constraints, shareScreenOn } = this.state;
@@ -725,7 +725,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                               kind: "videoinput",
                                               label: stream.getVideoTracks()[0].label
                                           } as MediaDeviceInfo)
-                                        : false
+                                        : undefined
                                 }
                                 selectedAudioDevice={
                                     stream && stream.getAudioTracks().length > 0
@@ -733,7 +733,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                               kind: "audioinput",
                                               label: stream.getAudioTracks()[0].label
                                           } as MediaDeviceInfo)
-                                        : false
+                                        : undefined
                                 }
                                 allowVideo={allowVideo}
                                 allowAudio={allowAudio}

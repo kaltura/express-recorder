@@ -7,12 +7,12 @@ import { VideoIcon, AudioIcon, ScreenIcon, NoAudioIcon, NoScreenIcon, NoVideoIco
 const styles = require("./style.scss");
 type Props = {
     onSettingsChanged?: (
-        selectedCamera: MediaDeviceInfo | false,
-        selectedAudio: MediaDeviceInfo | false,
-        screenOn: boolean
+        screenOn: boolean,
+        selectedCamera?: MediaDeviceInfo,
+        selectedAudio?: MediaDeviceInfo
     ) => void;
-    selectedCameraDevice: MediaDeviceInfo | false;
-    selectedAudioDevice: MediaDeviceInfo | false;
+    selectedCameraDevice?: MediaDeviceInfo;
+    selectedAudioDevice?: MediaDeviceInfo;
     allowVideo: boolean;
     allowAudio: boolean;
     screenShareOn: boolean;
@@ -138,19 +138,19 @@ export class Settings extends Component<Props, State> {
         if (this.props.onSettingsChanged) {
             const camera = newCameraOn
                 ? this.props.selectedCameraDevice || this.cameraDevicesInfo[0]
-                : false;
+                : undefined;
             const audio = newAudioOn
                 ? this.props.selectedAudioDevice || this.audioDevicesInfo[0]
-                : false;
-            this.props.onSettingsChanged(camera, audio, this.state.screenOn);
+                : undefined;
+            this.props.onSettingsChanged(this.state.screenOn, camera, audio);
         }
     };
 
     handleChooseDevice = (device: MediaDeviceInfo) => {
         if (this.props.onSettingsChanged) {
-            const camera = device.kind === "videoinput" && this.state.cameraOn ? device : false;
-            const audio = device.kind === "audioinput" && this.state.audioOn ? device : false;
-            this.props.onSettingsChanged(camera, audio, this.state.screenOn);
+            const camera = device.kind === "videoinput" && this.state.cameraOn ? device : undefined;
+            const audio = device.kind === "audioinput" && this.state.audioOn ? device : undefined;
+            this.props.onSettingsChanged(this.state.screenOn, camera, audio);
         }
     };
 
@@ -208,7 +208,6 @@ export class Settings extends Component<Props, State> {
                     devices={[]}
                     isOn={screenOn}
                     disabled={false} // can only turn off if both are available, so we won't end up with none
-                    selected={false}
                     onChooseDevice={this.handleChooseDevice}
                     onToggleChange={(isOn: boolean) => {
                         this.handleToggleChange(isOn, ResourceTypes.SCREEN_SHARE);

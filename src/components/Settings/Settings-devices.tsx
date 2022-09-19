@@ -11,7 +11,7 @@ type Props = {
     onChooseDevice: (device: MediaDeviceInfo) => void;
     isOn: boolean;
     disabled?: boolean;
-    selected: MediaDeviceInfo | false;
+    selected?: MediaDeviceInfo;
     onToggleChange: (isOn: boolean) => void;
 };
 
