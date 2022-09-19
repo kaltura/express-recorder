@@ -110,12 +110,12 @@ export class SettingsDevices extends Component<Props, State> {
                     tabIndex={0}
                 >
                     <span className={styles["device-label"]}>{item.label}</span>
-                    {isSelected && (
+                    {isSelected ? (
                         <span className={styles["sr-only"]}>
                             {translator.translate("currently selected")}
                         </span>
-                    )}
-                    {isSelected && (
+                    ) : null}
+                    {isSelected ? (
                         <span
                             className={
                                 "device-label__selected-icon " +
@@ -124,7 +124,7 @@ export class SettingsDevices extends Component<Props, State> {
                         >
                             <CheckIcon />
                         </span>
-                    )}
+                    ) : null}
                     <div className={"device-label__popup " + styles["device-label__popup"]}>
                         {item.label}
                     </div>
