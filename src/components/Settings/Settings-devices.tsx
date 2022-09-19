@@ -27,10 +27,6 @@ export class SettingsDevices extends Component<Props, State> {
 
     menuRef: HTMLElement | undefined;
 
-    constructor(props: Props) {
-        super(props);
-    }
-
     componentDidMount() {
         this.removeRedundantPopups();
         if (this.menuRef && this.menuRef.children[0]) {
