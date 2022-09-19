@@ -625,8 +625,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             serviceUrl,
             maxRecordingTime,
             showUploadUI,
-            allowVideo,
-            allowAudio,
+            allowVideo = true,
+            allowAudio = true,
             allowScreenShare = false
         } = props;
         const {
@@ -735,8 +735,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                           } as MediaDeviceInfo)
                                         : false
                                 }
-                                allowVideo={allowVideo!}
-                                allowAudio={allowAudio!}
+                                allowVideo={allowVideo}
+                                allowAudio={allowAudio}
                                 allowScreenShare={allowScreenShare}
                                 onSettingsChanged={this.handleSettingsChange}
                                 stream={stream}
