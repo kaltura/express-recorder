@@ -1,4 +1,10 @@
-.player-wrap {
+.player-wrap,
+.player-wrap-screen {
+    height: 100%;
+    width: 100%;
+}
+.players-wrap {
+    display: flex;
     height: 100%;
     width: 100%;
 }

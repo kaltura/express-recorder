@@ -1,9 +1,11 @@
 import { Component, h } from "preact";
 const styles = require("./style.scss");
 declare var KalturaPlayer: any;
+import "./player.css";
 
 type Props = {
-    media: { blob: Blob; mimeType: string }; // the actual recorded media
+    media: PlaybackMedia; // the actual recorded media
+    screenMedia?: PlaybackMedia; // the actual recorded media
     partnerId: number;
     uiconfId: number; // must be v3
     autoPlay?: boolean;
@@ -12,6 +14,8 @@ type Props = {
 
 type State = {};
 let uniqueId: number = 0;
+
+type PlaybackMedia = { blob: Blob; mimeType: string };
 
 /**
  * Component to play the recorded media, uses v3 player.
@@ -22,6 +26,7 @@ export class Playback extends Component<Props, State> {
         pictureInPicture: false
     };
     kalturaPlayer: any;
+    kalturaPlayerScreen: any;
 
     componentDidMount(): void {
         this.embedPlayer();
@@ -29,16 +34,19 @@ export class Playback extends Component<Props, State> {
     }
 
     componentDidUpdate(previousProps: Props, previousState: State, previousContext: any): void {
-        const { media } = this.props;
+        const { media, screenMedia } = this.props;
         if (previousProps.media !== media) {
             // play the new media
-            this.setMedia(media);
+            this.setMedia(media, this.kalturaPlayer);
+        }
+        if (screenMedia && previousProps.screenMedia !== screenMedia) {
+            this.setMedia(screenMedia, this.kalturaPlayerScreen);
         }
     }
 
-    setMedia(media: { blob: Blob; mimeType: string }) {
+    setMedia(media: PlaybackMedia, kalturaPlayer: any) {
         const { autoPlay, pictureInPicture } = this.props;
-        this.kalturaPlayer.setMedia({
+        kalturaPlayer.setMedia({
             sources: {
                 dvr: true,
                 progressive: [
@@ -47,7 +55,7 @@ export class Playback extends Component<Props, State> {
                         mimetype: media.mimeType
                     }
                 ],
-                type: this.kalturaPlayer.MediaType.VOD
+                type: kalturaPlayer.MediaType.VOD
             },
             plugins: {},
             playback: {
@@ -57,28 +65,61 @@ export class Playback extends Component<Props, State> {
         });
     }
 
-    embedPlayer() {
-        const { media, partnerId, uiconfId } = this.props;
+    async embedPlayer() {
+        const { partnerId, uiconfId, media, screenMedia } = this.props;
         try {
             this.kalturaPlayer = KalturaPlayer.setup({
-                targetId: "player-wrap_" + uniqueId,
+                targetId: "player-wrap__" + uniqueId,
                 provider: {
                     partnerId: partnerId,
                     uiConfId: uiconfId
                 }
             });
-            this.setMedia(media);
+            if (screenMedia) {
+                this.kalturaPlayerScreen = KalturaPlayer.setup({
+                    targetId: "player-wrap-screen__" + uniqueId,
+                    provider: {
+                        partnerId: partnerId,
+                        uiConfId: uiconfId
+                    }
+                });
+                this.setMedia(screenMedia, this.kalturaPlayerScreen);
+
+                this.kalturaPlayer.addEventListener("play", () => this.kalturaPlayerScreen.play());
+                this.kalturaPlayer.addEventListener("pause", () =>
+                    this.kalturaPlayerScreen.pause()
+                );
+                KalturaPlayer.getPlayers()["player-wrap__" + uniqueId].addEventListener(
+                    "seeking",
+                    () => {
+                        this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
+                    }
+                );
+            }
+            this.setMedia(media, this.kalturaPlayer);
         } catch (e) {
             console.error(e.message);
         }
     }
 
     render() {
+        const { screenMedia } = this.props;
+
         return (
-            <div
-                id={"player-wrap_" + uniqueId}
-                className={`xr_player-wrap ${styles["player-wrap"]}`}
-            />
+            <div className={`players-wrap ${styles["players-wrap"]}`}>
+                <div
+                    id={"player-wrap__" + uniqueId}
+                    className={`xr_player-wrap ${styles["player-wrap"]} ${
+                        screenMedia ? "player-wrap__main_controls" : ""
+                    }`}
+                />
+                {screenMedia ? (
+                    <div
+                        id={"player-wrap-screen__" + uniqueId}
+                        className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]}`}
+                    />
+                ) : null}
+            </div>
         );
     }
 }

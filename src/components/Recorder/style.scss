@@ -32,6 +32,22 @@
 .audio-indicator {
     float: right;
     position: relative;
-    margin-top: 4px;
+    margin-top: 8px;
     margin-left: 10px;
+}
+.express-recorder__recorder__share-screen {
+    height: auto;
+    width: 30%;
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 10;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+.express-recorder__screen {
+    position: absolute;
+    left: 0;
+    height: inherit;
+    width: inherit;
 }

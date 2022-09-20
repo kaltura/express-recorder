@@ -1,0 +1,20 @@
+.player-wrap__main_controls .playkit-bottom-bar.playkit-bottom-bar,
+.player-wrap__main_controls .playkit-pre-playback-play-overlay.playkit-pre-playback-play-overlay {
+    width: 200%;
+}
+.player-wrap__main_controls .playkit-center-playback-controls {
+    left: 100%;
+}
+.player-wrap__main_controls .playkit-bottom-bar {
+    top: -65px;
+}
+.player-wrap-screen
+    .playkit-playback-controls.playkit-playback-controls.playkit-playback-controls.playkit-playback-controls.playkit-playback-controls,
+.player-wrap-screen .playkit-bottom-bar.playkit-bottom-bar.playkit-bottom-bar,
+.player-wrap-screen .playkit-pre-playback-play-button {
+    display: none;
+}
+
+.player-wrap__main_controls .playkit-player.playkit-player {
+    overflow: visible;
+}
