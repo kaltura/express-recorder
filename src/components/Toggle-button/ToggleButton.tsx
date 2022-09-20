@@ -12,9 +12,7 @@ type Props = {
     onKeyPress?: () => void;
 };
 
-type State = {
-    isToggleOn: boolean;
-};
+type State = {};
 
 /**
  * show toggle button. used in settings box to turn on/off resource
@@ -27,18 +25,12 @@ export class ToggleButton extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = {
-            isToggleOn: props.isToggleOn
-        };
-
         this.handleClick = this.handleClick.bind(this);
     }
     handleClick = () => {
-        const { isToggleOn } = this.state;
         if (this.props.onClick) {
-            this.props.onClick(!isToggleOn);
+            this.props.onClick(!this.props.isToggleOn);
         }
-        this.setState({ isToggleOn: !isToggleOn });
     };
 
     handleKeyPress = (e: KeyboardEvent) => {
@@ -52,8 +44,7 @@ export class ToggleButton extends Component<Props, State> {
     };
 
     render(props: Props) {
-        const { text, id, name, screenReaderText, disabled } = props;
-        const { isToggleOn } = this.state;
+        const { text, id, name, screenReaderText, disabled, isToggleOn } = props;
 
         let sName = name;
         if (!sName) {

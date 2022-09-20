@@ -1,6 +1,7 @@
 import { Component, h } from "preact";
 import { ToggleButton } from "../Toggle-button/ToggleButton";
 import { Translator } from "../Translator/Translator";
+import CheckIcon from "./assets/check.svg";
 
 const styles = require("./style.scss");
 
@@ -10,15 +11,11 @@ type Props = {
     onChooseDevice: (device: MediaDeviceInfo) => void;
     isOn: boolean;
     disabled?: boolean;
-    selected: MediaDeviceInfo | false;
-    onBack: () => void;
+    selected?: MediaDeviceInfo;
     onToggleChange: (isOn: boolean) => void;
 };
 
-type State = {
-    isOn: boolean;
-    selectedDevice?: MediaDeviceInfo;
-};
+type State = {};
 
 /**
  * Component to display devices for one resource (camera / audio)
@@ -29,15 +26,6 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     menuRef: HTMLElement | undefined;
-
-    constructor(props: Props) {
-        super(props);
-
-        this.state = {
-            isOn: props.isOn,
-            selectedDevice: props.selected ? props.selected : undefined
-        };
-    }
 
     componentDidMount() {
         this.removeRedundantPopups();
@@ -60,10 +48,7 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     handleItemClick = (item: MediaDeviceInfo) => {
-        this.setState({ selectedDevice: item }, () => {
-            this.props.onChooseDevice(item);
-            this.handleBack();
-        });
+        this.props.onChooseDevice(item);
     };
 
     handleItemPress = (e: KeyboardEvent, item: MediaDeviceInfo) => {
@@ -73,26 +58,8 @@ export class SettingsDevices extends Component<Props, State> {
         this.handleKeyboardInput(e);
     };
 
-    handleToggleClick = (isOn: boolean) => {
-        this.setState({ isOn: isOn }, () => {
-            if (this.props.onToggleChange) {
-                this.props.onToggleChange(isOn);
-            }
-        });
-    };
-
-    handleBack = () => {
-        this.props.onBack();
-    };
-
-    handleBackIconKeyPressed = (e: KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === " ") {
-            this.handleBack();
-        }
-    };
-
-    handleKeyPress = () => {
-        this.handleToggleClick(this.state.isOn);
+    handleToggleClick = () => {
+        this.props.onToggleChange(!this.props.isOn);
     };
 
     handleKeyboardInput = (e: KeyboardEvent) => {
@@ -114,14 +81,13 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     render() {
-        const { resourceName, devices, disabled } = this.props;
-        const { isOn, selectedDevice } = this.state;
+        const { resourceName, devices, disabled, isOn, selected } = this.props;
         const translator = Translator.getTranslator();
 
         const resourcesList = devices.map((item: MediaDeviceInfo, index: number) => {
             let selectedClass = "";
             let isSelected = false;
-            if (isOn && selectedDevice && item.label === selectedDevice.label) {
+            if (isOn && selected && item.label === selected.label) {
                 selectedClass = styles["selected-device"];
                 isSelected = true;
             }
@@ -139,12 +105,22 @@ export class SettingsDevices extends Component<Props, State> {
                     }
                     tabIndex={0}
                 >
-                    <span>{item.label}</span>
-                    {isSelected && (
+                    <span className={styles["device-label"]}>{item.label}</span>
+                    {isSelected ? (
                         <span className={styles["sr-only"]}>
                             {translator.translate("currently selected")}
                         </span>
-                    )}
+                    ) : null}
+                    {isSelected ? (
+                        <span
+                            className={
+                                "device-label__selected-icon " +
+                                styles["device-label__selected-icon"]
+                            }
+                        >
+                            <CheckIcon />
+                        </span>
+                    ) : null}
                     <div className={"device-label__popup " + styles["device-label__popup"]}>
                         {item.label}
                     </div>
@@ -152,26 +128,16 @@ export class SettingsDevices extends Component<Props, State> {
             );
         });
         return (
-            <div>
-                <a
-                    aria-label={translator.translate("Back to Settings")}
-                    onClick={this.handleBack}
-                    onKeyPress={this.handleBackIconKeyPressed}
-                    className={styles["settings-arrow-wrap"]}
-                    tabIndex={0}
-                    role="link"
-                >
-                    <i className={styles["arrow-left"]} />
-                </a>
+            <div className={`device-settings-wrap ${styles["device-settings-wrap"]}`}>
                 <ToggleButton
                     id={resourceName}
                     text={translator.translate(resourceName)}
                     onClick={this.handleToggleClick}
                     isToggleOn={isOn}
                     disabled={disabled}
-                    onKeyPress={this.handleKeyPress}
+                    onKeyPress={this.handleToggleClick}
                 />
-                <hr className={styles["settings-line"]} />
+                {resourcesList.length > 0 ? <hr className={styles["settings-line"]} /> : null}
                 <div
                     className={styles["devices-list"]}
                     aria-live="polite"

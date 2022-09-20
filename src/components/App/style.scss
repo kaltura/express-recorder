@@ -7,22 +7,9 @@
     font-family: Helvetica;
     background-color: black;
 }
-.controls__start {
-    height: 72px;
-    width: 72px;
-    border-radius: 50%;
-    border: none;
-    background-image: linear-gradient(-180deg,#ef424e,#db1f26);
-    box-shadow: 0 0 1rem 0 rgba(0,0,0,.5);
-    cursor: pointer;
-
-    &:hover {
-        background-image: linear-gradient(-180deg,#ed2a38,#c51c22);
-    }
-}
 .express-recorder__controls {
     position: relative;
-    margin-top: -100px;
+    margin-top: -79px;
 }
 .express-recorder__save {
     margin-top: 55px;
@@ -49,7 +36,7 @@
     width: 130px;
     border-radius: 3px;
     position: relative;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     outline: none;
     cursor: pointer;
@@ -58,8 +45,8 @@
     background-color: #008297;
     border: 1px solid #ccc;
     color: white;
-    width:auto;
-    height:auto;
+    width: auto;
+    height: auto;
     min-width: 130px;
     min-height: 36px;
 }
@@ -68,16 +55,16 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #ffffff;
     margin-right: 24px;
-    width:auto;
-    height:auto;
+    width: auto;
+    height: auto;
     min-width: 130px;
     min-height: 36px;
 }
 .btn__download {
     min-width: 160px;
     min-height: 36px;
-    width:auto;
-    height:auto;
+    width: auto;
+    height: auto;
 }
 .progress-bar-wrap {
     margin-top: 130px;
@@ -86,9 +73,6 @@
 .settings-wrap {
     position: relative;
     display: inline-block;
-    float: right;
-    margin-right: 56px;
-    top: 16px;
-    color: #FFFFFF;
+    color: #111111;
     z-index: 9;
 }
