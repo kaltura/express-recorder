@@ -4,7 +4,7 @@ declare var KalturaPlayer: any;
 import "./player.css";
 
 type Props = {
-    media?: PlaybackMedia; // the actual recorded media
+    cameraMedia?: PlaybackMedia; // the actual recorded media
     screenMedia?: PlaybackMedia; // the actual recorded media
     partnerId: number;
     uiconfId: number; // must be v3
@@ -34,10 +34,10 @@ export class Playback extends Component<Props, State> {
     }
 
     componentDidUpdate(previousProps: Props, previousState: State, previousContext: any): void {
-        const { media, screenMedia } = this.props;
-        if (media && previousProps.media !== media) {
+        const { cameraMedia, screenMedia } = this.props;
+        if (cameraMedia && previousProps.cameraMedia !== cameraMedia) {
             // play the new media
-            this.setMedia(media, this.kalturaPlayer);
+            this.setMedia(cameraMedia, this.kalturaPlayer);
         }
         if (screenMedia && previousProps.screenMedia !== screenMedia) {
             this.setMedia(screenMedia, this.kalturaPlayerScreen);
@@ -66,9 +66,9 @@ export class Playback extends Component<Props, State> {
     }
 
     async embedPlayer() {
-        const { partnerId, uiconfId, media, screenMedia } = this.props;
+        const { partnerId, uiconfId, cameraMedia, screenMedia } = this.props;
         try {
-            if (media) {
+            if (cameraMedia) {
                 this.kalturaPlayer = KalturaPlayer.setup({
                     targetId: "player-wrap__" + uniqueId,
                     provider: {
@@ -76,7 +76,7 @@ export class Playback extends Component<Props, State> {
                         uiConfId: uiconfId
                     }
                 });
-                this.setMedia(media, this.kalturaPlayer);
+                this.setMedia(cameraMedia, this.kalturaPlayer);
             }
             if (screenMedia) {
                 this.kalturaPlayerScreen = KalturaPlayer.setup({
@@ -87,7 +87,7 @@ export class Playback extends Component<Props, State> {
                     }
                 });
                 this.setMedia(screenMedia, this.kalturaPlayerScreen);
-                if (media) {
+                if (cameraMedia) {
                     this.kalturaPlayer.addEventListener("play", () =>
                         this.kalturaPlayerScreen.play()
                     );
@@ -109,10 +109,10 @@ export class Playback extends Component<Props, State> {
     }
 
     render() {
-        const { screenMedia, media } = this.props;
+        const { screenMedia, cameraMedia } = this.props;
         return (
             <div className={`players-wrap ${styles["players-wrap"]}`}>
-                {media && (
+                {cameraMedia && (
                     <div
                         id={"player-wrap__" + uniqueId}
                         className={`xr_player-wrap ${styles["player-wrap"]} ${
@@ -124,7 +124,7 @@ export class Playback extends Component<Props, State> {
                     <div
                         id={"player-wrap-screen__" + uniqueId}
                         className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]} ${
-                            media ? "player-wrap-screen__with-video" : ""
+                            cameraMedia ? "player-wrap-screen__with-video" : ""
                         }`}
                     />
                 ) : null}

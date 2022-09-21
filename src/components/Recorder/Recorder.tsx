@@ -198,7 +198,7 @@ export class Recorder extends Component<Props, State> {
                     <Playback
                         partnerId={partnerId}
                         uiconfId={uiConfId}
-                        media={media}
+                        cameraMedia={media}
                         screenMedia={screenMedia}
                         autoPlay={false}
                     />
