@@ -803,21 +803,18 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             <button
                                 className={`xr_btn xr_btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
                                 onClick={this.saveFile}
-                                tabIndex={0}
                             >
                                 {this.translator.translate("Download a Copy")}
                             </button>
                             <button
                                 className={`xr_btn xr_btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
                                 onClick={this.recordAgain}
-                                tabIndex={0}
                             >
                                 {this.translator.translate("Record Again")}
                             </button>
                             <button
                                 className={`xr_btn xr_btn-primary xr_btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
                                 onClick={this.initiateUpload}
-                                tabIndex={0}
                             >
                                 {this.translator.translate("Use This")}
                             </button>
