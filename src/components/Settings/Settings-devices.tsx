@@ -29,10 +29,20 @@ export class SettingsDevices extends Component<Props, State> {
 
     componentDidMount() {
         this.removeRedundantPopups();
-        if (this.menuRef && this.menuRef.children[0]) {
-            (this.menuRef.children[0] as HTMLElement).focus();
-        }
+        this.focusOnToggle();
     }
+    componentDidUpdate() {
+        this.focusOnToggle();
+    }
+
+    focusOnToggle = () => {
+        if (this.menuRef && this.menuRef.children[0]) {
+            const toggleElement = (this.menuRef.children[0] as HTMLElement).getElementsByTagName(
+                "input"
+            );
+            toggleElement.length > 0 && toggleElement[0].focus();
+        }
+    };
 
     removeRedundantPopups = () => {
         const popups = Array.from(document.querySelectorAll(".device-label"));
@@ -105,6 +115,7 @@ export class SettingsDevices extends Component<Props, State> {
                     }
                     tabIndex={0}
                 >
+                    <span className={styles["sr-only"]}>{resourceName}</span>
                     <span className={styles["device-label"]}>{item.label}</span>
                     {isSelected ? (
                         <span className={styles["sr-only"]}>
@@ -128,7 +139,10 @@ export class SettingsDevices extends Component<Props, State> {
             );
         });
         return (
-            <div className={`device-settings-wrap ${styles["device-settings-wrap"]}`}>
+            <div
+                className={`device-settings-wrap ${styles["device-settings-wrap"]}`}
+                ref={node => (this.menuRef = node)}
+            >
                 <ToggleButton
                     id={resourceName}
                     text={translator.translate(resourceName)}
@@ -138,11 +152,7 @@ export class SettingsDevices extends Component<Props, State> {
                     onKeyPress={this.handleToggleClick}
                 />
                 {resourcesList.length > 0 ? <hr className={styles["settings-line"]} /> : null}
-                <div
-                    className={styles["devices-list"]}
-                    aria-live="polite"
-                    ref={node => (this.menuRef = node)}
-                >
+                <div className={styles["devices-list"]} aria-live="polite">
                     {resourcesList}
                 </div>
             </div>
