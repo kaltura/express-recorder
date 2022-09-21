@@ -4,7 +4,7 @@ declare var KalturaPlayer: any;
 import "./player.css";
 
 type Props = {
-    media: PlaybackMedia; // the actual recorded media
+    media?: PlaybackMedia; // the actual recorded media
     screenMedia?: PlaybackMedia; // the actual recorded media
     partnerId: number;
     uiconfId: number; // must be v3
@@ -35,7 +35,7 @@ export class Playback extends Component<Props, State> {
 
     componentDidUpdate(previousProps: Props, previousState: State, previousContext: any): void {
         const { media, screenMedia } = this.props;
-        if (previousProps.media !== media) {
+        if (media && previousProps.media !== media) {
             // play the new media
             this.setMedia(media, this.kalturaPlayer);
         }
@@ -68,13 +68,16 @@ export class Playback extends Component<Props, State> {
     async embedPlayer() {
         const { partnerId, uiconfId, media, screenMedia } = this.props;
         try {
-            this.kalturaPlayer = KalturaPlayer.setup({
-                targetId: "player-wrap__" + uniqueId,
-                provider: {
-                    partnerId: partnerId,
-                    uiConfId: uiconfId
-                }
-            });
+            if (media) {
+                this.kalturaPlayer = KalturaPlayer.setup({
+                    targetId: "player-wrap__" + uniqueId,
+                    provider: {
+                        partnerId: partnerId,
+                        uiConfId: uiconfId
+                    }
+                });
+                this.setMedia(media, this.kalturaPlayer);
+            }
             if (screenMedia) {
                 this.kalturaPlayerScreen = KalturaPlayer.setup({
                     targetId: "player-wrap-screen__" + uniqueId,
@@ -84,39 +87,46 @@ export class Playback extends Component<Props, State> {
                     }
                 });
                 this.setMedia(screenMedia, this.kalturaPlayerScreen);
+                if (media) {
+                    this.kalturaPlayer.addEventListener("play", () =>
+                        this.kalturaPlayerScreen.play()
+                    );
+                    this.kalturaPlayer.addEventListener("pause", () =>
+                        this.kalturaPlayerScreen.pause()
+                    );
 
-                this.kalturaPlayer.addEventListener("play", () => this.kalturaPlayerScreen.play());
-                this.kalturaPlayer.addEventListener("pause", () =>
-                    this.kalturaPlayerScreen.pause()
-                );
-                KalturaPlayer.getPlayers()["player-wrap__" + uniqueId].addEventListener(
-                    "seeking",
-                    () => {
-                        this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
-                    }
-                );
+                    KalturaPlayer.getPlayers()["player-wrap__" + uniqueId].addEventListener(
+                        "seeking",
+                        () => {
+                            this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
+                        }
+                    );
+                }
             }
-            this.setMedia(media, this.kalturaPlayer);
         } catch (e) {
             console.error(e.message);
         }
     }
 
     render() {
-        const { screenMedia } = this.props;
-
+        const { screenMedia, media } = this.props;
+        console.log("in playeback");
         return (
             <div className={`players-wrap ${styles["players-wrap"]}`}>
-                <div
-                    id={"player-wrap__" + uniqueId}
-                    className={`xr_player-wrap ${styles["player-wrap"]} ${
-                        screenMedia ? "player-wrap__main_controls" : ""
-                    }`}
-                />
+                {media && (
+                    <div
+                        id={"player-wrap__" + uniqueId}
+                        className={`xr_player-wrap ${styles["player-wrap"]} ${
+                            screenMedia ? "player-wrap__main_controls" : ""
+                        }`}
+                    />
+                )}
                 {screenMedia ? (
                     <div
                         id={"player-wrap-screen__" + uniqueId}
-                        className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]}`}
+                        className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]} ${
+                            media ? "player-wrap-screen__with-video" : ""
+                        }`}
                     />
                 ) : null}
             </div>
