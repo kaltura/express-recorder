@@ -4,8 +4,8 @@ declare var KalturaPlayer: any;
 import "./player.css";
 
 type Props = {
-    cameraMedia?: PlaybackMedia; // the actual recorded media
-    screenMedia?: PlaybackMedia; // the actual recorded media
+    cameraMedia?: PlaybackMedia; // the actual recorded camera
+    screenMedia?: PlaybackMedia; // the actual recorded screen
     partnerId: number;
     uiconfId: number; // must be v3
     autoPlay?: boolean;
