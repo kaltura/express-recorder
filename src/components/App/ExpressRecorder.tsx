@@ -686,6 +686,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
         }
+        const showController =
+            showUploadUI && !doRecording && (recordedBlobs.length || screenRecordedBlobs.length);
 
         if (error !== "") {
             return (
@@ -796,10 +798,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             {this.translator.translate("Cancel")}
                         </button>
                     )}
-                    {showUploadUI &&
-                    !doRecording &&
-                    (recordedBlobs.length || screenRecordedBlobs.length) &&
-                    !this.uploadedOnce ? (
+                    {showController && !this.uploadedOnce ? (
                         <div className={`${styles["express-recorder__bottom"]}`}>
                             <button
                                 className={`xr_btn xr_btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
