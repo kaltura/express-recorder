@@ -34,10 +34,10 @@ export class AudioIndicator extends Component<Props, State> {
 
     componentDidMount() {
         const { audioOn, stream } = this.props;
-        const { foundAudioSignal } = this.state;
         if (!audioOn || !stream) {
             return;
         }
+        const { foundAudioSignal } = this.state;
 
         // create audio analyser
         let analyser = this.audioContext.createAnalyser();
