@@ -162,13 +162,17 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      */
     upload = () => {
         const { doRecording, recordedBlobs, screenRecordedBlobs } = this.state;
-        if (
-            !doRecording &&
-            (recordedBlobs.length || screenRecordedBlobs.length) &&
-            !this.uploadedOnce
-        ) {
-            this.initiateUpload();
+        if (doRecording) {
+            return;
         }
+        if (!recordedBlobs.length && !screenRecordedBlobs.length) {
+            return;
+        }
+        if (this.uploadedOnce) {
+            return;
+        }
+
+        this.initiateUpload();
     };
 
     /**
