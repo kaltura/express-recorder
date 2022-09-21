@@ -496,7 +496,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         return new MediaStream([audio.getTracks()[0], stream.getTracks()[0]]);
     };
     createStream = (constraints: MediaStreamConstraints, screenOn: boolean) => {
-        const { shareScreenOn } = this.state;
         this.modifyConstraints(constraints).then(finalConstraints => {
             if (!finalConstraints.video && !finalConstraints.audio) {
                 this.setState({
@@ -506,37 +505,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 });
                 return;
             }
-            if (screenOn && (screenOn !== shareScreenOn || !finalConstraints.video)) {
-                if (!finalConstraints.video && finalConstraints.audio) {
-                    this.getScreenshareWithMicrophone()
-                        .then((stream: MediaStream) => {
-                            this.setState({
-                                screenStream: stream,
-                                constraints: finalConstraints,
-                                shareScreenOn: screenOn,
-                                stream: undefined
-                            });
-                        })
-                        .catch((e: any) =>
-                            this.handleError("Failed to allocate resource: " + e.message)
-                        );
-                } else {
-                    navigator.mediaDevices
-                        // @ts-ignore
-                        .getDisplayMedia({ video: true })
-                        .then((screenStream: MediaStream) => {
-                            this.setState({
-                                screenStream: screenStream,
-                                constraints: finalConstraints,
-                                shareScreenOn: screenOn,
-                                stream: undefined
-                            });
-                        })
-                        .catch((e: any) =>
-                            this.handleError("Failed to allocate resource: " + e.message)
-                        );
-                }
-            }
+
             if (finalConstraints.video) {
                 navigator.mediaDevices
                     .getUserMedia(finalConstraints)
@@ -549,7 +518,45 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     })
                     .catch(e => this.handleError("Failed to allocate resource: " + e.message));
             }
+            this.createScreenStream(screenOn, finalConstraints);
         });
+    };
+
+    createScreenStream = (screenOn: boolean, finalConstraints: MediaStreamConstraints) => {
+        const { shareScreenOn } = this.state;
+        if (!screenOn) {
+            return;
+        }
+        if (screenOn === shareScreenOn && finalConstraints.video) {
+            return;
+        }
+
+        if (!finalConstraints.video && finalConstraints.audio) {
+            this.getScreenshareWithMicrophone()
+                .then((stream: MediaStream) => {
+                    this.setState({
+                        screenStream: stream,
+                        constraints: finalConstraints,
+                        shareScreenOn: screenOn,
+                        stream: undefined
+                    });
+                })
+                .catch((e: any) => this.handleError("Failed to allocate resource: " + e.message));
+            return;
+        }
+
+        navigator.mediaDevices
+            // @ts-ignore
+            .getDisplayMedia({ video: true })
+            .then((screenStream: MediaStream) => {
+                this.setState({
+                    screenStream: screenStream,
+                    constraints: finalConstraints,
+                    shareScreenOn: screenOn,
+                    stream: undefined
+                });
+            })
+            .catch((e: any) => this.handleError("Failed to allocate resource: " + e.message));
     };
 
     setBeforeunload = (addMessage: boolean = false) => {
