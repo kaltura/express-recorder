@@ -693,6 +693,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         const showController =
             showUploadUI && !doRecording && (recordedBlobs.length || screenRecordedBlobs.length);
 
+        const uploadManagerProps = {
+            mediaType:
+                constraints.video || shareScreenOn
+                    ? KalturaMediaType.video
+                    : KalturaMediaType.audio,
+            recordedBlobs: recordedBlobs.length ? recordedBlobs : screenRecordedBlobs,
+            childRecordedBlobs: recordedBlobs.length ? screenRecordedBlobs : undefined
+        };
+
         if (error !== "") {
             return (
                 <div className={`express-recorder ${styles["express-recorder"]}`}>
@@ -710,19 +719,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         onUploadEnded={this.handleUploadEnded}
                         onUploadCancelled={this.handleUploadCancelled}
                         onUploadProgress={this.handleUploadProgress}
-                        mediaType={
-                            constraints.video || shareScreenOn
-                                ? KalturaMediaType.video
-                                : KalturaMediaType.audio
-                        }
-                        recordedBlobs={recordedBlobs.length ? recordedBlobs : screenRecordedBlobs}
-                        childRecordedBlobs={recordedBlobs.length ? screenRecordedBlobs : undefined}
                         entryName={entryName ? entryName : this.getDefaultEntryName()}
                         serviceUrl={serviceUrl}
                         ks={ks}
                         abortUpload={abortUpload}
                         showUploadUI={showUploadUI}
                         onCancel={this.cancelUpload}
+                        {...uploadManagerProps}
                     />
                 </div>
             );
