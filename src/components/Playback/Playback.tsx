@@ -110,7 +110,6 @@ export class Playback extends Component<Props, State> {
 
     render() {
         const { screenMedia, media } = this.props;
-        console.log("in playeback");
         return (
             <div className={`players-wrap ${styles["players-wrap"]}`}>
                 {media && (
