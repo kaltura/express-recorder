@@ -2,7 +2,7 @@ import { Component, h } from "preact";
 import { AudioWave } from "./AudioWave";
 
 type Props = {
-    stream: MediaStream;
+    stream?: MediaStream;
     audioOn?: boolean;
 };
 
@@ -33,15 +33,17 @@ export class AudioIndicator extends Component<Props, State> {
     }
 
     componentDidMount() {
-        if (!this.props.audioOn) {
+        const { audioOn, stream } = this.props;
+        if (!audioOn || !stream) {
             return;
         }
+        const { foundAudioSignal } = this.state;
 
         // create audio analyser
         let analyser = this.audioContext.createAnalyser();
 
         // get audio source from stream
-        let source = this.audioContext.createMediaStreamSource(this.props.stream);
+        let source = this.audioContext.createMediaStreamSource(stream);
 
         // connect analyser with source
         source.connect(analyser);
@@ -64,10 +66,10 @@ export class AudioIndicator extends Component<Props, State> {
                 return num > 0;
             });
 
-            if (result.length === 0 && this.state.foundAudioSignal) {
+            if (result.length === 0 && foundAudioSignal) {
                 // no sound found
                 this.setState({ foundAudioSignal: false });
-            } else if (result.length > 0 && !this.state.foundAudioSignal) {
+            } else if (result.length > 0 && !foundAudioSignal) {
                 // found sound
                 this.setState({ foundAudioSignal: true });
             }

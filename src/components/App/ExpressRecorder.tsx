@@ -127,8 +127,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * clear any existing recording and start a new one
      */
     startRecording = () => {
-        const { recordedBlobs } = this.state;
-        if (recordedBlobs.length) {
+        const { recordedBlobs, screenRecordedBlobs } = this.state;
+        if (recordedBlobs.length || screenRecordedBlobs.length) {
             this.recordAgain();
         }
         this.handleStartClick();
@@ -151,8 +151,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * get a local copy of the latest recording
      */
     saveCopy = () => {
-        const { doRecording, recordedBlobs } = this.state;
-        if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
+        const { doRecording } = this.state;
+        if (!doRecording && !this.uploadedOnce) {
             this.saveFile();
         }
     };
@@ -161,10 +161,18 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * upload the latest recording to Kaltura
      */
     upload = () => {
-        const { doRecording, recordedBlobs } = this.state;
-        if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
-            this.initiateUpload();
+        const { doRecording, recordedBlobs, screenRecordedBlobs } = this.state;
+        if (doRecording) {
+            return;
         }
+        if (!recordedBlobs.length && !screenRecordedBlobs.length) {
+            return;
+        }
+        if (this.uploadedOnce) {
+            return;
+        }
+
+        this.initiateUpload();
     };
 
     /**
@@ -331,6 +339,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 doCountdown: false,
                 abortUpload: false,
                 recordedBlobs: [],
+                screenRecordedBlobs: [],
                 doPlayback: false,
                 error: ""
             },
@@ -376,13 +385,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * @param screenBlobs
      */
     handleRecordingEnd = (recordedBlobs: Blob[], duration: number, screenBlobs?: Blob[]) => {
-        const blob = new Blob(recordedBlobs, { type: "video/webm" });
-        // handle chrome blob duration issue
-        fixWebmDuration(blob, duration, (fixedBlob: Blob) => {
-            this.setState({ recordedBlobs: recordedBlobs, blob: fixedBlob });
-            this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-        });
-        if (screenBlobs) {
+        if (recordedBlobs.length) {
+            const blob = new Blob(recordedBlobs, { type: "video/webm" });
+            // handle chrome blob duration issue
+            fixWebmDuration(blob, duration, (fixedBlob: Blob) => {
+                this.setState({ recordedBlobs: recordedBlobs, blob: fixedBlob });
+                this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+            });
+        }
+        if (screenBlobs && screenBlobs.length) {
             const screenBlobObject = new Blob(screenBlobs, { type: "video/webm" });
             fixWebmDuration(screenBlobObject, duration, (fixedBlob: Blob) => {
                 this.setState({ screenRecordedBlobs: screenBlobs, screenRecordedBlob: fixedBlob });
@@ -391,9 +402,12 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     getDefaultEntryName() {
-        const { constraints } = this.state;
+        const { constraints, shareScreenOn } = this.state;
         if (constraints.video) {
             return this.translator.translate("Video Recording") + " - " + new Date();
+        }
+        if (shareScreenOn) {
+            return this.translator.translate("Screen Recording") + " - " + new Date();
         }
         return this.translator.translate("Audio Recording") + " - " + new Date();
     }
@@ -430,28 +444,16 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             this.setState({ doCountdown: false, doRecording: true });
         }
     };
+
     handleSettingsChange = (
+        deviceWasChanged: boolean,
+        toggleWasChanged: boolean,
         screenOn: boolean,
         selectedCamera?: MediaDeviceInfo,
         selectedAudio?: MediaDeviceInfo
     ) => {
         // check if something has been changed
-        const { constraints, shareScreenOn } = this.state;
-        if (
-            ((selectedCamera && constraints.video) || // check if video has turned on/off
-                (!selectedCamera && !constraints.video)) &&
-            ((selectedAudio && constraints.audio) || // check if audio has turned on/off
-                (!selectedAudio && !constraints.audio)) &&
-            (!selectedCamera || // check if device id has been changed
-                (constraints.video &&
-                    typeof constraints.video !== "boolean" &&
-                    selectedCamera.deviceId === constraints.video.deviceId)) &&
-            (!selectedAudio || // check if device id has been changed
-                (constraints.audio &&
-                    typeof constraints.audio !== "boolean" &&
-                    selectedAudio.deviceId === constraints.audio.deviceId)) &&
-            screenOn === shareScreenOn
-        ) {
+        if (!deviceWasChanged && !toggleWasChanged && screenOn === this.state.shareScreenOn) {
             return;
         }
 
@@ -475,8 +477,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.createStream(newConstraints, screenOn);
     };
 
+    getScreenshareWithMicrophone = async () => {
+        // @ts-ignore
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        const audio = await navigator.mediaDevices.getUserMedia({ audio: true });
+        return new MediaStream([audio.getTracks()[0], stream.getTracks()[0]]);
+    };
     createStream = (constraints: MediaStreamConstraints, screenOn: boolean) => {
-        const { shareScreenOn } = this.state;
         this.modifyConstraints(constraints).then(finalConstraints => {
             if (!finalConstraints.video && !finalConstraints.audio) {
                 this.setState({
@@ -486,28 +493,59 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 });
                 return;
             }
-            if (screenOn && screenOn !== shareScreenOn) {
+            if (finalConstraints.video || (finalConstraints.audio && !screenOn)) {
                 navigator.mediaDevices
-                    // @ts-ignore
-                    .getDisplayMedia({ video: true })
-                    .then((screenStream: MediaStream) => {
-                        this.setState({ screenStream: screenStream });
+                    .getUserMedia(finalConstraints)
+                    .then((stream: MediaStream) => {
+                        this.setState({
+                            stream: stream,
+                            constraints: finalConstraints,
+                            shareScreenOn: screenOn
+                        });
                     })
-                    .catch((e: any) =>
-                        this.handleError("Failed to allocate resource: " + e.message)
-                    );
+                    .catch(e => this.handleError("Failed to allocate resource: " + e.message));
             }
-            navigator.mediaDevices
-                .getUserMedia(finalConstraints)
+            if (screenOn) {
+                this.createScreenStream(screenOn, finalConstraints);
+            }
+        });
+    };
+
+    createScreenStream = (screenOn: boolean, finalConstraints: MediaStreamConstraints) => {
+        const { shareScreenOn } = this.state;
+        const { video, audio } = finalConstraints;
+        if (!screenOn) {
+            return;
+        }
+        if (screenOn === shareScreenOn && video) {
+            return;
+        }
+
+        if (!video && audio) {
+            this.getScreenshareWithMicrophone()
                 .then((stream: MediaStream) => {
                     this.setState({
-                        stream: stream,
+                        screenStream: stream,
                         constraints: finalConstraints,
-                        shareScreenOn: screenOn
+                        shareScreenOn: screenOn,
+                        stream: undefined
                     });
                 })
-                .catch(e => this.handleError("Failed to allocate resource: " + e.message));
-        });
+                .catch((e: any) => this.handleError("Failed to allocate resource: " + e.message));
+            return;
+        }
+
+        navigator.mediaDevices
+            // @ts-ignore
+            .getDisplayMedia({ video: true })
+            .then((screenStream: MediaStream) => {
+                this.setState({
+                    screenStream: screenStream,
+                    constraints: finalConstraints,
+                    shareScreenOn: screenOn
+                });
+            })
+            .catch((e: any) => this.handleError("Failed to allocate resource: " + e.message));
     };
 
     setBeforeunload = (addMessage: boolean = false) => {
@@ -544,7 +582,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         // upload record on Alt + Shift (Meta for mac) + U
         if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyU") {
             e.preventDefault();
-            if (!doRecording && recordedBlobs.length > 0 && !this.uploadedOnce) {
+            if (!doRecording && recordedBlobs.length && !this.uploadedOnce) {
                 this.initiateUpload();
             }
             return;
@@ -648,6 +686,29 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
         }
+        const showController =
+            showUploadUI &&
+            !doRecording &&
+            !this.uploadedOnce &&
+            (recordedBlobs.length || screenRecordedBlobs.length);
+
+        const uploadManagerProps = {
+            mediaType:
+                constraints.video || shareScreenOn
+                    ? KalturaMediaType.video
+                    : KalturaMediaType.audio,
+            recordedBlobs: recordedBlobs.length ? recordedBlobs : screenRecordedBlobs,
+            childRecordedBlobs: recordedBlobs.length ? screenRecordedBlobs : undefined
+        };
+
+        const audioStream = stream || screenStream;
+        const selectedAudioDevice =
+            audioStream && audioStream.getAudioTracks().length
+                ? audioStream.getAudioTracks()[0]
+                : undefined;
+
+        const selectedCameraDevice =
+            stream && stream.getVideoTracks().length > 0 ? stream.getVideoTracks()[0] : undefined;
 
         if (error !== "") {
             return (
@@ -666,17 +727,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         onUploadEnded={this.handleUploadEnded}
                         onUploadCancelled={this.handleUploadCancelled}
                         onUploadProgress={this.handleUploadProgress}
-                        mediaType={
-                            constraints.video ? KalturaMediaType.video : KalturaMediaType.audio
-                        }
-                        recordedBlobs={recordedBlobs}
-                        childRecordedBlobs={screenRecordedBlobs}
                         entryName={entryName ? entryName : this.getDefaultEntryName()}
                         serviceUrl={serviceUrl}
                         ks={ks}
                         abortUpload={abortUpload}
                         showUploadUI={showUploadUI}
                         onCancel={this.cancelUpload}
+                        {...uploadManagerProps}
                     />
                 </div>
             );
@@ -684,8 +741,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
                 <Recorder
-                    video={constraints.video !== false}
-                    stream={stream}
+                    video={!!constraints.video}
+                    videoStream={stream}
                     screenStream={screenStream}
                     onRecordingEnd={this.handleRecordingEnd}
                     doRecording={doRecording}
@@ -719,22 +776,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     <div className={styles["settings-wrap"]}>
                         {!doPlayback && !doRecording && !doCountdown && (
                             <Settings
-                                selectedCameraDevice={
-                                    stream && stream.getVideoTracks().length > 0
-                                        ? ({
-                                              kind: "videoinput",
-                                              label: stream.getVideoTracks()[0].label
-                                          } as MediaDeviceInfo)
-                                        : undefined
-                                }
-                                selectedAudioDevice={
-                                    stream && stream.getAudioTracks().length > 0
-                                        ? ({
-                                              kind: "audioinput",
-                                              label: stream.getAudioTracks()[0].label
-                                          } as MediaDeviceInfo)
-                                        : undefined
-                                }
+                                selectedCameraDevice={selectedCameraDevice}
+                                selectedAudioDevice={selectedAudioDevice}
                                 allowVideo={allowVideo}
                                 allowAudio={allowAudio}
                                 allowScreenShare={allowScreenShare}
@@ -756,34 +799,28 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             {this.translator.translate("Cancel")}
                         </button>
                     )}
-                    {showUploadUI &&
-                        !doRecording &&
-                        recordedBlobs.length > 0 &&
-                        !this.uploadedOnce && (
-                            <div className={`${styles["express-recorder__bottom"]}`}>
-                                <button
-                                    className={`xr_btn xr_btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
-                                    onClick={this.saveFile}
-                                    tabIndex={0}
-                                >
-                                    {this.translator.translate("Download a Copy")}
-                                </button>
-                                <button
-                                    className={`xr_btn xr_btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
-                                    onClick={this.recordAgain}
-                                    tabIndex={0}
-                                >
-                                    {this.translator.translate("Record Again")}
-                                </button>
-                                <button
-                                    className={`xr_btn xr_btn-primary xr_btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
-                                    onClick={this.initiateUpload}
-                                    tabIndex={0}
-                                >
-                                    {this.translator.translate("Use This")}
-                                </button>
-                            </div>
-                        )}
+                    {showController ? (
+                        <div className={`${styles["express-recorder__bottom"]}`}>
+                            <button
+                                className={`xr_btn xr_btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
+                                onClick={this.saveFile}
+                            >
+                                {this.translator.translate("Download a Copy")}
+                            </button>
+                            <button
+                                className={`xr_btn xr_btn__reset ${styles["bottom__btn"]} ${styles["btn__clear"]}`}
+                                onClick={this.recordAgain}
+                            >
+                                {this.translator.translate("Record Again")}
+                            </button>
+                            <button
+                                className={`xr_btn xr_btn-primary xr_btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
+                                onClick={this.initiateUpload}
+                            >
+                                {this.translator.translate("Use This")}
+                            </button>
+                        </div>
+                    ) : null}
                 </div>
             </div>
         );

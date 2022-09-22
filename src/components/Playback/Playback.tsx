@@ -4,8 +4,8 @@ declare var KalturaPlayer: any;
 import "./player.css";
 
 type Props = {
-    media: PlaybackMedia; // the actual recorded media
-    screenMedia?: PlaybackMedia; // the actual recorded media
+    cameraMedia?: PlaybackMedia; // the actual recorded camera
+    screenMedia?: PlaybackMedia; // the actual recorded screen
     partnerId: number;
     uiconfId: number; // must be v3
     autoPlay?: boolean;
@@ -34,10 +34,10 @@ export class Playback extends Component<Props, State> {
     }
 
     componentDidUpdate(previousProps: Props, previousState: State, previousContext: any): void {
-        const { media, screenMedia } = this.props;
-        if (previousProps.media !== media) {
+        const { cameraMedia, screenMedia } = this.props;
+        if (cameraMedia && previousProps.cameraMedia !== cameraMedia) {
             // play the new media
-            this.setMedia(media, this.kalturaPlayer);
+            this.setMedia(cameraMedia, this.kalturaPlayer);
         }
         if (screenMedia && previousProps.screenMedia !== screenMedia) {
             this.setMedia(screenMedia, this.kalturaPlayerScreen);
@@ -66,15 +66,18 @@ export class Playback extends Component<Props, State> {
     }
 
     async embedPlayer() {
-        const { partnerId, uiconfId, media, screenMedia } = this.props;
+        const { partnerId, uiconfId, cameraMedia, screenMedia } = this.props;
         try {
-            this.kalturaPlayer = KalturaPlayer.setup({
-                targetId: "player-wrap__" + uniqueId,
-                provider: {
-                    partnerId: partnerId,
-                    uiConfId: uiconfId
-                }
-            });
+            if (cameraMedia) {
+                this.kalturaPlayer = KalturaPlayer.setup({
+                    targetId: "player-wrap__" + uniqueId,
+                    provider: {
+                        partnerId: partnerId,
+                        uiConfId: uiconfId
+                    }
+                });
+                this.setMedia(cameraMedia, this.kalturaPlayer);
+            }
             if (screenMedia) {
                 this.kalturaPlayerScreen = KalturaPlayer.setup({
                     targetId: "player-wrap-screen__" + uniqueId,
@@ -84,39 +87,45 @@ export class Playback extends Component<Props, State> {
                     }
                 });
                 this.setMedia(screenMedia, this.kalturaPlayerScreen);
+                if (cameraMedia) {
+                    this.kalturaPlayer.addEventListener("play", () =>
+                        this.kalturaPlayerScreen.play()
+                    );
+                    this.kalturaPlayer.addEventListener("pause", () =>
+                        this.kalturaPlayerScreen.pause()
+                    );
 
-                this.kalturaPlayer.addEventListener("play", () => this.kalturaPlayerScreen.play());
-                this.kalturaPlayer.addEventListener("pause", () =>
-                    this.kalturaPlayerScreen.pause()
-                );
-                KalturaPlayer.getPlayers()["player-wrap__" + uniqueId].addEventListener(
-                    "seeking",
-                    () => {
-                        this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
-                    }
-                );
+                    KalturaPlayer.getPlayers()["player-wrap__" + uniqueId].addEventListener(
+                        "seeking",
+                        () => {
+                            this.kalturaPlayerScreen.currentTime = this.kalturaPlayer.currentTime;
+                        }
+                    );
+                }
             }
-            this.setMedia(media, this.kalturaPlayer);
         } catch (e) {
             console.error(e.message);
         }
     }
 
     render() {
-        const { screenMedia } = this.props;
-
+        const { screenMedia, cameraMedia } = this.props;
         return (
             <div className={`players-wrap ${styles["players-wrap"]}`}>
-                <div
-                    id={"player-wrap__" + uniqueId}
-                    className={`xr_player-wrap ${styles["player-wrap"]} ${
-                        screenMedia ? "player-wrap__main_controls" : ""
-                    }`}
-                />
+                {cameraMedia && (
+                    <div
+                        id={"player-wrap__" + uniqueId}
+                        className={`xr_player-wrap ${styles["player-wrap"]} ${
+                            screenMedia ? "player-wrap__main_controls" : ""
+                        }`}
+                    />
+                )}
                 {screenMedia ? (
                     <div
                         id={"player-wrap-screen__" + uniqueId}
-                        className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]}`}
+                        className={`xr_player-wrap player-wrap-screen ${styles["player-wrap"]} ${
+                            cameraMedia ? "player-wrap-screen__with-video" : ""
+                        }`}
                     />
                 ) : null}
             </div>

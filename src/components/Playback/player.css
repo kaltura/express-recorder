@@ -8,10 +8,11 @@
 .player-wrap__main_controls .playkit-bottom-bar {
     top: -65px;
 }
-.player-wrap-screen
+.player-wrap-screen__with-video
     .playkit-playback-controls.playkit-playback-controls.playkit-playback-controls.playkit-playback-controls.playkit-playback-controls,
-.player-wrap-screen .playkit-bottom-bar.playkit-bottom-bar.playkit-bottom-bar,
-.player-wrap-screen .playkit-pre-playback-play-button {
+.player-wrap-screen__with-video .playkit-bottom-bar.playkit-bottom-bar.playkit-bottom-bar,
+.player-wrap-screen__with-video .playkit-pre-playback-play-button,
+.player-wrap-screen__with-video .playkit-overlay-action {
     display: none;
 }
 
