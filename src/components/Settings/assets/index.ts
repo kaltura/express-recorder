@@ -1,7 +1,7 @@
-import VideoIcon from "./video.svg";
-import AudioIcon from "./audio.svg";
-import ScreenIcon from "./screen.svg";
-import NoVideoIcon from "./noVideo.svg";
-import NoAudioIcon from "./noAudio.svg";
-import NoScreenIcon from "./noScreen.svg";
+import { VideoIcon } from "./VideoIcon";
+import { AudioIcon } from "./AudioIcon";
+import { ScreenIcon } from "./ScreenIcon";
+import { NoVideoIcon } from "./NoVideoIcon";
+import { NoAudioIcon } from "./NoAudioIcon";
+import { NoScreenIcon } from "./NoScreenIcon";
 export { VideoIcon, AudioIcon, ScreenIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon };
