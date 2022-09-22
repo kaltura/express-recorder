@@ -444,28 +444,18 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             this.setState({ doCountdown: false, doRecording: true });
         }
     };
+
     handleSettingsChange = (
+        deviceWasChanged: boolean,
+        toggleWasChanged: boolean,
         screenOn: boolean,
         selectedCamera?: MediaDeviceInfo,
         selectedAudio?: MediaDeviceInfo
     ) => {
         // check if something has been changed
-        const { constraints, shareScreenOn } = this.state;
-        if (
-            ((selectedCamera && constraints.video) || // check if video has turned on/off
-                (!selectedCamera && !constraints.video)) &&
-            ((selectedAudio && constraints.audio) || // check if audio has turned on/off
-                (!selectedAudio && !constraints.audio)) &&
-            (!selectedCamera || // check if device id has been changed
-                (constraints.video &&
-                    typeof constraints.video !== "boolean" &&
-                    selectedCamera.deviceId === constraints.video.deviceId)) &&
-            (!selectedAudio || // check if device id has been changed
-                (constraints.audio &&
-                    typeof constraints.audio !== "boolean" &&
-                    selectedAudio.deviceId === constraints.audio.deviceId)) &&
-            screenOn === shareScreenOn
-        ) {
+        const { shareScreenOn } = this.state;
+
+        if (!deviceWasChanged && !toggleWasChanged && screenOn === shareScreenOn) {
             return;
         }
 
@@ -505,8 +495,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 });
                 return;
             }
-
-            if (finalConstraints.video) {
+            if (finalConstraints.video || (finalConstraints.audio && !screenOn)) {
                 navigator.mediaDevices
                     .getUserMedia(finalConstraints)
                     .then((stream: MediaStream) => {
@@ -518,7 +507,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     })
                     .catch(e => this.handleError("Failed to allocate resource: " + e.message));
             }
-            this.createScreenStream(screenOn, finalConstraints);
+            if (screenOn) {
+                this.createScreenStream(screenOn, finalConstraints);
+            }
         });
     };
 
@@ -553,8 +544,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 this.setState({
                     screenStream: screenStream,
                     constraints: finalConstraints,
-                    shareScreenOn: screenOn,
-                    stream: undefined
+                    shareScreenOn: screenOn
                 });
             })
             .catch((e: any) => this.handleError("Failed to allocate resource: " + e.message));
@@ -710,6 +700,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             childRecordedBlobs: recordedBlobs.length ? screenRecordedBlobs : undefined
         };
 
+        const audioStream = stream || screenStream;
+        const selectedAudioDevice =
+            audioStream && audioStream.getAudioTracks().length
+                ? audioStream.getAudioTracks()[0]
+                : undefined;
+
+        const selectedCameraDevice =
+            stream && stream.getVideoTracks().length > 0 ? stream.getVideoTracks()[0] : undefined;
+
         if (error !== "") {
             return (
                 <div className={`express-recorder ${styles["express-recorder"]}`}>
@@ -741,7 +740,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
                 <Recorder
-                    video={constraints.video !== false}
+                    video={!!constraints.video}
                     videoStream={stream}
                     screenStream={screenStream}
                     onRecordingEnd={this.handleRecordingEnd}
@@ -776,22 +775,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     <div className={styles["settings-wrap"]}>
                         {!doPlayback && !doRecording && !doCountdown && (
                             <Settings
-                                selectedCameraDevice={
-                                    stream && stream.getVideoTracks().length > 0
-                                        ? ({
-                                              kind: "videoinput",
-                                              label: stream.getVideoTracks()[0].label
-                                          } as MediaDeviceInfo)
-                                        : undefined
-                                }
-                                selectedAudioDevice={
-                                    stream && stream.getAudioTracks().length > 0
-                                        ? ({
-                                              kind: "audioinput",
-                                              label: stream.getAudioTracks()[0].label
-                                          } as MediaDeviceInfo)
-                                        : undefined
-                                }
+                                selectedCameraDevice={selectedCameraDevice}
+                                selectedAudioDevice={selectedAudioDevice}
                                 allowVideo={allowVideo}
                                 allowAudio={allowAudio}
                                 allowScreenShare={allowScreenShare}
