@@ -222,7 +222,7 @@ export class Recorder extends Component<Props, State> {
                 {!video ? (
                     <div className={`${styles["express-recorder__recorder__no-video"]}`}>
                         <div class={`xr_no-video-text ${styles["no-video-text"]}`}>
-                            {screenShareOn ? (
+                            {!screenShareOn ? (
                                 <div class={styles["audio-indicator"]}>
                                     <AudioIndicator stream={videoStream || screenStream} />
                                 </div>
