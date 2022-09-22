@@ -2,7 +2,7 @@ import { Component, h } from "preact";
 import { SettingsDevices } from "./Settings-devices";
 import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 import { Translator } from "../Translator/Translator";
-import { VideoIcon, AudioIcon, ScreenIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon } from "./assets";
+import { VideoIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon, ScreenIcon, AudioIcon } from "./icons";
 
 const styles = require("./style.scss");
 type Props = {

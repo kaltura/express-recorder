@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
 import { ToggleButton } from "../Toggle-button/ToggleButton";
 import { Translator } from "../Translator/Translator";
-import { CheckIcon } from "./icons/CheckIcon";
+import { CheckIcon } from "./icons";
 
 const styles = require("./style.scss");
 
