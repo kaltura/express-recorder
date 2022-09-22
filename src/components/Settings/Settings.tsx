@@ -6,13 +6,15 @@ import { VideoIcon, AudioIcon, ScreenIcon, NoAudioIcon, NoScreenIcon, NoVideoIco
 
 const styles = require("./style.scss");
 type Props = {
-    onSettingsChanged?: (
+    onSettingsChanged: (
+        deviceWasChanged: boolean,
+        toggleWasChanged: boolean,
         screenOn: boolean,
         selectedCamera?: MediaDeviceInfo,
         selectedAudio?: MediaDeviceInfo
     ) => void;
-    selectedCameraDevice?: MediaDeviceInfo;
-    selectedAudioDevice?: MediaDeviceInfo;
+    selectedCameraDevice?: MediaStreamTrack;
+    selectedAudioDevice?: MediaStreamTrack;
     allowVideo: boolean;
     allowAudio: boolean;
     screenShareOn: boolean;
@@ -103,6 +105,17 @@ export class Settings extends Component<Props, State> {
         }
     };
 
+    getDeviceByLabel = (label: string, deviceType: ResourceTypes) => {
+        if (deviceType === ResourceTypes.AUDIO) {
+            return this.audioDevicesInfo.find((device: MediaDeviceInfo) => {
+                return device.label === label;
+            });
+        }
+        return this.cameraDevicesInfo.find((device: MediaDeviceInfo) => {
+            return device.label === label;
+        });
+    };
+
     handleClose = () => {
         document.removeEventListener("click", this.handleExternalClick, true);
 
@@ -118,7 +131,7 @@ export class Settings extends Component<Props, State> {
      */
     handleToggleChange = (isOn: boolean, resourceType: ResourceTypes) => {
         const { cameraOn, audioOn } = this.state;
-        const { selectedCameraDevice, onSettingsChanged, selectedAudioDevice } = this.props;
+        const { onSettingsChanged } = this.props;
 
         let newCameraOn = resourceType === ResourceTypes.VIDEO ? isOn : cameraOn;
         let newAudioOn = resourceType === ResourceTypes.AUDIO ? isOn : audioOn;
@@ -135,21 +148,38 @@ export class Settings extends Component<Props, State> {
             };
         });
 
-        if (onSettingsChanged) {
-            const camera = newCameraOn
-                ? selectedCameraDevice || this.cameraDevicesInfo[0]
-                : undefined;
-            const audio = newAudioOn ? selectedAudioDevice || this.audioDevicesInfo[0] : undefined;
-            onSettingsChanged(this.state.screenOn, camera, audio);
+        const camera = newCameraOn ? this.getCurrentDevice(ResourceTypes.VIDEO) : undefined;
+        const audio = newAudioOn ? this.getCurrentDevice(ResourceTypes.AUDIO) : undefined;
+        onSettingsChanged(false, true, this.state.screenOn, camera, audio);
+    };
+
+    getCurrentDevice = (type: ResourceTypes) => {
+        const { selectedCameraDevice, selectedAudioDevice } = this.props;
+        if (type === ResourceTypes.VIDEO) {
+            return selectedCameraDevice
+                ? this.getDeviceByLabel(selectedCameraDevice.label, ResourceTypes.VIDEO)
+                : this.cameraDevicesInfo[0];
         }
+
+        return selectedAudioDevice
+            ? this.getDeviceByLabel(selectedAudioDevice.label, ResourceTypes.AUDIO)
+            : this.audioDevicesInfo[0];
     };
 
     handleChooseDevice = (device: MediaDeviceInfo) => {
-        if (this.props.onSettingsChanged) {
-            const camera = device.kind === "videoinput" && this.state.cameraOn ? device : undefined;
-            const audio = device.kind === "audioinput" && this.state.audioOn ? device : undefined;
-            this.props.onSettingsChanged(this.state.screenOn, camera, audio);
-        }
+        const { onSettingsChanged } = this.props;
+
+        const { cameraOn, audioOn, screenOn } = this.state;
+        const camera =
+            device.kind === "videoinput" && cameraOn
+                ? device
+                : this.getCurrentDevice(ResourceTypes.VIDEO);
+        const audio =
+            device.kind === "audioinput" && audioOn
+                ? device
+                : this.getCurrentDevice(ResourceTypes.AUDIO);
+
+        onSettingsChanged(true, false, screenOn, camera, audio);
     };
 
     handleKeyboardInput = (e: KeyboardEvent, type: ResourceTypes) => {
@@ -230,11 +260,11 @@ export class Settings extends Component<Props, State> {
                     }
                     isOn={showSettingsOf === ResourceTypes.VIDEO ? cameraOn : audioOn}
                     disabled={!(allowVideo && allowAudio)} // can only turn off if both are available, so we won't end up with none
-                    selected={
+                    selected={this.getCurrentDevice(
                         showSettingsOf === ResourceTypes.VIDEO
-                            ? selectedCameraDevice
-                            : selectedAudioDevice
-                    }
+                            ? ResourceTypes.VIDEO
+                            : ResourceTypes.AUDIO
+                    )}
                     onChooseDevice={this.handleChooseDevice}
                     onToggleChange={(isOn: boolean) => {
                         this.handleToggleChange(
