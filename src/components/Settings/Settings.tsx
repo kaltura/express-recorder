@@ -116,7 +116,6 @@ export class Settings extends Component<Props, State> {
                 return device.label === label;
             });
         }
-        return undefined;
     };
 
     handleClose = () => {
@@ -163,10 +162,11 @@ export class Settings extends Component<Props, State> {
                 ? this.getDeviceByLabel(selectedCameraDevice.label, ResourceTypes.VIDEO)
                 : this.cameraDevicesInfo[0];
         }
-
-        return selectedAudioDevice
-            ? this.getDeviceByLabel(selectedAudioDevice.label, ResourceTypes.AUDIO)
-            : this.audioDevicesInfo[0];
+        if (type === ResourceTypes.AUDIO) {
+            return selectedAudioDevice
+                ? this.getDeviceByLabel(selectedAudioDevice.label, ResourceTypes.AUDIO)
+                : this.audioDevicesInfo[0];
+        }
     };
 
     handleChooseDevice = (device: MediaDeviceInfo) => {
