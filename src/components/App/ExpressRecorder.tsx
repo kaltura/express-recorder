@@ -524,14 +524,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     createScreenStream = (screenOn: boolean, finalConstraints: MediaStreamConstraints) => {
         const { shareScreenOn } = this.state;
+        const { video, audio } = finalConstraints;
         if (!screenOn) {
             return;
         }
-        if (screenOn === shareScreenOn && finalConstraints.video) {
+        if (screenOn === shareScreenOn && video) {
             return;
         }
 
-        if (!finalConstraints.video && finalConstraints.audio) {
+        if (!video && audio) {
             this.getScreenshareWithMicrophone()
                 .then((stream: MediaStream) => {
                     this.setState({
