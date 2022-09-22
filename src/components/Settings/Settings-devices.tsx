@@ -29,13 +29,13 @@ export class SettingsDevices extends Component<Props, State> {
 
     componentDidMount() {
         this.removeRedundantPopups();
-        this.focusOnToggle();
+        this.focusOnToggleIfPossible();
     }
     componentDidUpdate() {
-        this.focusOnToggle();
+        this.focusOnToggleIfPossible();
     }
 
-    focusOnToggle = () => {
+    focusOnToggleIfPossible = () => {
         if (this.menuRef && this.menuRef.children[0]) {
             const toggleElement = (this.menuRef.children[0] as HTMLElement).getElementsByTagName(
                 "input"
