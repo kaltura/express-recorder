@@ -111,9 +111,12 @@ export class Settings extends Component<Props, State> {
                 return device.label === label;
             });
         }
-        return this.cameraDevicesInfo.find((device: MediaDeviceInfo) => {
-            return device.label === label;
-        });
+        if (deviceType === ResourceTypes.VIDEO) {
+            return this.cameraDevicesInfo.find((device: MediaDeviceInfo) => {
+                return device.label === label;
+            });
+        }
+        return undefined;
     };
 
     handleClose = () => {
