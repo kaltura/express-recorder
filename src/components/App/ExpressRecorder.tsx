@@ -453,9 +453,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         selectedAudio?: MediaDeviceInfo
     ) => {
         // check if something has been changed
-        const { shareScreenOn } = this.state;
-
-        if (!deviceWasChanged && !toggleWasChanged && screenOn === shareScreenOn) {
+        if (!deviceWasChanged && !toggleWasChanged && screenOn === this.state.shareScreenOn) {
             return;
         }
 
