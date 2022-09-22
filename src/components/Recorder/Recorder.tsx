@@ -46,12 +46,12 @@ export class Recorder extends Component<Props, State> {
         this.startTime = 0;
     }
     componentDidMount() {
-        this.startStreamIfPossible();
+        this.showStreamIfPossible();
     }
 
     componentDidUpdate(prevProps: Props) {
         const { doRecording, discard } = this.props;
-        this.startStreamIfPossible();
+        this.showStreamIfPossible();
 
         if (doRecording !== prevProps.doRecording) {
             this.toggleRecording();
@@ -63,7 +63,7 @@ export class Recorder extends Component<Props, State> {
         }
     }
 
-    startStreamIfPossible = () => {
+    showStreamIfPossible = () => {
         const { videoStream, screenStream, doPlayback } = this.props;
         if (!doPlayback) {
             if (this.videoRef && videoStream) {
