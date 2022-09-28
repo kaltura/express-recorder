@@ -231,11 +231,14 @@ export class Recorder extends Component<Props, State> {
                     </div>
                 ) : (
                     <video
-                        id="recorder"
+                        id={"recorder"}
                         className={`express-recorder__recorder ${styles["express-recorder__recorder"]} ${styles[shareScreenClass]}`}
                         muted={true}
                         autoPlay={true}
                         ref={node => {
+                            if (!node) {
+                                return;
+                            }
                             this.videoRef = node as HTMLMediaElement;
                         }}
                     />
