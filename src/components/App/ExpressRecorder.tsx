@@ -199,16 +199,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             this.setState({ error: "Widget Destroyed" });
         });
         // stop stream:
-        if (this.state.stream) {
-            this.state.stream.getTracks().forEach(function(track) {
-                track.stop();
-            });
-        }
-        if (this.state.screenStream) {
-            this.state.screenStream.getTracks().forEach(function(track) {
-                track.stop();
-            });
-        }
+        this.stopStreams();
         // keyboard
         window.removeEventListener("keydown", this.handleKeyboardControl);
     };
@@ -263,11 +254,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         window.addEventListener("keydown", this.handleKeyboardControl);
 
-        if (this.state.stream) {
-            this.state.stream.getTracks().forEach(function(track) {
-                track.stop();
-            });
-        }
+        this.stopStreams();
         this.createStream(this.state.constraints, false);
     }
 
@@ -344,11 +331,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 error: ""
             },
             () => {
-                if (this.state.stream) {
-                    this.state.stream.getTracks().forEach(function(track) {
-                        track.stop();
-                    });
-                }
+                this.stopStreams();
                 if (!this.state.destroyed) {
                     this.createStream(this.state.constraints, this.state.shareScreenOn);
                 }
@@ -356,22 +339,26 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         );
     };
 
+    stopStreams = () => {
+        const { stream, screenStream } = this.state;
+        if (stream) {
+            stream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+        if (screenStream) {
+            screenStream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+    };
     handleError = (error: string) => {
         this.setState({ error: error });
         this.dispatcher.dispatchEvent(RecorderEvents.error, { message: error });
     };
 
     initiateUpload = () => {
-        const videoTracks = this.state.stream ? this.state.stream.getVideoTracks() : [];
-        const audioTracks = this.state.stream ? this.state.stream.getAudioTracks() : [];
-
-        // Release video and media devices
-        videoTracks.forEach((item: MediaStreamTrack) => {
-            item.stop();
-        });
-        audioTracks.forEach((item: MediaStreamTrack) => {
-            item.stop();
-        });
+        this.stopStreams();
 
         this.setState({
             doUpload: true
@@ -470,6 +457,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         if (this.state.stream) {
             this.state.stream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+        if (!screenOn && this.state.screenStream) {
+            this.state.screenStream.getTracks().forEach(function(track) {
                 track.stop();
             });
         }
