@@ -1,6 +1,5 @@
 .settings {
-    padding: 8px 24px 8px 32px;
-    width: 248px;
+    padding: 8px 24px 8px 23px;
     height: 40px;
     background: #111111;
     border-radius: 28px;
@@ -13,6 +12,7 @@
     background-image: linear-gradient(-180deg, #ef424e, #db1f26);
     box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.5);
     cursor: pointer;
+    margin-left: 5px;
 
     &:hover {
         background-image: linear-gradient(-180deg, #ed2a38, #c51c22);
@@ -23,8 +23,8 @@
     align-items: center;
 }
 .resources-icon {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
     svg {
         vertical-align: bottom;
     }
@@ -118,7 +118,6 @@
 }
 .arrow-wrap {
     width: 20px;
-    cursor: pointer;
     margin-top: 3px;
     i {
         margin-left: 13px;
@@ -127,10 +126,16 @@
 }
 .resource-link {
     color: white;
+    width: 50px;
+    padding: 4px;
+    cursor: pointer;
+    margin: 0 5px 0 5px;
     &:hover,
     &:focus {
         color: white;
         text-decoration: none;
+        background-color: #666666;
+        border-radius: 4px;
     }
 }
 .device-disabled {

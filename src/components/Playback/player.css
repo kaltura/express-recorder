@@ -19,3 +19,6 @@
 .player-wrap__main_controls .playkit-player.playkit-player {
     overflow: visible;
 }
+.player-wrap__main_controls .playkit-control-fullscreen.playkit-control-fullscreen {
+    display: none;
+}
