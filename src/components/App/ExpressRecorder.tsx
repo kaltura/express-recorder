@@ -460,20 +460,20 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 track.stop();
             });
         }
-        if (!screenOn && this.state.screenStream) {
-            this.state.screenStream.getTracks().forEach(function(track) {
-                track.stop();
-            });
-        }
         // update constraints state only if create stream has been succeeded
         this.createStream(newConstraints, screenOn);
     };
 
     getScreenshareWithMicrophone = async () => {
-        // @ts-ignore
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        let screenStream;
+        if (this.state.screenStream && this.state.screenStream.active) {
+            screenStream = this.state.screenStream;
+        } else {
+            // @ts-ignore
+            screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        }
         const audio = await navigator.mediaDevices.getUserMedia({ audio: true });
-        return new MediaStream([audio.getTracks()[0], stream.getTracks()[0]]);
+        return new MediaStream([audio.getTracks()[0], screenStream.getTracks()[0]]);
     };
     createStream = (constraints: MediaStreamConstraints, screenOn: boolean) => {
         this.modifyConstraints(constraints).then(finalConstraints => {
