@@ -1,6 +1,5 @@
 import { Component, h } from "preact";
 import { SettingsDevices } from "./Settings-devices";
-import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 import { Translator } from "../Translator/Translator";
 import { VideoIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon, ScreenIcon, AudioIcon } from "./icons";
 
@@ -339,11 +338,6 @@ export class Settings extends Component<Props, State> {
                             <div className={styles["resources-icon"]} aria-hidden="true">
                                 {audioOn && <AudioIcon />}
                                 {!audioOn && <NoAudioIcon />}
-                                {/*stream && (
-                                        <div className={styles["settings-audio-indicator"]}>
-                                            <AudioIndicator stream={stream} audioOn={audioOn} />
-                                        </div>
-                                    )*/}
                             </div>
                             <div className={styles["arrow-wrap"]}>
                                 {showSettingsOf !== ResourceTypes.AUDIO && (
