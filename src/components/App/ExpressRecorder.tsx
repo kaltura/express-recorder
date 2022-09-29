@@ -384,6 +384,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             const screenBlobObject = new Blob(screenBlobs, { type: "video/webm" });
             fixWebmDuration(screenBlobObject, duration, (fixedBlob: Blob) => {
                 this.setState({ screenRecordedBlobs: screenBlobs, screenRecordedBlob: fixedBlob });
+                if (!recordedBlobs.length) {
+                    this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                }
             });
         }
     };
