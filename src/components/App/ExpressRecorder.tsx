@@ -611,7 +611,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (shareScreenOn && screenRecordedBlob) {
             this.invokeDownload(screenRecordedBlob, "Screen-Recording-" + new Date());
         }
-        if (!!constraints.video) {
+        if (constraints.video) {
             this.invokeDownload(blob, entryName);
         }
     };
