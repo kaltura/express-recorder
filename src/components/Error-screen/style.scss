@@ -1,8 +1,8 @@
 .error-screen-wrap {
     height: 100%;
     width: 100%;
-    background-color: #FFDD87;
-    color: #8B572A;
+    background-color: #ffdd87;
+    color: #8b572a;
     text-shadow: 1px 1px 0 0 rgba(255, 255, 255, 0.5);
     margin: auto;
     display: flex;
@@ -10,7 +10,7 @@
 
     .error-screen {
         text-align: center;
-        width:100%;
+        width: 100%;
 
         h1.error-screen__title {
             font-size: 18px;
@@ -27,4 +27,14 @@
             word-wrap: break-word;
         }
     }
+}
+.error-screen__reset-button {
+    height: 36px;
+    width: 130px;
+    position: relative;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    margin-top: 20px;
 }
