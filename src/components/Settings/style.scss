@@ -1,6 +1,5 @@
 .settings {
-    padding: 8px 24px 8px 32px;
-    width: 248px;
+    padding: 8px 24px 8px 23px;
     height: 40px;
     background: #111111;
     border-radius: 28px;
@@ -13,6 +12,7 @@
     background-image: linear-gradient(-180deg, #ef424e, #db1f26);
     box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.5);
     cursor: pointer;
+    margin-left: 5px;
 
     &:hover {
         background-image: linear-gradient(-180deg, #ed2a38, #c51c22);
@@ -23,8 +23,8 @@
     align-items: center;
 }
 .resources-icon {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
     svg {
         vertical-align: bottom;
     }
@@ -42,7 +42,8 @@
     justify-content: space-between;
     height: 100%;
 }
-.arrow-up, .arrow-down {
+.arrow-up,
+.arrow-down {
     border: solid #ffffff;
     border-width: 0 2px 2px 0;
     display: inline-block;
@@ -50,16 +51,10 @@
     transform: rotate(-135deg);
 }
 .arrow-down {
-     transform: rotate(45deg);
+    transform: rotate(45deg);
     margin-bottom: 5px !important;
- }
-.settings-line {
-    height: 1px;
-    opacity: 0.15;
-    background-color: #ffffff;
-    margin: 8px 0;
-    border: none;
 }
+
 .device-label {
     &:hover {
         .device-label__popup {
@@ -83,7 +78,7 @@
     visibility: hidden;
     position: absolute;
     border-radius: 4px;
-    background-color: #eaeaea;
+    background-color: #ffffff;
     color: #000;
     margin-left: 100px;
     margin-right: 10px;
@@ -118,7 +113,6 @@
 }
 .arrow-wrap {
     width: 20px;
-    cursor: pointer;
     margin-top: 3px;
     i {
         margin-left: 13px;
@@ -127,10 +121,16 @@
 }
 .resource-link {
     color: white;
+    width: 50px;
+    padding: 4px;
+    cursor: pointer;
+    margin: 0 5px 0 5px;
     &:hover,
     &:focus {
         color: white;
         text-decoration: none;
+        background-color: #666666;
+        border-radius: 4px;
     }
 }
 .device-disabled {
@@ -160,8 +160,8 @@
     font-size: 16px;
     line-height: 35px;
     width: 280px;
-    border-radius: 3px;
-    background: rgba(34, 34, 34, 0.9);
+    border-radius: 4px;
+    background: #333333;
     color: #ffffff;
 }
 .device-label__selected-icon {

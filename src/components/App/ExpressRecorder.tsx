@@ -763,7 +763,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 >
                     {doRecording && (
                         <RecordingTimer
-                            onButtonClick={this.handleStopClick}
+                            onStop={this.handleStopClick}
                             maxRecordingTime={maxRecordingTime}
                             setStopButtonRef={this.setStopButtonRef}
                         />

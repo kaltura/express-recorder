@@ -1,9 +1,10 @@
 import { Component, h } from "preact";
-import StopIcon from "./Stop.svg";
+import { StopIcon } from "./icons/stop";
+
 const styles = require("./style.scss");
 
 type Props = {
-    onButtonClick: () => void;
+    onStop: () => void;
     maxRecordingTime?: number;
     setStopButtonRef: (ref: HTMLElement) => void;
 };
@@ -22,7 +23,6 @@ export class RecordingTimer extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = { currentTime: 0, clickedOnce: false };
-        this.clickHandler = this.clickHandler.bind(this);
     }
 
     componentDidMount() {
@@ -35,24 +35,22 @@ export class RecordingTimer extends Component<Props, State> {
     update() {
         const { maxRecordingTime } = this.props;
         if (maxRecordingTime && maxRecordingTime <= this.state.currentTime) {
-            this.clickHandler();
+            this.handleStop();
             return;
         }
         this.setState({ currentTime: this.state.currentTime + 1 });
     }
 
-    clickHandler() {
+    handleStop = () => {
         if (this.state.clickedOnce) {
             return;
         }
 
         clearInterval(this.interval);
         this.setState({ clickedOnce: true }, () => {
-            if (this.props.onButtonClick) {
-                this.props.onButtonClick();
-            }
+            this.props.onStop();
         });
-    }
+    };
 
     render(props: Props, state: State) {
         const { currentTime } = state;
@@ -64,17 +62,21 @@ export class RecordingTimer extends Component<Props, State> {
         timeString += ":" + (seconds < 10 ? "0" + seconds : seconds);
 
         return (
-            <div className={`xr_timer ${styles["timer"]}`}>
-                <button
-                    type={"button"}
-                    className={`xr_timer-button ${styles["timer-button"]}`}
-                    onClick={this.clickHandler}
-                    tabIndex={0}
-                    ref={props.setStopButtonRef}
-                >
-                    <StopIcon />
-                    <span>{timeString}</span>
-                </button>
+            <div className={`xr_recording-timer ${styles["recording-timer"]}`}>
+                <div className={`xr_recording-menu ${styles["recording-menu"]}`}>
+                    <div>
+                        <button
+                            type={"button"}
+                            className={`xr_timer-button ${styles["timer-button"]}`}
+                            onClick={this.handleStop}
+                            tabIndex={0}
+                            ref={props.setStopButtonRef}
+                        >
+                            <StopIcon />
+                        </button>
+                    </div>
+                    <div className={`xr_timer ${styles["timer"]}`}>{timeString}</div>
+                </div>
             </div>
         );
     }
