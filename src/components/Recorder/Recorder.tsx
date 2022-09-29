@@ -138,12 +138,10 @@ export class Recorder extends Component<Props, State> {
     };
 
     stopRecording = () => {
-        const { screenStream, screenShareOn } = this.props;
-
         if (this.mediaRecorder && this.mediaRecorder.active) {
             this.mediaRecorder.stop();
         }
-        if (screenStream && screenShareOn) {
+        if (this.screenRecorder && this.screenRecorder.active) {
             this.screenRecorder.stop();
         }
         if (this.props.onRecordingEnd) {
