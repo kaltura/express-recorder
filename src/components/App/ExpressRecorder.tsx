@@ -330,7 +330,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 recordedBlobs: [],
                 screenRecordedBlobs: [],
                 doPlayback: false,
-                error: ""
+                error: "",
+                shareScreenOn: false
             },
             () => {
                 this.stopStreams();
@@ -379,7 +380,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         const isProcessing = () => !!(processingCamera || processingScreen);
 
-        this.setState({ processing: true });
+        this.setState({ processing: isProcessing() });
         if (recordedBlobs.length) {
             const blob = new Blob(recordedBlobs, { type: "video/webm" });
             // handle chrome blob duration issue
@@ -731,7 +732,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (error !== "") {
             return (
                 <div className={`express-recorder ${styles["express-recorder"]}`}>
-                    <ErrorScreen text={error} />
+                    <ErrorScreen text={error} onReset={this.resetApp} />
                 </div>
             );
         }
