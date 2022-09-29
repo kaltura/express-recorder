@@ -390,7 +390,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     blob: fixedBlob,
                     processing: isProcessing()
                 });
-                this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                if (!isProcessing()) {
+                    this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                }
             });
         }
         if (screenBlobs && screenBlobs.length) {
@@ -402,6 +404,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     screenRecordedBlob: fixedBlob,
                     processing: isProcessing()
                 });
+                if (!isProcessing()) {
+                    this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                }
             });
         }
     };
