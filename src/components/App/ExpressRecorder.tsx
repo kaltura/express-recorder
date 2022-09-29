@@ -50,6 +50,7 @@ type State = {
     error: string;
     constraints: MediaStreamConstraints;
     shareScreenOn: boolean;
+    processing: boolean;
 };
 
 const VIDEO_CONSTRAINT = {
@@ -91,6 +92,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             screenRecordedBlob: new Blob(),
             doPlayback: false,
             error: "",
+            processing: false,
             constraints: {
                 video:
                     props.allowVideo !== false
@@ -372,19 +374,37 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * @param screenBlobs
      */
     handleRecordingEnd = (recordedBlobs: Blob[], duration: number, screenBlobs?: Blob[]) => {
+        let processingCamera = recordedBlobs.length > 0;
+        let processingScreen = screenBlobs && screenBlobs.length > 0;
+
+        const isProcessing = () => !!(processingCamera || processingScreen);
+
+        this.setState({ processing: true });
         if (recordedBlobs.length) {
             const blob = new Blob(recordedBlobs, { type: "video/webm" });
             // handle chrome blob duration issue
             fixWebmDuration(blob, duration, (fixedBlob: Blob) => {
-                this.setState({ recordedBlobs: recordedBlobs, blob: fixedBlob });
-                this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                processingCamera = false;
+                this.setState({
+                    recordedBlobs: recordedBlobs,
+                    blob: fixedBlob,
+                    processing: isProcessing()
+                });
+                if (!isProcessing()) {
+                    this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                }
             });
         }
         if (screenBlobs && screenBlobs.length) {
             const screenBlobObject = new Blob(screenBlobs, { type: "video/webm" });
             fixWebmDuration(screenBlobObject, duration, (fixedBlob: Blob) => {
-                this.setState({ screenRecordedBlobs: screenBlobs, screenRecordedBlob: fixedBlob });
-                if (!recordedBlobs.length) {
+                processingScreen = false;
+                this.setState({
+                    screenRecordedBlobs: screenBlobs,
+                    screenRecordedBlob: fixedBlob,
+                    processing: isProcessing()
+                });
+                if (!isProcessing()) {
                     this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
                 }
             });
@@ -676,7 +696,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             constraints,
             blob,
             screenRecordedBlob,
-            screenRecordedBlobs
+            screenRecordedBlobs,
+            processing
         } = state;
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
@@ -735,6 +756,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         }
         return (
             <div className={`express-recorder ${styles["express-recorder"]}`}>
+                {processing ? (
+                    <div
+                        className={`express-recorder__processing ${styles["express-recorder__processing"]}`}
+                    >
+                        {this.translator.translate("Processing media, please wait..")}
+                    </div>
+                ) : null}
                 <Recorder
                     video={!!constraints.video}
                     videoStream={stream}
