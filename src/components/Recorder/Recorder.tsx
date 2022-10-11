@@ -51,15 +51,17 @@ export class Recorder extends Component<Props, State> {
 
     componentDidUpdate(prevProps: Props) {
         const { doRecording, discard } = this.props;
-        this.showStreamIfPossible();
-
-        if (doRecording !== prevProps.doRecording) {
-            this.toggleRecording();
-        }
 
         if (discard) {
             this.recordedBlobs = [];
             this.screenBlobs = [];
+            return;
+        }
+
+        this.showStreamIfPossible();
+
+        if (doRecording !== prevProps.doRecording) {
+            this.toggleRecording();
         }
     }
 
@@ -215,6 +217,9 @@ export class Recorder extends Component<Props, State> {
                         muted={true}
                         autoPlay={true}
                         ref={node => {
+                            if (!node) {
+                                return;
+                            }
                             this.screenRef = node as HTMLMediaElement;
                         }}
                     />
