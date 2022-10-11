@@ -784,8 +784,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     uiConfId={uiConfId}
                     onError={this.handleError}
                     screenShareOn={shareScreenOn}
-                    blob={blob}
-                    screenBlob={screenRecordedBlob}
                 />
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
