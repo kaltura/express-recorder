@@ -485,7 +485,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             });
         }
         // update constraints state only if create stream has been succeeded
-        this.createStream(newConstraints, screenOn);
+        this.createStream(newConstraints, screenOn, toggleWasChanged);
     };
 
     getScreenshareWithMicrophone = async () => {
@@ -499,7 +499,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         const audio = await navigator.mediaDevices.getUserMedia({ audio: true });
         return new MediaStream([audio.getTracks()[0], screenStream.getTracks()[0]]);
     };
-    createStream = (constraints: MediaStreamConstraints, screenOn: boolean) => {
+    createStream = (
+        constraints: MediaStreamConstraints,
+        screenOn: boolean,
+        toggleChanged?: boolean
+    ) => {
         this.modifyConstraints(constraints).then(finalConstraints => {
             if (!finalConstraints.video && !finalConstraints.audio) {
                 this.setState({
@@ -515,25 +519,27 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     .then((stream: MediaStream) => {
                         this.setState({
                             stream: stream,
-                            constraints: finalConstraints,
-                            shareScreenOn: screenOn
+                            constraints: finalConstraints
                         });
                     })
                     .catch(e => this.handleError("Failed to allocate resource: " + e.message));
             }
             if (screenOn) {
-                this.createScreenStream(screenOn, finalConstraints);
+                this.createScreenStream(finalConstraints, toggleChanged);
+            } else {
+                const { screenStream } = this.state;
+                screenStream &&
+                    screenStream.getTracks().forEach(function(track) {
+                        track.stop();
+                    });
+                this.setState({ screenStream: undefined, shareScreenOn: false });
             }
         });
     };
 
-    createScreenStream = (screenOn: boolean, finalConstraints: MediaStreamConstraints) => {
-        const { shareScreenOn } = this.state;
+    createScreenStream = (finalConstraints: MediaStreamConstraints, toggleChanged?: boolean) => {
         const { video, audio } = finalConstraints;
-        if (!screenOn) {
-            return;
-        }
-        if (screenOn === shareScreenOn && video) {
+        if (!toggleChanged && video) {
             return;
         }
 
@@ -543,7 +549,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     this.setState({
                         screenStream: stream,
                         constraints: finalConstraints,
-                        shareScreenOn: screenOn,
+                        shareScreenOn: true,
                         stream: undefined
                     });
                 })
@@ -558,7 +564,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 this.setState({
                     screenStream: screenStream,
                     constraints: finalConstraints,
-                    shareScreenOn: screenOn
+                    shareScreenOn: true
                 });
             })
             .catch((e: any) => this.handleError("Failed to allocate resource: " + e.message));
@@ -778,8 +784,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     uiConfId={uiConfId}
                     onError={this.handleError}
                     screenShareOn={shareScreenOn}
-                    blob={blob}
-                    screenBlob={screenRecordedBlob}
                 />
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
@@ -804,13 +808,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             <Settings
                                 selectedCameraDevice={selectedCameraDevice}
                                 selectedAudioDevice={selectedAudioDevice}
-                                allowVideo={allowVideo}
-                                allowAudio={allowAudio}
+                                cameraOn={!!constraints.video}
+                                audioOn={!!constraints.audio}
                                 allowScreenShare={allowScreenShare}
                                 onSettingsChanged={this.handleSettingsChange}
                                 stream={stream}
                                 screenShareOn={shareScreenOn}
                                 onStartRecording={this.handleStartClick}
+                                allowVideo={allowVideo}
+                                allowAudio={allowAudio}
                             />
                         )}
                     </div>

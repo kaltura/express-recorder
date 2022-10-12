@@ -14,16 +14,12 @@ type Props = {
     doPlayback: boolean;
     partnerId: number;
     uiConfId: number;
-    blob: Blob;
-    screenBlob: Blob;
 };
-
-type State = {};
 
 /**
  * Handle the actual recording with given stream. Gather all blob data and handle start/stop.
  */
-export class Recorder extends Component<Props, State> {
+export class Recorder extends Component<Props> {
     static defaultProps = {
         doRecording: false,
         discard: false,
@@ -51,15 +47,17 @@ export class Recorder extends Component<Props, State> {
 
     componentDidUpdate(prevProps: Props) {
         const { doRecording, discard } = this.props;
-        this.showStreamIfPossible();
-
-        if (doRecording !== prevProps.doRecording) {
-            this.toggleRecording();
-        }
 
         if (discard) {
             this.recordedBlobs = [];
             this.screenBlobs = [];
+            return;
+        }
+
+        this.showStreamIfPossible();
+
+        if (doRecording !== prevProps.doRecording) {
+            this.toggleRecording();
         }
     }
 
@@ -138,10 +136,10 @@ export class Recorder extends Component<Props, State> {
     };
 
     stopRecording = () => {
-        if (this.mediaRecorder && this.mediaRecorder.active) {
+        if (this.mediaRecorder) {
             this.mediaRecorder.stop();
         }
-        if (this.screenRecorder && this.screenRecorder.active) {
+        if (this.screenRecorder) {
             this.screenRecorder.stop();
         }
         if (this.props.onRecordingEnd) {
@@ -178,19 +176,18 @@ export class Recorder extends Component<Props, State> {
             screenMedia = undefined;
 
         if (doPlayback) {
-            if (this.recordedBlobs && this.recordedBlobs.length > 0) {
+            if (this.recordedBlobs.length > 0) {
                 media = {
-                    blob: this.props.blob,
+                    blob: new Blob(this.recordedBlobs, { type: "video/webm" }),
                     mimeType: "video/webm"
                 };
             }
-            if (this.screenBlobs && this.screenBlobs.length > 0) {
+            if (this.screenBlobs.length > 0) {
                 screenMedia = {
-                    blob: this.props.screenBlob,
+                    blob: new Blob(this.screenBlobs, { type: "video/webm" }),
                     mimeType: "video/webm"
                 };
             }
-
             return (
                 <div
                     className={`express-recorder__playback ${styles["express-recorder__playback"]}`}
@@ -215,6 +212,9 @@ export class Recorder extends Component<Props, State> {
                         muted={true}
                         autoPlay={true}
                         ref={node => {
+                            if (!node) {
+                                return;
+                            }
                             this.screenRef = node as HTMLMediaElement;
                         }}
                     />

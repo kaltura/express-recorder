@@ -14,18 +14,17 @@ type Props = {
     ) => void;
     selectedCameraDevice?: MediaStreamTrack;
     selectedAudioDevice?: MediaStreamTrack;
-    allowVideo: boolean;
-    allowAudio: boolean;
+    cameraOn: boolean;
+    audioOn: boolean;
     screenShareOn: boolean;
     allowScreenShare: boolean;
     stream?: MediaStream;
     onStartRecording: () => void;
+    allowVideo: boolean;
+    allowAudio: boolean;
 };
 type State = {
     showSettingsOf?: ResourceTypes;
-    cameraOn: boolean;
-    audioOn: boolean;
-    screenOn: boolean;
 };
 
 export enum ResourceTypes {
@@ -44,12 +43,6 @@ export class Settings extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-
-        this.state = {
-            cameraOn: props.allowVideo,
-            audioOn: props.allowAudio,
-            screenOn: props.screenShareOn
-        };
 
         this.cameraDevicesInfo = [];
         this.audioDevicesInfo = [];
@@ -131,8 +124,7 @@ export class Settings extends Component<Props, State> {
      * @param resourceType  ResourceTypes, the type of the control that changed
      */
     handleToggleChange = (isOn: boolean, resourceType: ResourceTypes) => {
-        const { cameraOn, audioOn } = this.state;
-        const { onSettingsChanged } = this.props;
+        const { onSettingsChanged, cameraOn, audioOn, screenShareOn } = this.props;
 
         let newCameraOn = resourceType === ResourceTypes.VIDEO ? isOn : cameraOn;
         let newAudioOn = resourceType === ResourceTypes.AUDIO ? isOn : audioOn;
@@ -141,17 +133,11 @@ export class Settings extends Component<Props, State> {
         newCameraOn = !isOn && resourceType === ResourceTypes.AUDIO ? true : newCameraOn;
         newAudioOn = !isOn && resourceType === ResourceTypes.VIDEO ? true : newAudioOn;
 
-        this.setState((prevState: State) => {
-            return {
-                cameraOn: newCameraOn,
-                audioOn: newAudioOn,
-                screenOn: resourceType === ResourceTypes.SCREEN_SHARE ? isOn : prevState.screenOn
-            };
-        });
-
         const camera = newCameraOn ? this.getCurrentDevice(ResourceTypes.VIDEO) : undefined;
         const audio = newAudioOn ? this.getCurrentDevice(ResourceTypes.AUDIO) : undefined;
-        onSettingsChanged(false, true, this.state.screenOn, camera, audio);
+        const screen = resourceType === ResourceTypes.SCREEN_SHARE ? isOn : screenShareOn;
+
+        onSettingsChanged(false, true, screen, camera, audio);
     };
 
     getCurrentDevice = (type: ResourceTypes) => {
@@ -169,9 +155,8 @@ export class Settings extends Component<Props, State> {
     };
 
     handleChooseDevice = (device: MediaDeviceInfo) => {
-        const { onSettingsChanged } = this.props;
+        const { onSettingsChanged, cameraOn, audioOn, screenShareOn } = this.props;
 
-        const { cameraOn, audioOn, screenOn } = this.state;
         const camera =
             device.kind === "videoinput" && cameraOn
                 ? device
@@ -181,7 +166,7 @@ export class Settings extends Component<Props, State> {
                 ? device
                 : this.getCurrentDevice(ResourceTypes.AUDIO);
 
-        onSettingsChanged(true, false, screenOn, camera, audio);
+        onSettingsChanged(true, false, screenShareOn, camera, audio);
     };
 
     handleKeyboardInput = (e: KeyboardEvent, type: ResourceTypes) => {
@@ -219,15 +204,15 @@ export class Settings extends Component<Props, State> {
 
     render() {
         const {
-            stream,
-            allowAudio,
-            allowVideo,
+            audioOn,
+            cameraOn,
             allowScreenShare,
             onStartRecording,
-            selectedAudioDevice,
-            selectedCameraDevice
+            screenShareOn,
+            allowAudio,
+            allowVideo
         } = this.props;
-        const { cameraOn, audioOn, screenOn, showSettingsOf } = this.state;
+        const { showSettingsOf } = this.state;
         const translator = Translator.getTranslator();
 
         let devicesSettings = null;
@@ -236,7 +221,7 @@ export class Settings extends Component<Props, State> {
                 <SettingsDevices
                     resourceName={ResourceTypes.SCREEN_SHARE}
                     devices={[]}
-                    isOn={screenOn}
+                    isOn={screenShareOn}
                     disabled={false} // can only turn off if both are available, so we won't end up with none
                     onChooseDevice={this.handleChooseDevice}
                     onToggleChange={(isOn: boolean) => {
@@ -366,8 +351,8 @@ export class Settings extends Component<Props, State> {
                             </span>
                             <div className={styles["resources-item"]}>
                                 <div className={styles["resources-icon"]}>
-                                    {screenOn && <ScreenIcon />}
-                                    {!screenOn && <NoScreenIcon />}
+                                    {screenShareOn && <ScreenIcon />}
+                                    {!screenShareOn && <NoScreenIcon />}
                                 </div>
                                 <div className={styles["arrow-wrap"]}>
                                     {showSettingsOf !== ResourceTypes.SCREEN_SHARE && (
