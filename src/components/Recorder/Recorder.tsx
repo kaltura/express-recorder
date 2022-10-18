@@ -58,7 +58,7 @@ export class Recorder extends Component<Props> {
         }
 
         if (!videoStream) {
-            this.screenRecorder = undefined;
+            this.mediaRecorder = undefined;
         }
         if (!screenStream) {
             this.screenRecorder = undefined;
