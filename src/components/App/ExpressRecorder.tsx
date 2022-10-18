@@ -448,7 +448,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             recordedBlobs: [],
             screenRecordedBlobs: [],
             doPlayback: false,
-            processing: false
+            processing: false,
+            blob: undefined,
+            screenRecordedBlob: undefined
         });
     };
     handleCountdownComplete = () => {

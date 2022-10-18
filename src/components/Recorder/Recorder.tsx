@@ -28,7 +28,7 @@ export class Recorder extends Component<Props> {
         doPlayback: false
     };
 
-    mediaRecorder: any; // recorder for audio and camera
+    mediaRecorder?: any; // recorder for audio and camera
     screenRecorder?: any; // recorder for screen sharing
     recordedBlobs: Blob[]; // blobs from stream recording of camera and audio
     screenBlobs: Blob[]; // blobs from stream recording of screen sharing
@@ -38,7 +38,6 @@ export class Recorder extends Component<Props> {
 
     constructor(props: Props) {
         super(props);
-        this.mediaRecorder = null;
         this.recordedBlobs = [];
         this.screenBlobs = [];
         this.startTime = 0;
@@ -48,12 +47,21 @@ export class Recorder extends Component<Props> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { doRecording, discard } = this.props;
+        const { doRecording, discard, screenStream, videoStream } = this.props;
 
         if (discard) {
             this.recordedBlobs = [];
             this.screenBlobs = [];
+            this.mediaRecorder = undefined;
+            this.screenRecorder = undefined;
             return;
+        }
+
+        if (!videoStream) {
+            this.screenRecorder = undefined;
+        }
+        if (!screenStream) {
+            this.screenRecorder = undefined;
         }
 
         this.showStreamIfPossible();
