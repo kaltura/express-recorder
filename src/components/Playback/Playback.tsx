@@ -4,8 +4,8 @@ declare var KalturaPlayer: any;
 import "./player.css";
 
 type Props = {
-    cameraMedia?: PlaybackMedia; // the actual recorded camera
-    screenMedia?: PlaybackMedia; // the actual recorded screen
+    cameraMedia?: Blob; // recording from camera
+    screenMedia?: Blob; // recording from screen
     partnerId: number;
     uiconfId: number; // must be v3
     autoPlay?: boolean;
@@ -14,8 +14,6 @@ type Props = {
 
 type State = {};
 let uniqueId: number = 0;
-
-type PlaybackMedia = { blob: Blob; mimeType: string };
 
 /**
  * Component to play the recorded media, uses v3 player.
@@ -35,24 +33,24 @@ export class Playback extends Component<Props, State> {
 
     componentDidUpdate(previousProps: Props, previousState: State, previousContext: any): void {
         const { cameraMedia, screenMedia } = this.props;
-        if (cameraMedia && previousProps.cameraMedia !== cameraMedia) {
+        if (cameraMedia && previousProps.cameraMedia !== cameraMedia && this.kalturaPlayer) {
             // play the new media
             this.setMedia(cameraMedia, this.kalturaPlayer);
         }
-        if (screenMedia && previousProps.screenMedia !== screenMedia) {
+        if (screenMedia && previousProps.screenMedia !== screenMedia && this.kalturaPlayerScreen) {
             this.setMedia(screenMedia, this.kalturaPlayerScreen);
         }
     }
 
-    setMedia(media: PlaybackMedia, kalturaPlayer: any) {
+    setMedia(media: Blob, kalturaPlayer: any) {
         const { autoPlay, pictureInPicture } = this.props;
         kalturaPlayer.setMedia({
             sources: {
                 dvr: true,
                 progressive: [
                     {
-                        url: window.URL.createObjectURL(media.blob),
-                        mimetype: media.mimeType
+                        url: window.URL.createObjectURL(media),
+                        mimetype: "video/webm"
                     }
                 ],
                 type: kalturaPlayer.MediaType.VOD

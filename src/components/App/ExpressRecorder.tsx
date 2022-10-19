@@ -45,8 +45,8 @@ type State = {
     abortUpload: boolean;
     recordedBlobs: Blob[];
     screenRecordedBlobs: Blob[];
-    blob: Blob;
-    screenRecordedBlob: Blob;
+    blob?: Blob;
+    screenRecordedBlob?: Blob;
     error: string;
     constraints: MediaStreamConstraints;
     shareScreenOn: boolean;
@@ -88,8 +88,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             abortUpload: false,
             recordedBlobs: [],
             screenRecordedBlobs: [],
-            blob: new Blob(),
-            screenRecordedBlob: new Blob(),
             doPlayback: false,
             error: "",
             processing: false,
@@ -389,7 +387,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 this.setState({
                     recordedBlobs: recordedBlobs,
                     blob: fixedBlob,
-                    processing: isProcessing()
+                    processing: isProcessing(),
+                    doPlayback: !isProcessing()
                 });
                 if (!isProcessing()) {
                     this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
@@ -403,7 +402,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 this.setState({
                     screenRecordedBlobs: screenBlobs,
                     screenRecordedBlob: fixedBlob,
-                    processing: isProcessing()
+                    processing: isProcessing(),
+                    doPlayback: !isProcessing()
                 });
                 if (!isProcessing()) {
                     this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
@@ -433,7 +433,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * when user requests to stop the recording
      */
     handleStopClick = () => {
-        this.setState({ doRecording: false, doPlayback: true });
+        this.setState({ doRecording: false });
     };
 
     /**
@@ -447,7 +447,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({
             recordedBlobs: [],
             screenRecordedBlobs: [],
-            doPlayback: false
+            doPlayback: false,
+            processing: false,
+            blob: undefined,
+            screenRecordedBlob: undefined
         });
     };
     handleCountdownComplete = () => {
@@ -513,13 +516,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 });
                 return;
             }
+            this.setState({
+                constraints: finalConstraints
+            });
             if (finalConstraints.video || (finalConstraints.audio && !screenOn)) {
                 navigator.mediaDevices
                     .getUserMedia(finalConstraints)
                     .then((stream: MediaStream) => {
                         this.setState({
-                            stream: stream,
-                            constraints: finalConstraints
+                            stream: stream
                         });
                     })
                     .catch(e => this.handleError("Failed to allocate resource: " + e.message));
@@ -548,7 +553,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 .then((stream: MediaStream) => {
                     this.setState({
                         screenStream: stream,
-                        constraints: finalConstraints,
                         shareScreenOn: true,
                         stream: undefined
                     });
@@ -563,7 +567,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             .then((screenStream: MediaStream) => {
                 this.setState({
                     screenStream: screenStream,
-                    constraints: finalConstraints,
                     shareScreenOn: true
                 });
             })
@@ -617,7 +620,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (shareScreenOn && screenRecordedBlob) {
             this.invokeDownload(screenRecordedBlob, "Screen-Recording-" + new Date());
         }
-        if (constraints.video) {
+        if (blob && constraints.video) {
             this.invokeDownload(blob, entryName);
         }
     };
@@ -784,6 +787,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     uiConfId={uiConfId}
                     onError={this.handleError}
                     screenShareOn={shareScreenOn}
+                    blob={blob}
+                    screenBlob={screenRecordedBlob}
                 />
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>

@@ -14,6 +14,8 @@ type Props = {
     doPlayback: boolean;
     partnerId: number;
     uiConfId: number;
+    blob?: Blob;
+    screenBlob?: Blob;
 };
 
 /**
@@ -26,7 +28,7 @@ export class Recorder extends Component<Props> {
         doPlayback: false
     };
 
-    mediaRecorder: any; // recorder for audio and camera
+    mediaRecorder?: any; // recorder for audio and camera
     screenRecorder?: any; // recorder for screen sharing
     recordedBlobs: Blob[]; // blobs from stream recording of camera and audio
     screenBlobs: Blob[]; // blobs from stream recording of screen sharing
@@ -36,7 +38,6 @@ export class Recorder extends Component<Props> {
 
     constructor(props: Props) {
         super(props);
-        this.mediaRecorder = null;
         this.recordedBlobs = [];
         this.screenBlobs = [];
         this.startTime = 0;
@@ -46,12 +47,21 @@ export class Recorder extends Component<Props> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { doRecording, discard } = this.props;
+        const { doRecording, discard, screenStream, videoStream } = this.props;
 
         if (discard) {
             this.recordedBlobs = [];
             this.screenBlobs = [];
+            this.mediaRecorder = undefined;
+            this.screenRecorder = undefined;
             return;
+        }
+
+        if (!videoStream) {
+            this.mediaRecorder = undefined;
+        }
+        if (!screenStream) {
+            this.screenRecorder = undefined;
         }
 
         this.showStreamIfPossible();
@@ -169,25 +179,13 @@ export class Recorder extends Component<Props> {
             videoStream,
             screenShareOn,
             video,
-            screenStream
+            screenStream,
+            blob,
+            screenBlob
         } = this.props;
         const shareScreenClass = screenShareOn ? "express-recorder__recorder__share-screen" : "";
-        let media = undefined,
-            screenMedia = undefined;
 
-        if (doPlayback) {
-            if (this.recordedBlobs.length > 0) {
-                media = {
-                    blob: new Blob(this.recordedBlobs, { type: "video/webm" }),
-                    mimeType: "video/webm"
-                };
-            }
-            if (this.screenBlobs.length > 0) {
-                screenMedia = {
-                    blob: new Blob(this.screenBlobs, { type: "video/webm" }),
-                    mimeType: "video/webm"
-                };
-            }
+        if (doPlayback && (blob || screenBlob)) {
             return (
                 <div
                     className={`express-recorder__playback ${styles["express-recorder__playback"]}`}
@@ -195,8 +193,8 @@ export class Recorder extends Component<Props> {
                     <Playback
                         partnerId={partnerId}
                         uiconfId={uiConfId}
-                        cameraMedia={media}
-                        screenMedia={screenMedia}
+                        cameraMedia={blob}
+                        screenMedia={screenBlob}
                         autoPlay={false}
                     />
                 </div>
