@@ -448,7 +448,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             recordedBlobs: [],
             screenRecordedBlobs: [],
             doPlayback: false,
-            processing: false
+            processing: false,
+            blob: undefined,
+            screenRecordedBlob: undefined
         });
     };
     handleCountdownComplete = () => {
@@ -514,13 +516,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 });
                 return;
             }
+            this.setState({
+                constraints: finalConstraints
+            });
             if (finalConstraints.video || (finalConstraints.audio && !screenOn)) {
                 navigator.mediaDevices
                     .getUserMedia(finalConstraints)
                     .then((stream: MediaStream) => {
                         this.setState({
-                            stream: stream,
-                            constraints: finalConstraints
+                            stream: stream
                         });
                     })
                     .catch(e => this.handleError("Failed to allocate resource: " + e.message));
@@ -549,7 +553,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 .then((stream: MediaStream) => {
                     this.setState({
                         screenStream: stream,
-                        constraints: finalConstraints,
                         shareScreenOn: true,
                         stream: undefined
                     });
@@ -564,7 +567,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             .then((screenStream: MediaStream) => {
                 this.setState({
                     screenStream: screenStream,
-                    constraints: finalConstraints,
                     shareScreenOn: true
                 });
             })
