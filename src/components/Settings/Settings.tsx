@@ -157,16 +157,20 @@ export class Settings extends Component<Props, State> {
     handleChooseDevice = (device: MediaDeviceInfo) => {
         const { onSettingsChanged, cameraOn, audioOn, screenShareOn } = this.props;
 
-        const camera =
-            device.kind === "videoinput" && cameraOn
-                ? device
-                : this.getCurrentDevice(ResourceTypes.VIDEO);
-        const audio =
+        const cameraDevice =
+            device.kind === "videoinput" ? device : this.getCurrentDevice(ResourceTypes.VIDEO);
+        const audioDevice =
             device.kind === "audioinput" && audioOn
                 ? device
                 : this.getCurrentDevice(ResourceTypes.AUDIO);
 
-        onSettingsChanged(true, false, screenShareOn, camera, audio);
+        onSettingsChanged(
+            true,
+            false,
+            screenShareOn,
+            cameraOn ? cameraDevice : undefined,
+            audioOn ? audioDevice : undefined
+        );
     };
 
     handleKeyboardInput = (e: KeyboardEvent, type: ResourceTypes) => {
