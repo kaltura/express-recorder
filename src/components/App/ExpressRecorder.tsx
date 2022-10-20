@@ -497,7 +497,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             screenStream = this.state.screenStream;
         } else {
             // @ts-ignore
-            screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+            screenStream = await navigator.mediaDevices.getDisplayMedia({
+                video: true,
+                audio: true
+            });
         }
         const audio = await navigator.mediaDevices.getUserMedia({ audio: true });
         return new MediaStream([audio.getTracks()[0], screenStream.getTracks()[0]]);
@@ -563,7 +566,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         navigator.mediaDevices
             // @ts-ignore
-            .getDisplayMedia({ video: true })
+            .getDisplayMedia({ video: true, audio: true })
             .then((screenStream: MediaStream) => {
                 this.setState({
                     screenStream: screenStream,
