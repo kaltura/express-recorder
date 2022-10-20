@@ -27,22 +27,4 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-icon-gear {
-  &:before {
-    content: $icon-gear;
-  }
-}
-.icon-stop .path1 {
-  &:before {
-    content: $icon-stop-path1;
-    color: rgb(0, 0, 0);
-  }
-}
-.icon-stop .path2 {
-  &:before {
-    content: $icon-stop-path2;
-    margin-left: -1em;
-    color: rgb(255, 255, 255);
-  }
-}
 
