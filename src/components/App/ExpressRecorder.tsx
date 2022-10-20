@@ -615,12 +615,12 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     saveFile = () => {
-        const { shareScreenOn, screenRecordedBlob, blob, constraints } = this.state;
+        const { shareScreenOn, screenRecordedBlob, blob } = this.state;
         const entryName = this.props.entryName ? this.props.entryName : this.getDefaultEntryName();
         if (shareScreenOn && screenRecordedBlob) {
             this.invokeDownload(screenRecordedBlob, "Screen-Recording-" + new Date());
         }
-        if (blob && constraints.video) {
+        if (blob) {
             this.invokeDownload(blob, entryName);
         }
     };
