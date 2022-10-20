@@ -160,9 +160,7 @@ export class Settings extends Component<Props, State> {
         const cameraDevice =
             device.kind === "videoinput" ? device : this.getCurrentDevice(ResourceTypes.VIDEO);
         const audioDevice =
-            device.kind === "audioinput" && audioOn
-                ? device
-                : this.getCurrentDevice(ResourceTypes.AUDIO);
+            device.kind === "audioinput" ? device : this.getCurrentDevice(ResourceTypes.AUDIO);
 
         onSettingsChanged(
             true,
