@@ -169,3 +169,35 @@
     margin-top: 2px;
     position: absolute;
 }
+
+.controls-popup__start {
+    top: -42px;
+    right: -15px;
+    &:after {
+        left: 48px;
+        top: 34px;
+    }
+}
+.controls__start {
+    &:hover {
+        .controls-popup__start {
+            visibility: visible;
+            white-space: normal;
+        }
+    }
+}
+.controls__start[title]:hover::after,
+.resource-link[title]:hover::after{
+    content: attr(title);
+    position: absolute;
+    border-radius: 4px;
+    background-color: #222222;
+    color: #ffffff;
+    padding: 10px 10px;
+    line-height: 14px;
+    font-size: 13px;
+    font-weight: 400;
+    top: -45px;
+    width: max-content;
+    margin-left: -55px;
+}

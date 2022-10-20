@@ -286,6 +286,7 @@ export class Settings extends Component<Props, State> {
                         }}
                         tabIndex={0}
                         role="menuitem"
+                        title={translator.translate("Camera Settings")}
                     >
                         <span className={styles["sr-only"]}>
                             {translator.translate("Camera Settings")}
@@ -315,6 +316,7 @@ export class Settings extends Component<Props, State> {
                         }}
                         tabIndex={0}
                         role="menuitem"
+                        title={translator.translate("Audio Settings")}
                     >
                         <span className={styles["sr-only"]}>
                             {translator.translate("Audio Settings")}
@@ -345,6 +347,7 @@ export class Settings extends Component<Props, State> {
                             }}
                             tabIndex={0}
                             role="menuitem"
+                            title={translator.translate("Screen Share Settings")}
                         >
                             <span className={styles["sr-only"]}>
                                 {translator.translate("Screen Share Settings")}
@@ -373,7 +376,8 @@ export class Settings extends Component<Props, State> {
                             "Start Recording. recording will start in a three seconds delay"
                         )}
                         tabIndex={0}
-                    />
+                        title={translator.translate("Start Recording")}
+                    ></button>
                 </div>
             </div>
         );
