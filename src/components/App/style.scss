@@ -87,3 +87,9 @@
     background-color: black;
     z-index: 999;
 }
+.express-recorder__playback {
+    height: 100%;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+}
