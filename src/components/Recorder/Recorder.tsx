@@ -1,5 +1,4 @@
 import { h, Component } from "preact";
-import { Playback } from "../Playback/Playback";
 import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 const styles = require("./style.scss");
 type Props = {
@@ -9,13 +8,8 @@ type Props = {
     screenShareOn: boolean;
     onError?: (error: string) => void;
     doRecording: boolean;
-    onRecordingEnd: (recorderBlobs: Blob[], duration: number, screenBlobs?: Blob[]) => void;
+    onRecordingEnd: (duration: number, cameraBlobs?: Blob[], screenBlobs?: Blob[]) => void;
     discard?: boolean;
-    doPlayback: boolean;
-    partnerId: number;
-    uiConfId: number;
-    blob?: Blob;
-    screenBlob?: Blob;
 };
 
 /**
@@ -24,8 +18,7 @@ type Props = {
 export class Recorder extends Component<Props> {
     static defaultProps = {
         doRecording: false,
-        discard: false,
-        doPlayback: false
+        discard: false
     };
 
     mediaRecorder?: any; // recorder for audio and camera
@@ -72,15 +65,14 @@ export class Recorder extends Component<Props> {
     }
 
     showStreamIfPossible = () => {
-        const { videoStream, screenStream, doPlayback } = this.props;
-        if (!doPlayback) {
-            if (this.videoRef && videoStream) {
-                this.videoRef.srcObject = videoStream;
-            }
+        const { videoStream, screenStream } = this.props;
 
-            if (screenStream && this.screenRef) {
-                this.screenRef.srcObject = screenStream;
-            }
+        if (this.videoRef && videoStream) {
+            this.videoRef.srcObject = videoStream;
+        }
+
+        if (screenStream && this.screenRef) {
+            this.screenRef.srcObject = screenStream;
         }
     };
 
@@ -127,13 +119,13 @@ export class Recorder extends Component<Props> {
                 this.mediaRecorder = new MediaRecorder(videoStream, options);
                 this.mediaRecorder.ondataavailable = (event: any) =>
                     this.handleDataAvailable(event, "video");
-                this.mediaRecorder.start(10); // collect 10ms of data
+                this.mediaRecorder.start(3000); // collect 10ms of data
             }
             if (screenShareOn && screenStream) {
                 this.screenRecorder = new MediaRecorder(screenStream, options);
                 this.screenRecorder.ondataavailable = (event: any) =>
                     this.handleDataAvailable(event, "screen");
-                this.screenRecorder.start(10);
+                this.screenRecorder.start(3000);
             }
         } catch (e) {
             if (this.props.onError) {
@@ -154,9 +146,9 @@ export class Recorder extends Component<Props> {
         }
         if (this.props.onRecordingEnd) {
             this.props.onRecordingEnd(
-                this.recordedBlobs,
                 Date.now() - this.startTime,
-                this.screenBlobs
+                this.recordedBlobs.length > 0 ? this.recordedBlobs : undefined,
+                this.screenBlobs.length > 0 ? this.screenBlobs : undefined
             );
         }
     };
@@ -172,34 +164,8 @@ export class Recorder extends Component<Props> {
     };
 
     render(props: Props) {
-        const {
-            doPlayback,
-            partnerId,
-            uiConfId,
-            videoStream,
-            screenShareOn,
-            video,
-            screenStream,
-            blob,
-            screenBlob
-        } = this.props;
+        const { videoStream, screenShareOn, video, screenStream } = this.props;
         const shareScreenClass = screenShareOn ? "express-recorder__recorder__share-screen" : "";
-
-        if (doPlayback && (blob || screenBlob)) {
-            return (
-                <div
-                    className={`express-recorder__playback ${styles["express-recorder__playback"]}`}
-                >
-                    <Playback
-                        partnerId={partnerId}
-                        uiconfId={uiConfId}
-                        cameraMedia={blob}
-                        screenMedia={screenBlob}
-                        autoPlay={false}
-                    />
-                </div>
-            );
-        }
 
         return (
             <div class={`xr_video-object-wrap ${styles["video-object-wrap"]}`}>
