@@ -119,7 +119,7 @@ export class Recorder extends Component<Props> {
                 this.mediaRecorder = new MediaRecorder(videoStream, options);
                 this.mediaRecorder.ondataavailable = (event: any) =>
                     this.handleDataAvailable(event, "video");
-                this.mediaRecorder.start(3000); // collect 10ms of data
+                this.mediaRecorder.start(3000); // collect data every 3 seconds
             }
             if (screenShareOn && screenStream) {
                 this.screenRecorder = new MediaRecorder(screenStream, options);
