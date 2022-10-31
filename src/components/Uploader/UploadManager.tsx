@@ -24,13 +24,13 @@ type Props = {
     onUploadCancelled?: () => void;
     onUploadProgress?: (loaded: number, total: number) => void;
     mediaType: KalturaMediaType;
-    recordedBlobs: Blob[];
+    parentBlob?: Blob;
+    childBlob?: Blob;
     entryName: string;
     serviceUrl: string;
     ks: string;
     conversionProfileId?: number;
     abortUpload?: boolean;
-    childRecordedBlobs?: Blob[];
     showUploadUI?: boolean;
     onCancel: () => void;
 };
@@ -174,13 +174,7 @@ export class UploadManager extends Component<Props, State> {
      * Upload media file with given tokenId. Use chunks if needed (file above 5MB)
      */
     addMedia(tokenId: string) {
-        const {
-            client,
-            onUploadEnded,
-            onUploadProgress,
-            recordedBlobs,
-            childRecordedBlobs
-        } = this.props;
+        const { client, onUploadEnded, onUploadProgress, parentBlob, childBlob } = this.props;
         const { doChildUpload } = this.state;
         if (!client) {
             this.throwError(new Error("Missing client object"));
@@ -190,10 +184,11 @@ export class UploadManager extends Component<Props, State> {
             return;
         }
 
-        const blob = new Blob(doChildUpload ? childRecordedBlobs : recordedBlobs, {
-            type: "video/webm"
-        });
-        const file = new File([blob], "name.webm");
+        const fileBits = doChildUpload ? childBlob : parentBlob;
+        if (!fileBits) {
+            return;
+        }
+        const file = new File([fileBits], "name.webm");
         // keep request so it can be canceled
         const addMediaRequest = new UploadTokenUploadAction({
             uploadTokenId: tokenId,
@@ -212,7 +207,7 @@ export class UploadManager extends Component<Props, State> {
         );
         this.cancellableUploadAction.then(
             data => {
-                if (childRecordedBlobs && !doChildUpload) {
+                if (childBlob && !doChildUpload) {
                     this.setState({ doChildUpload: true, loaded: 0, total: 0 });
                     return;
                 }
@@ -298,10 +293,10 @@ export class UploadManager extends Component<Props, State> {
     }
 
     render() {
-        const { showUploadUI, onCancel, childRecordedBlobs } = this.props;
+        const { showUploadUI, onCancel, childBlob } = this.props;
         const { loaded, total, abort, doChildUpload, uploadDone } = this.state;
         let text = "";
-        if (childRecordedBlobs && childRecordedBlobs.length) {
+        if (childBlob && childBlob.size) {
             text = !doChildUpload ? "1/2" : "2/2";
         }
 

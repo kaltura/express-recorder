@@ -12,6 +12,7 @@ import PubSub, { ExpressRecorderEvent } from "../../services/PubSub";
 import { UploadManager } from "../Uploader/UploadManager";
 import { Translator } from "../Translator/Translator";
 import fixWebmDuration from "fix-webm-duration";
+import { Playback } from "../Playback/Playback";
 const styles = require("./style.scss");
 // player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
@@ -43,10 +44,8 @@ type State = {
     doCountdown: boolean;
     doPlayback: boolean;
     abortUpload: boolean;
-    recordedBlobs: Blob[];
-    screenRecordedBlobs: Blob[];
-    blob?: Blob;
-    screenRecordedBlob?: Blob;
+    cameraBlob?: Blob;
+    screenBlob?: Blob;
     error: string;
     constraints: MediaStreamConstraints;
     shareScreenOn: boolean;
@@ -86,8 +85,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doRecording: false,
             doCountdown: false,
             abortUpload: false,
-            recordedBlobs: [],
-            screenRecordedBlobs: [],
             doPlayback: false,
             error: "",
             processing: false,
@@ -127,8 +124,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * clear any existing recording and start a new one
      */
     startRecording = () => {
-        const { recordedBlobs, screenRecordedBlobs } = this.state;
-        if (recordedBlobs.length || screenRecordedBlobs.length) {
+        const { cameraBlob, screenBlob } = this.state;
+        if (cameraBlob || screenBlob) {
             this.recordAgain();
         }
         this.handleStartClick();
@@ -161,11 +158,11 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      * upload the latest recording to Kaltura
      */
     upload = () => {
-        const { doRecording, recordedBlobs, screenRecordedBlobs } = this.state;
+        const { doRecording, cameraBlob, screenBlob } = this.state;
         if (doRecording) {
             return;
         }
-        if (!recordedBlobs.length && !screenRecordedBlobs.length) {
+        if (!cameraBlob && !screenBlob) {
             return;
         }
         if (this.uploadedOnce) {
@@ -325,8 +322,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 doRecording: false,
                 doCountdown: false,
                 abortUpload: false,
-                recordedBlobs: [],
-                screenRecordedBlobs: [],
+                cameraBlob: undefined,
+                screenBlob: undefined,
                 doPlayback: false,
                 error: "",
                 shareScreenOn: false
@@ -368,48 +365,46 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     /**
      * triggered when recording is finished
-     * @param recordedBlobs
-     * @param duration
+     * @param cameraBlobs
      * @param screenBlobs
+     * @param duration
      */
-    handleRecordingEnd = (recordedBlobs: Blob[], duration: number, screenBlobs?: Blob[]) => {
-        let processingCamera = recordedBlobs.length > 0;
-        let processingScreen = screenBlobs && screenBlobs.length > 0;
+    handleRecordingEnd = (duration: number, cameraBlobs?: Blob[], screenBlobs?: Blob[]) => {
+        let processingCamera = !!cameraBlobs;
+        let processingScreen = !!screenBlobs;
 
-        const isProcessing = () => !!(processingCamera || processingScreen);
-
-        this.setState({ processing: isProcessing() });
-        if (recordedBlobs.length) {
-            const blob = new Blob(recordedBlobs, { type: "video/webm" });
-            // handle chrome blob duration issue
-            fixWebmDuration(blob, duration, (fixedBlob: Blob) => {
-                processingCamera = false;
-                this.setState({
-                    recordedBlobs: recordedBlobs,
-                    blob: fixedBlob,
-                    processing: isProcessing(),
-                    doPlayback: !isProcessing()
+        const isProcessing = () => processingCamera || processingScreen;
+        this.setState({ processing: isProcessing() }, () => {
+            if (cameraBlobs) {
+                // handle chrome blob duration issue
+                const cameraBlob = new Blob(cameraBlobs, { type: "video/webm" });
+                fixWebmDuration(cameraBlob, duration, (fixedBlob: Blob) => {
+                    processingCamera = false;
+                    this.setState({
+                        cameraBlob: fixedBlob,
+                        processing: isProcessing(),
+                        doPlayback: !isProcessing()
+                    });
+                    if (!isProcessing()) {
+                        this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                    }
                 });
-                if (!isProcessing()) {
-                    this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-                }
-            });
-        }
-        if (screenBlobs && screenBlobs.length) {
-            const screenBlobObject = new Blob(screenBlobs, { type: "video/webm" });
-            fixWebmDuration(screenBlobObject, duration, (fixedBlob: Blob) => {
-                processingScreen = false;
-                this.setState({
-                    screenRecordedBlobs: screenBlobs,
-                    screenRecordedBlob: fixedBlob,
-                    processing: isProcessing(),
-                    doPlayback: !isProcessing()
+            }
+            if (screenBlobs) {
+                const screenBlob = new Blob(screenBlobs, { type: "video/webm" });
+                fixWebmDuration(screenBlob, duration, (fixedBlob: Blob) => {
+                    processingScreen = false;
+                    this.setState({
+                        screenBlob: fixedBlob,
+                        processing: isProcessing(),
+                        doPlayback: !isProcessing()
+                    });
+                    if (!isProcessing()) {
+                        this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                    }
                 });
-                if (!isProcessing()) {
-                    this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-                }
-            });
-        }
+            }
+        });
     };
 
     getDefaultEntryName() {
@@ -445,12 +440,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
     recordAgain = () => {
         this.setState({
-            recordedBlobs: [],
-            screenRecordedBlobs: [],
+            cameraBlob: undefined,
+            screenBlob: undefined,
             doPlayback: false,
-            processing: false,
-            blob: undefined,
-            screenRecordedBlob: undefined
+            processing: false
         });
     };
     handleCountdownComplete = () => {
@@ -503,7 +496,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             });
         }
         const audio = await navigator.mediaDevices.getUserMedia({ audio: true });
-        return new MediaStream([audio.getTracks()[0], screenStream.getTracks()[0]]);
+        return new MediaStream([audio.getTracks()[0], ...screenStream.getTracks()]);
     };
     createStream = (
         constraints: MediaStreamConstraints,
@@ -530,7 +523,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             stream: stream
                         });
                     })
-                    .catch(e => this.handleError("Failed to allocate resource: " + e.message));
+                    .catch(e => {
+                        this.handleError("Failed to allocate resource: " + e.message);
+                    });
             }
             if (screenOn) {
                 this.createScreenStream(finalConstraints, toggleChanged);
@@ -560,7 +555,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         stream: undefined
                     });
                 })
-                .catch((e: any) => this.handleError("Failed to allocate resource: " + e.message));
+                .catch((e: any) => {
+                    this.handleError("Failed to allocate resource: " + e.message);
+                });
             return;
         }
 
@@ -573,7 +570,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     shareScreenOn: true
                 });
             })
-            .catch((e: any) => this.handleError("Failed to allocate resource: " + e.message));
+            .catch((e: any) => {
+                this.handleError("Failed to allocate resource: " + e.message);
+            });
     };
 
     setBeforeunload = (addMessage: boolean = false) => {
@@ -583,7 +582,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     handleKeyboardControl = (e: any) => {
-        const { doCountdown, doRecording, recordedBlobs, doPlayback } = this.state;
+        const { doCountdown, doRecording, cameraBlob, screenBlob, doPlayback } = this.state;
 
         // start record on Alt + Shift (Meta for mac) + R
         if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyR") {
@@ -610,7 +609,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         // upload record on Alt + Shift (Meta for mac) + U
         if (e.altKey && (e.shiftKey || e.metaKey) && e.code === "KeyU") {
             e.preventDefault();
-            if (!doRecording && recordedBlobs.length && !this.uploadedOnce) {
+            if (!doRecording && (cameraBlob || screenBlob) && !this.uploadedOnce) {
                 this.initiateUpload();
             }
             return;
@@ -618,13 +617,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     saveFile = () => {
-        const { shareScreenOn, screenRecordedBlob, blob } = this.state;
+        const { shareScreenOn, screenBlob, cameraBlob } = this.state;
         const entryName = this.props.entryName ? this.props.entryName : this.getDefaultEntryName();
-        if (shareScreenOn && screenRecordedBlob) {
-            this.invokeDownload(screenRecordedBlob, "Screen-Recording-" + new Date());
+        if (shareScreenOn && screenBlob) {
+            this.invokeDownload(screenBlob, "Screen-Recording-" + new Date());
         }
-        if (blob) {
-            this.invokeDownload(blob, entryName);
+        if (cameraBlob) {
+            this.invokeDownload(cameraBlob, entryName);
         }
     };
 
@@ -705,32 +704,22 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             shareScreenOn,
             doRecording,
             abortUpload,
-            recordedBlobs,
             doPlayback,
             error,
             constraints,
-            blob,
-            screenRecordedBlob,
-            screenRecordedBlobs,
+            cameraBlob,
+            screenBlob,
             processing
         } = state;
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
         }
-        const showController =
+        const showPostRecordingActions =
             showUploadUI &&
             !doRecording &&
             !this.uploadedOnce &&
-            (recordedBlobs.length || screenRecordedBlobs.length);
-
-        const uploadManagerProps = {
-            mediaType:
-                constraints.video || shareScreenOn
-                    ? KalturaMediaType.video
-                    : KalturaMediaType.audio,
-            recordedBlobs: recordedBlobs.length ? recordedBlobs : screenRecordedBlobs,
-            childRecordedBlobs: recordedBlobs.length ? screenRecordedBlobs : undefined
-        };
+            (cameraBlob || screenBlob) &&
+            !processing;
 
         const audioStream = stream || screenStream;
         const selectedAudioDevice =
@@ -764,7 +753,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         abortUpload={abortUpload}
                         showUploadUI={showUploadUI}
                         onCancel={this.cancelUpload}
-                        {...uploadManagerProps}
+                        mediaType={
+                            constraints.video || shareScreenOn
+                                ? KalturaMediaType.video
+                                : KalturaMediaType.audio
+                        }
+                        parentBlob={cameraBlob ? cameraBlob : screenBlob}
+                        childBlob={cameraBlob ? screenBlob : undefined}
                     />
                 </div>
             );
@@ -778,21 +773,31 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         {this.translator.translate("Processing media, please wait..")}
                     </div>
                 ) : null}
-                <Recorder
-                    video={!!constraints.video}
-                    videoStream={stream}
-                    screenStream={screenStream}
-                    onRecordingEnd={this.handleRecordingEnd}
-                    doRecording={doRecording}
-                    discard={doCountdown}
-                    doPlayback={doPlayback}
-                    partnerId={partnerId}
-                    uiConfId={uiConfId}
-                    onError={this.handleError}
-                    screenShareOn={shareScreenOn}
-                    blob={blob}
-                    screenBlob={screenRecordedBlob}
-                />
+                {doPlayback && (cameraBlob || screenBlob) ? (
+                    <div
+                        className={`express-recorder__playback ${styles["express-recorder__playback"]}`}
+                    >
+                        <Playback
+                            partnerId={partnerId}
+                            uiconfId={uiConfId}
+                            cameraMedia={cameraBlob}
+                            screenMedia={screenBlob}
+                            autoPlay={false}
+                        />
+                    </div>
+                ) : null}
+                {!doUpload && !doPlayback ? (
+                    <Recorder
+                        video={!!constraints.video}
+                        videoStream={stream}
+                        screenStream={screenStream}
+                        onRecordingEnd={this.handleRecordingEnd}
+                        doRecording={doRecording}
+                        discard={doCountdown}
+                        onError={this.handleError}
+                        screenShareOn={shareScreenOn}
+                    />
+                ) : null}
                 {doCountdown && (
                     <div className={styles["express-recorder__countdown"]}>
                         <CountdownTimer
@@ -839,7 +844,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             {this.translator.translate("Cancel")}
                         </button>
                     )}
-                    {showController ? (
+                    {showPostRecordingActions ? (
                         <div className={`${styles["express-recorder__bottom"]}`}>
                             <button
                                 className={`xr_btn xr_btn__download ${styles["bottom__btn"]} ${styles["btn__clear"]} ${styles["btn__download"]} `}
