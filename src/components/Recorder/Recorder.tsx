@@ -2,7 +2,6 @@ import { h, Component } from "preact";
 import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 const styles = require("./style.scss");
 type Props = {
-    video: boolean;
     videoStream?: MediaStream;
     screenStream?: MediaStream;
     screenShareOn: boolean;
@@ -164,7 +163,7 @@ export class Recorder extends Component<Props> {
     };
 
     render(props: Props) {
-        const { videoStream, screenShareOn, video, screenStream } = this.props;
+        const { videoStream, screenShareOn, screenStream } = this.props;
         const shareScreenClass = screenShareOn ? "express-recorder__recorder__share-screen" : "";
 
         return (
@@ -183,7 +182,7 @@ export class Recorder extends Component<Props> {
                         }}
                     />
                 )}
-                {!video ? (
+                {!videoStream || !videoStream.active ? (
                     <div className={`${styles["express-recorder__recorder__no-video"]}`}>
                         <div class={`xr_no-video-text ${styles["no-video-text"]}`}>
                             {!screenShareOn ? (
