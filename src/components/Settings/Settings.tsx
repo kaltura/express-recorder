@@ -138,6 +138,8 @@ export class Settings extends Component<Props, State> {
         const screen = resourceType === ResourceTypes.SCREEN_SHARE ? isOn : screenShareOn;
 
         onSettingsChanged(false, true, screen, camera, audio);
+
+        this.handleClose();
     };
 
     getCurrentDevice = (type: ResourceTypes) => {
@@ -177,6 +179,8 @@ export class Settings extends Component<Props, State> {
             cameraOn ? this._getCameraDevice(device) : undefined,
             audioOn ? this._getAudioDevice(device) : undefined
         );
+
+        this.handleClose();
     };
 
     handleKeyboardInput = (e: KeyboardEvent, type: ResourceTypes) => {
@@ -202,11 +206,15 @@ export class Settings extends Component<Props, State> {
         }
     };
 
+    /**
+     * Close/open resource settings according to clicked element.
+     */
+
     toggleSettingsShow = (clickedResource: ResourceTypes) => {
         const { showSettingsOf } = this.state;
 
         if (showSettingsOf === clickedResource) {
-            this.setState({ showSettingsOf: undefined });
+            this.handleClose();
             return;
         }
         this.setState({ showSettingsOf: clickedResource });
