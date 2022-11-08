@@ -788,7 +788,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 ) : null}
                 {!doUpload && !doPlayback ? (
                     <Recorder
-                        video={!!constraints.video}
                         videoStream={stream}
                         screenStream={screenStream}
                         onRecordingEnd={this.handleRecordingEnd}
