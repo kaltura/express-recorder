@@ -129,10 +129,6 @@ export class Settings extends Component<Props, State> {
         let newCameraOn = resourceType === ResourceTypes.VIDEO ? isOn : cameraOn;
         let newAudioOn = resourceType === ResourceTypes.AUDIO ? isOn : audioOn;
 
-        // do not allow both camera and audio to be turned off
-        newCameraOn = !isOn && resourceType === ResourceTypes.AUDIO ? true : newCameraOn;
-        newAudioOn = !isOn && resourceType === ResourceTypes.VIDEO ? true : newAudioOn;
-
         const camera = newCameraOn ? this.getCurrentDevice(ResourceTypes.VIDEO) : undefined;
         const audio = newAudioOn ? this.getCurrentDevice(ResourceTypes.AUDIO) : undefined;
         const screen = resourceType === ResourceTypes.SCREEN_SHARE ? isOn : screenShareOn;

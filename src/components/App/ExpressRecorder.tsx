@@ -504,14 +504,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         toggleChanged?: boolean
     ) => {
         this.modifyConstraints(constraints).then(finalConstraints => {
-            if (!finalConstraints.video && !finalConstraints.audio) {
-                this.setState({
-                    error: this.translator.translate(
-                        "Video and audio are disabled, at least one of them must be enabled."
-                    )
-                });
-                return;
-            }
             this.setState({
                 constraints: finalConstraints
             });
@@ -526,6 +518,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     .catch(e => {
                         this.handleError("Failed to allocate resource: " + e.message);
                     });
+            } else {
+                this.setState({ stream: undefined });
             }
             if (screenOn) {
                 this.createScreenStream(finalConstraints, toggleChanged);
