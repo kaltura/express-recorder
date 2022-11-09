@@ -337,14 +337,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         );
     };
 
-    stopStreams = () => {
+    stopStreams = (screenOn?: boolean) => {
         const { stream, screenStream } = this.state;
         if (stream) {
             stream.getTracks().forEach(function(track) {
                 track.stop();
             });
         }
-        if (screenStream) {
+        if (screenStream && !screenOn) {
             screenStream.getTracks().forEach(function(track) {
                 track.stop();
             });
@@ -481,6 +481,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             });
         }
         // update constraints state only if create stream has been succeeded
+        this.stopStreams(screenOn);
         this.createStream(newConstraints, screenOn, toggleWasChanged);
     };
 
@@ -504,10 +505,16 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         toggleChanged?: boolean
     ) => {
         this.modifyConstraints(constraints).then(finalConstraints => {
-            this.setState({
-                constraints: finalConstraints
+            const isMainStreamOn = finalConstraints.video || (finalConstraints.audio && !screenOn);
+            this.setState((prevState: State) => {
+                return {
+                    constraints: finalConstraints,
+                    stream: isMainStreamOn ? prevState.stream : undefined,
+                    screenStream: !screenOn ? undefined : prevState.screenStream,
+                    shareScreenOn: screenOn
+                };
             });
-            if (finalConstraints.video || (finalConstraints.audio && !screenOn)) {
+            if (isMainStreamOn) {
                 navigator.mediaDevices
                     .getUserMedia(finalConstraints)
                     .then((stream: MediaStream) => {
@@ -518,18 +525,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     .catch(e => {
                         this.handleError("Failed to allocate resource: " + e.message);
                     });
-            } else {
-                this.setState({ stream: undefined });
             }
             if (screenOn) {
                 this.createScreenStream(finalConstraints, toggleChanged);
-            } else {
-                const { screenStream } = this.state;
-                screenStream &&
-                    screenStream.getTracks().forEach(function(track) {
-                        track.stop();
-                    });
-                this.setState({ screenStream: undefined, shareScreenOn: false });
             }
         });
     };
@@ -545,8 +543,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 .then((stream: MediaStream) => {
                     this.setState({
                         screenStream: stream,
-                        shareScreenOn: true,
-                        stream: undefined
+                        shareScreenOn: true
                     });
                 })
                 .catch((e: any) => {
