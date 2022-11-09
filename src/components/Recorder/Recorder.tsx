@@ -168,7 +168,7 @@ export class Recorder extends Component<Props> {
 
         return (
             <div class={`xr_video-object-wrap ${styles["video-object-wrap"]}`}>
-                {screenShareOn && (
+                {screenShareOn && screenStream && screenStream.active && (
                     <video
                         id={"screenShare"}
                         className={`express-recorder__screen ${styles["express-recorder__screen"]}`}
