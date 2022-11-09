@@ -1,30 +1,33 @@
 @import "variables";
 
 @font-face {
-  font-family: '#{$icomoon-font-family}';
-  src:  url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?8ccqho');
-  src:  url('#{$icomoon-font-path}/#{$icomoon-font-family}.eot?8ccqho#iefix') format('embedded-opentype'),
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff2?8ccqho') format('woff2'),
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?8ccqho') format('truetype'),
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?8ccqho') format('woff'),
-    url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?8ccqho##{$icomoon-font-family}') format('svg');
+    font-family: "#{$font-family}";
+    src: url('#{$font-path}/#{$lato-black}.eot?8ccqho');
+  url("#{$font-path}/#{$lato-black}.eot?8ccqho#iefix")
+  format("embedded-opentype"),
+url('#{$font-path}/#{$lato-black}.ttf?8ccqho') format('truetype'),
+url('#{$font-path}/#{$lato-black}.woff?8ccqho') format('woff'),
+url('#{$font-path}/#{$lato-black}.woff2?8ccqho') format('woff2'),
+url('#{$font-path}/#{$lato-bold}.eot?8ccqho'),
+url('#{$font-path}/#{$lato-bold}.ttf?8ccqho') format('truetype'),
+url('#{$font-path}/#{$lato-bold}.woff?8ccqho') format('woff'),
+url('#{$font-path}/#{$lato-bold}.woff2?8ccqho') format('woff2');
   font-weight: normal;
-  font-style: normal;
+    font-style: normal;
 }
 
-[class^="icon-"], [class*=" icon-"] {
-  /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: '#{$icomoon-font-family}' !important;
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
+[class^="icon-"],
+[class*=" icon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: "#{$font-family}" !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
 
-  /* Better Font Rendering =========== */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
-
-
