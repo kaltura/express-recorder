@@ -37,8 +37,8 @@ export type ExpressRecorderProps = {
 
 type State = {
     destroyed: boolean;
-    stream?: MediaStream;
-    screenStream?: MediaStream;
+    cameraStream?: MediaStream; // stream of camera and audio
+    screenStream?: MediaStream; // stream of screen share and audio (if camera is off)
     doUpload: boolean;
     doRecording: boolean;
     doCountdown: boolean;
@@ -195,7 +195,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState(state, () => {
             this.setState({ error: "Widget Destroyed" });
         });
-        // stop stream:
+        // stop streams:
         this.stopStreams();
         // keyboard
         window.removeEventListener("keydown", this.handleKeyboardControl);
@@ -337,10 +337,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         );
     };
 
+    /**
+     * stop all active streams - camera, audio and screen
+     * @param screenOn - share screen is on/off
+     */
     stopStreams = (screenOn?: boolean) => {
-        const { stream, screenStream } = this.state;
-        if (stream) {
-            stream.getTracks().forEach(function(track) {
+        const { cameraStream, screenStream } = this.state;
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(function(track) {
                 track.stop();
             });
         }
@@ -475,8 +479,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             newConstraints.audio = { deviceId: selectedAudio.deviceId };
         }
 
-        if (this.state.stream) {
-            this.state.stream.getTracks().forEach(function(track) {
+        if (this.state.cameraStream) {
+            this.state.cameraStream.getTracks().forEach(function(track) {
                 track.stop();
             });
         }
@@ -509,7 +513,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             this.setState((prevState: State) => {
                 return {
                     constraints: finalConstraints,
-                    stream: isMainStreamOn ? prevState.stream : undefined,
+                    cameraStream: isMainStreamOn ? prevState.cameraStream : undefined,
                     screenStream: !screenOn ? undefined : prevState.screenStream,
                     shareScreenOn: screenOn
                 };
@@ -519,7 +523,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     .getUserMedia(finalConstraints)
                     .then((stream: MediaStream) => {
                         this.setState({
-                            stream: stream
+                            cameraStream: stream
                         });
                     })
                     .catch(e => {
@@ -690,7 +694,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         const {
             doCountdown,
             doUpload,
-            stream,
+            cameraStream,
             screenStream,
             shareScreenOn,
             doRecording,
@@ -712,14 +716,16 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             (cameraBlob || screenBlob) &&
             !processing;
 
-        const audioStream = stream || screenStream;
+        const audioStream = cameraStream || screenStream;
         const selectedAudioDevice =
             audioStream && audioStream.getAudioTracks().length
                 ? audioStream.getAudioTracks()[0]
                 : undefined;
 
         const selectedCameraDevice =
-            stream && stream.getVideoTracks().length > 0 ? stream.getVideoTracks()[0] : undefined;
+            cameraStream && cameraStream.getVideoTracks().length > 0
+                ? cameraStream.getVideoTracks()[0]
+                : undefined;
 
         if (error !== "") {
             return (
@@ -779,13 +785,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 ) : null}
                 {!doUpload && !doPlayback ? (
                     <Recorder
-                        videoStream={stream}
+                        cameraStream={cameraStream}
                         screenStream={screenStream}
                         onRecordingEnd={this.handleRecordingEnd}
                         doRecording={doRecording}
                         discard={doCountdown}
                         onError={this.handleError}
                         screenShareOn={shareScreenOn}
+                        constraint={constraints}
                     />
                 ) : null}
                 {doCountdown && (
@@ -815,7 +822,6 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 audioOn={!!constraints.audio}
                                 allowScreenShare={allowScreenShare}
                                 onSettingsChanged={this.handleSettingsChange}
-                                stream={stream}
                                 screenShareOn={shareScreenOn}
                                 onStartRecording={this.handleStartClick}
                                 allowVideo={allowVideo}

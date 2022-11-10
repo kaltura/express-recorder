@@ -18,7 +18,6 @@ type Props = {
     audioOn: boolean;
     screenShareOn: boolean;
     allowScreenShare: boolean;
-    stream?: MediaStream;
     onStartRecording: () => void;
     allowVideo: boolean;
     allowAudio: boolean;
@@ -391,7 +390,7 @@ export class Settings extends Component<Props, State> {
                         )}
                         tabIndex={0}
                         title={translator.translate("Start Recording")}
-                    ></button>
+                    />
                 </div>
             </div>
         );
