@@ -186,9 +186,9 @@
         }
     }
 }
-.controls__start[title]:hover::after,
-.resource-link[title]:hover::after{
-    content: attr(title);
+.controls__start[data-title]:hover::after,
+.resource-link[data-title]:hover::after{
+    content: attr(data-title);
     position: absolute;
     border-radius: 4px;
     background-color: #222222;
