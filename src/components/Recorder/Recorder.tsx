@@ -2,13 +2,14 @@ import { h, Component } from "preact";
 import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 const styles = require("./style.scss");
 type Props = {
-    videoStream?: MediaStream;
+    cameraStream?: MediaStream;
     screenStream?: MediaStream;
     screenShareOn: boolean;
     onError?: (error: string) => void;
     doRecording: boolean;
     onRecordingEnd: (duration: number, cameraBlobs?: Blob[], screenBlobs?: Blob[]) => void;
     discard?: boolean;
+    constraint: MediaStreamConstraints;
 };
 
 /**
@@ -39,7 +40,7 @@ export class Recorder extends Component<Props> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { doRecording, discard, screenStream, videoStream } = this.props;
+        const { doRecording, discard, screenStream, cameraStream } = this.props;
 
         if (discard) {
             this.recordedBlobs = [];
@@ -49,7 +50,7 @@ export class Recorder extends Component<Props> {
             return;
         }
 
-        if (!videoStream) {
+        if (!cameraStream) {
             this.mediaRecorder = undefined;
         }
         if (!screenStream) {
@@ -64,10 +65,10 @@ export class Recorder extends Component<Props> {
     }
 
     showStreamIfPossible = () => {
-        const { videoStream, screenStream } = this.props;
+        const { cameraStream, screenStream } = this.props;
 
-        if (this.videoRef && videoStream) {
-            this.videoRef.srcObject = videoStream;
+        if (this.videoRef && cameraStream) {
+            this.videoRef.srcObject = cameraStream;
         }
 
         if (screenStream && this.screenRef) {
@@ -85,7 +86,7 @@ export class Recorder extends Component<Props> {
     };
 
     startRecording = () => {
-        const { videoStream, screenStream, screenShareOn } = this.props;
+        const { cameraStream, screenStream, screenShareOn } = this.props;
 
         const mimeTypes = [
             "video/webm;codecs=vp9,opus",
@@ -114,8 +115,8 @@ export class Recorder extends Component<Props> {
         console.log(options.mimeType + " is selected");
 
         try {
-            if (videoStream) {
-                this.mediaRecorder = new MediaRecorder(videoStream, options);
+            if (cameraStream) {
+                this.mediaRecorder = new MediaRecorder(cameraStream, options);
                 this.mediaRecorder.ondataavailable = (event: any) =>
                     this.handleDataAvailable(event, "video");
                 this.mediaRecorder.start(3000); // collect data every 3 seconds
@@ -163,12 +164,12 @@ export class Recorder extends Component<Props> {
     };
 
     render(props: Props) {
-        const { videoStream, screenShareOn, screenStream } = this.props;
+        const { cameraStream, screenShareOn, screenStream, constraint } = this.props;
         const shareScreenClass = screenShareOn ? "express-recorder__recorder__share-screen" : "";
 
         return (
             <div class={`xr_video-object-wrap ${styles["video-object-wrap"]}`}>
-                {screenShareOn && (
+                {screenShareOn && screenStream && screenStream.active && (
                     <video
                         id={"screenShare"}
                         className={`express-recorder__screen ${styles["express-recorder__screen"]}`}
@@ -182,12 +183,15 @@ export class Recorder extends Component<Props> {
                         }}
                     />
                 )}
-                {!videoStream || !videoStream.active ? (
+                {!constraint.video ? (
                     <div className={`${styles["express-recorder__recorder__no-video"]}`}>
                         <div class={`xr_no-video-text ${styles["no-video-text"]}`}>
                             {!screenShareOn ? (
                                 <div class={styles["audio-indicator"]}>
-                                    <AudioIndicator stream={videoStream || screenStream} />
+                                    <AudioIndicator
+                                        stream={cameraStream || screenStream}
+                                        audioOn={!!constraint.audio}
+                                    />
                                 </div>
                             ) : null}
                         </div>
