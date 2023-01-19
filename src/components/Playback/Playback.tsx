@@ -53,8 +53,7 @@ export class Playback extends Component<Props, State> {
                         mimetype: "video/webm"
                     }
                 ],
-                type: kalturaPlayer.MediaType.VOD,
-                id: "111"
+                type: kalturaPlayer.MediaType.VOD
             },
             plugins: {},
             playback: {
