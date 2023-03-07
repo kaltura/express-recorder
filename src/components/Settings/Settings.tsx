@@ -227,6 +227,7 @@ export class Settings extends Component<Props, State> {
         } = this.props;
         const { showSettingsOf } = this.state;
         const translator = Translator.getTranslator();
+        const disableStart = !screenShareOn && !audioOn && !cameraOn;
 
         let devicesSettings = null;
         if (showSettingsOf === ResourceTypes.SCREEN_SHARE) {
@@ -382,15 +383,17 @@ export class Settings extends Component<Props, State> {
                         </div>
                     )}
                     <button
-                        className={`xr_controls__start ${styles["controls__start"]}`}
+                        className={`xr_controls__start ${
+                            styles["controls__start"]
+                        } ${disableStart && styles["controls__start--disabled"]}`}
                         id="startRecord"
-                        onClick={onStartRecording}
+                        onClick={disableStart ? undefined : onStartRecording}
                         aria-label={translator.translate(
                             "Start Recording. recording will start in a three seconds delay"
                         )}
                         tabIndex={0}
                         data-title={translator.translate("Start Recording")}
-                    ></button>
+                    />
                 </div>
             </div>
         );
