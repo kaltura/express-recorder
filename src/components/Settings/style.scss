@@ -186,6 +186,10 @@
         }
     }
 }
+.controls__start--disabled {
+    background: rgb(153, 153, 153) !important;
+    cursor: unset;
+}
 .controls__start[data-title]:hover::after,
 .resource-link[data-title]:hover::after{
     content: attr(data-title);
