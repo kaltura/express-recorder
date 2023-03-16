@@ -1,6 +1,6 @@
 import { Component, h } from "preact";
 import { StopIcon } from "./icons/stop";
-
+import { Translator } from "../Translator/Translator";
 const styles = require("./style.scss");
 
 type Props = {
@@ -54,6 +54,7 @@ export class RecordingTimer extends Component<Props, State> {
 
     render(props: Props, state: State) {
         const { currentTime } = state;
+        const translator = Translator.getTranslator();
         const hours = Math.floor(currentTime / 3600);
         const minutes = Math.floor((currentTime - hours * 3600) / 60);
         const seconds = currentTime - hours * 3600 - minutes * 60;
@@ -70,6 +71,7 @@ export class RecordingTimer extends Component<Props, State> {
                             className={`xr_timer-button ${styles["timer-button"]}`}
                             onClick={this.handleStop}
                             tabIndex={0}
+                            aria-label={translator.translate("Stop Recording")}
                             ref={props.setStopButtonRef}
                         >
                             <StopIcon />
