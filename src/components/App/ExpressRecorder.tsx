@@ -857,6 +857,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             <button
                                 className={`xr_btn xr_btn-primary xr_btn__save ${styles["bottom__btn"]} ${styles["btn__save"]}`}
                                 onClick={this.initiateUpload}
+                                autofocus
                             >
                                 {this.translator.translate("Use This")}
                             </button>
