@@ -5,7 +5,7 @@
 .player-wrap__main_controls .playkit-center-playback-controls {
     left: 100%;
 }
-.player-wrap__main_controls .playkit-bottom-bar {
+.player-wrap__main_controls .playkit-player .playkit-bottom-bar {
     top: -65px;
     z-index: 10;
 }
