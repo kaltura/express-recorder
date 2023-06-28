@@ -7,6 +7,7 @@
 }
 .player-wrap__main_controls .playkit-bottom-bar {
     top: -65px;
+    z-index: 10;
 }
 .player-wrap-screen__with-video
     .playkit-playback-controls.playkit-playback-controls.playkit-playback-controls.playkit-playback-controls.playkit-playback-controls,
@@ -20,5 +21,8 @@
     overflow: visible;
 }
 .player-wrap__main_controls .playkit-control-fullscreen.playkit-control-fullscreen {
+    display: none;
+}
+.playkit-top-bar {
     display: none;
 }
