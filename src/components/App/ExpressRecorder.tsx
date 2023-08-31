@@ -54,8 +54,8 @@ type State = {
 
 const VIDEO_CONSTRAINT = {
     frameRate: 15,
-    height: 483,
-    width: 858
+    height: 1080,
+    width: 1920
 };
 
 /**
@@ -496,7 +496,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         } else {
             // @ts-ignore
             screenStream = await navigator.mediaDevices.getDisplayMedia({
-                video: true,
+                video: VIDEO_CONSTRAINT,
                 audio: true
             });
         }
@@ -558,7 +558,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         navigator.mediaDevices
             // @ts-ignore
-            .getDisplayMedia({ video: true, audio: true })
+            .getDisplayMedia({ video: VIDEO_CONSTRAINT, audio: true })
             .then((screenStream: MediaStream) => {
                 this.setState({
                     screenStream: screenStream,
