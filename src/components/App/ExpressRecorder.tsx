@@ -756,8 +756,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 ? KalturaMediaType.video
                                 : KalturaMediaType.audio
                         }
-                        parentBlob={cameraBlob ? cameraBlob : screenBlob}
-                        childBlob={cameraBlob ? screenBlob : undefined}
+                        parentBlob={screenBlob ? screenBlob : cameraBlob}
+                        childBlob={screenBlob ? cameraBlob : undefined}
                     />
                 </div>
             );
