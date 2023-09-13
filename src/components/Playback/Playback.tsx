@@ -35,14 +35,14 @@ export class Playback extends Component<Props, State> {
         const { cameraMedia, screenMedia } = this.props;
         if (cameraMedia && previousProps.cameraMedia !== cameraMedia && this.kalturaPlayer) {
             // play the new media
-            this.setMedia(cameraMedia, this.kalturaPlayer);
+            this.setMedia(cameraMedia, this.kalturaPlayer, !!screenMedia);
         }
         if (screenMedia && previousProps.screenMedia !== screenMedia && this.kalturaPlayerScreen) {
             this.setMedia(screenMedia, this.kalturaPlayerScreen);
         }
     }
 
-    setMedia(media: Blob, kalturaPlayer: any) {
+    setMedia(media: Blob, kalturaPlayer: any, muted = false) {
         const { autoPlay, pictureInPicture } = this.props;
         kalturaPlayer.setMedia({
             sources: {
@@ -59,7 +59,8 @@ export class Playback extends Component<Props, State> {
             plugins: {},
             playback: {
                 autoplay: autoPlay,
-                pictureInPicture: pictureInPicture
+                pictureInPicture: pictureInPicture,
+                muted: muted
             }
         });
     }
@@ -75,7 +76,7 @@ export class Playback extends Component<Props, State> {
                         uiConfId: uiconfId
                     }
                 });
-                this.setMedia(cameraMedia, this.kalturaPlayer);
+                this.setMedia(cameraMedia, this.kalturaPlayer, !!screenMedia);
             }
             if (screenMedia) {
                 this.kalturaPlayerScreen = KalturaPlayer.setup({
