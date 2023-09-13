@@ -497,28 +497,29 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             // @ts-ignore
             screenStream = await navigator.mediaDevices.getDisplayMedia({
                 video: VIDEO_CONSTRAINT,
-                audio: true
+                audio: false
             });
         }
         const audio = await navigator.mediaDevices.getUserMedia({ audio: true });
         return new MediaStream([audio.getTracks()[0], ...screenStream.getTracks()]);
     };
+
     createStream = (
         constraints: MediaStreamConstraints,
         screenOn: boolean,
         toggleChanged?: boolean
     ) => {
         this.modifyConstraints(constraints).then(finalConstraints => {
-            const isMainStreamOn = finalConstraints.video || (finalConstraints.audio && !screenOn);
+            const isCameraOn = finalConstraints.video || (finalConstraints.audio && !screenOn);
             this.setState((prevState: State) => {
                 return {
                     constraints: finalConstraints,
-                    cameraStream: isMainStreamOn ? prevState.cameraStream : undefined,
+                    cameraStream: isCameraOn ? prevState.cameraStream : undefined,
                     screenStream: !screenOn ? undefined : prevState.screenStream,
                     shareScreenOn: screenOn
                 };
             });
-            if (isMainStreamOn) {
+            if (isCameraOn) {
                 navigator.mediaDevices
                     .getUserMedia(finalConstraints)
                     .then((stream: MediaStream) => {
@@ -537,12 +538,12 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     };
 
     createScreenStream = (finalConstraints: MediaStreamConstraints, toggleChanged?: boolean) => {
-        const { video, audio } = finalConstraints;
-        if (!toggleChanged && video) {
+        const { audio } = finalConstraints;
+        if (!toggleChanged) {
             return;
         }
 
-        if (!video && audio) {
+        if (audio) {
             this.getScreenshareWithMicrophone()
                 .then((stream: MediaStream) => {
                     this.setState({
@@ -558,7 +559,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         navigator.mediaDevices
             // @ts-ignore
-            .getDisplayMedia({ video: VIDEO_CONSTRAINT, audio: true })
+            .getDisplayMedia({ video: VIDEO_CONSTRAINT, audio: false })
             .then((screenStream: MediaStream) => {
                 this.setState({
                     screenStream: screenStream,
