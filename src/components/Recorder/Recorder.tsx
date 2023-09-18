@@ -1,6 +1,7 @@
 import { h, Component } from "preact";
 import { AudioIndicator } from "../AudioIndicator/AudioIndicator";
 const styles = require("./style.scss");
+
 type Props = {
     cameraStream?: MediaStream;
     screenStream?: MediaStream;
@@ -11,6 +12,8 @@ type Props = {
     discard?: boolean;
     constraint: MediaStreamConstraints;
 };
+
+const RECORDER_TIMESLICE = 500;
 
 /**
  * Handle the actual recording with given stream. Gather all blob data and handle start/stop.
@@ -119,13 +122,13 @@ export class Recorder extends Component<Props> {
                 this.mediaRecorder = new MediaRecorder(cameraStream, options);
                 this.mediaRecorder.ondataavailable = (event: any) =>
                     this.handleDataAvailable(event, "video");
-                this.mediaRecorder.start(3000); // collect data every 3 seconds
+                this.mediaRecorder.start(RECORDER_TIMESLICE); // collect data every 0.5 second
             }
             if (screenShareOn && screenStream) {
                 this.screenRecorder = new MediaRecorder(screenStream, options);
                 this.screenRecorder.ondataavailable = (event: any) =>
                     this.handleDataAvailable(event, "screen");
-                this.screenRecorder.start(3000);
+                this.screenRecorder.start(RECORDER_TIMESLICE);
             }
         } catch (e) {
             if (this.props.onError) {
