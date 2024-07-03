@@ -3,6 +3,9 @@
     height: 40px;
     background: #111111;
     border-radius: 28px;
+    @media (max-width: 320px) {
+        padding: 0.5em 0.5em;
+    }
 }
 .controls__start {
     height: 32px;
@@ -16,6 +19,10 @@
 
     &:hover {
         background-image: linear-gradient(-180deg, #ed2a38, #c51c22);
+    }
+    @media (max-width: 320px) {
+        height: 1.8em;
+        width: 1.8em;
     }
 }
 .resources-item {
@@ -131,6 +138,9 @@
         text-decoration: none;
         background-color: #666666;
         border-radius: 4px;
+    }
+    @media (max-width: 320px) {
+        padding: 0.25em;
     }
 }
 .device-disabled {
