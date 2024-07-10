@@ -10,6 +10,8 @@ type Props = {
     isToggleOn: boolean;
     disabled?: boolean;
     onKeyPress?: () => void;
+    toggleRef?: (element: HTMLElement | null) => void;
+    containerRef?: (element: HTMLElement | null) => void;
 };
 
 type State = {};
@@ -26,6 +28,7 @@ export class ToggleButton extends Component<Props, State> {
         super(props);
 
         this.handleClick = this.handleClick.bind(this);
+        this.handleContainerKeyPress = this.handleContainerKeyPress.bind(this);
     }
     handleClick = () => {
         if (this.props.onClick) {
@@ -43,8 +46,24 @@ export class ToggleButton extends Component<Props, State> {
         }
     };
 
+    handleContainerKeyPress = (e: KeyboardEvent) => {
+        if (e.key === " ") {
+            e.preventDefault();
+            this.handleClick();
+        }
+    };
+
     render(props: Props) {
-        const { text, id, name, screenReaderText, disabled, isToggleOn } = props;
+        const {
+            text,
+            id,
+            name,
+            screenReaderText,
+            disabled,
+            isToggleOn,
+            containerRef,
+            toggleRef
+        } = props;
 
         let sName = name;
         if (!sName) {
@@ -57,7 +76,12 @@ export class ToggleButton extends Component<Props, State> {
         }
 
         return (
-            <div class={`xr_toggle-button ${styles["toggle-button"]}`}>
+            <div
+                ref={containerRef}
+                onKeyDown={this.handleContainerKeyPress}
+                tabIndex={0}
+                class={`xr_toggle-button ${styles["toggle-button"]}`}
+            >
                 <div class={`xr_toggle-button__label ${styles["toggle-button__label"]}`}>
                     {text}
                 </div>
@@ -67,10 +91,11 @@ export class ToggleButton extends Component<Props, State> {
                             type={"checkbox"}
                             name={sName}
                             id={id}
+                            ref={toggleRef}
                             class={`xr_toggle-button__checkbox ${styles["toggle-button__checkbox"]} ${styles["screenreader-only"]}`}
                             onClick={this.handleClick}
                             checked={isToggleOn}
-                            tabIndex={0}
+                            tabIndex={-1}
                             disabled={disabled}
                             onKeyDown={this.handleKeyPress}
                         />
