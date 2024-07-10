@@ -4,12 +4,19 @@
 }
 
 .toggle-button {
-    display: inline;
+    display: block;
+    padding-left: 10px;
+    padding-right: 10px;
+    &:focus {
+        text-decoration: none;
+        border-radius: 4px;
+        border: 1px solid white;
+        box-shadow: 0 0 0 2px #0000FF, 
+        0 2px 2px rgba(0, 0, 0, 0.1);
+    }
     .toggle-button__label {
         display: inline;
         vertical-align: middle;
-        vertical-align: -webkit-baseline-middle;
-        vertical-align: -moz-middle-with-baseline;
         font-size: 15px;
         font-weight: 600;
 
@@ -23,7 +30,7 @@
 
     .toggle-button__checkbox-label {
         position: relative;
-        min-height: 20px;
+        // min-height: 20px;
         padding-left: 36px;
         display: inline;
 
@@ -74,8 +81,7 @@
 
 
     .toggle-button__button {
-        display: inline-block;
-        margin-top: 5px;
+        margin-top: -1px;
         float: right;
     }
 }

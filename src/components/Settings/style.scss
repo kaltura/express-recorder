@@ -70,9 +70,18 @@
     vertical-align: bottom;
 }
 .device-label {
-    width: 260px;
+    width: 90%;
     cursor: pointer;
     font-size: 14px;
+    padding-left: 5px;
+    padding-right: 15px;
+    &:focus {
+        text-decoration: none;
+        border-radius: 4px;
+        border: 2px solid white;
+        box-shadow: 0 0 0 2px #0000FF, 
+        0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 }
 .device-label__popup {
     visibility: hidden;
@@ -156,7 +165,7 @@
     left: -3px;
     bottom: 61px;
     text-align: left;
-    padding: 4px 20px;
+    padding: 4px 10px;
     font-size: 16px;
     line-height: 35px;
     width: 280px;
