@@ -65,6 +65,7 @@
 .device-label {
     &:hover {
         .device-label__popup {
+            display: block;
             visibility: visible;
             white-space: normal;
         }
@@ -75,13 +76,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: bottom;
+    margin-right: 12px;
 }
 .device-label {
-    width: 260px;
+    width: auto;
+    max-width: 260px;
     cursor: pointer;
     font-size: 14px;
 }
 .device-label__popup {
+    display: none;
     visibility: hidden;
     position: absolute;
     border-radius: 4px;
@@ -140,7 +144,7 @@
         border-radius: 4px;
     }
     @media (max-width: 320px) {
-        padding: 0.25em;
+        padding: 0.1em;
     }
 }
 .device-disabled {
@@ -168,6 +172,8 @@
     text-align: left;
     padding: 4px 20px;
     font-size: 16px;
+    max-width: 100%;
+    box-sizing: border-box;
     line-height: 35px;
     width: 280px;
     border-radius: 4px;
