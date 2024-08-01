@@ -26,6 +26,8 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     menuRef: HTMLElement | undefined;
+    toggleRef?: HTMLElement | null = null;
+    containerRef?: HTMLElement | null = null;
 
     componentDidMount() {
         this.removeRedundantPopups();
@@ -36,11 +38,8 @@ export class SettingsDevices extends Component<Props, State> {
     }
 
     focusOnToggleIfPossible = () => {
-        if (this.menuRef && this.menuRef.children[0]) {
-            const toggleElement = (this.menuRef.children[0] as HTMLElement).getElementsByTagName(
-                "input"
-            );
-            toggleElement.length > 0 && toggleElement[0].focus();
+        if (this.menuRef && this.menuRef.children[0] && this.containerRef) {
+            this.containerRef.focus();
         }
     };
 
@@ -148,6 +147,8 @@ export class SettingsDevices extends Component<Props, State> {
                     text={translator.translate(resourceName)}
                     onClick={this.handleToggleClick}
                     isToggleOn={isOn}
+                    toggleRef={node => (this.toggleRef = node)}
+                    containerRef={node => (this.containerRef = node)}
                     disabled={disabled}
                     onKeyPress={this.handleToggleClick}
                 />
