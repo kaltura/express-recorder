@@ -306,7 +306,12 @@ export class Settings extends Component<Props, State> {
                             {translator.translate("Camera Settings")}
                         </span>
                         <div className={styles["resources-item"]}>
-                            <div className={styles["resources-icon"]} aria-hidden="true">
+                            <div
+                                className={styles["resources-icon"]}
+                                aria-hidden="true"
+                                role="img"
+                                aria-label={translator.translate("Camera Settings")}
+                            >
                                 {cameraOn && <VideoIcon />}
                                 {!cameraOn && <NoVideoIcon />}
                             </div>
@@ -336,7 +341,12 @@ export class Settings extends Component<Props, State> {
                             {translator.translate("Audio Settings")}
                         </span>
                         <div className={styles["resources-item"]}>
-                            <div className={styles["resources-icon"]} aria-hidden="true">
+                            <div
+                                className={styles["resources-icon"]}
+                                aria-hidden="true"
+                                role="img"
+                                aria-label={translator.translate("Audio Settings")}
+                            >
                                 {audioOn && <AudioIcon />}
                                 {!audioOn && <NoAudioIcon />}
                             </div>
@@ -367,7 +377,11 @@ export class Settings extends Component<Props, State> {
                                 {translator.translate("Screen Share Settings")}
                             </span>
                             <div className={styles["resources-item"]}>
-                                <div className={styles["resources-icon"]}>
+                                <div
+                                    className={styles["resources-icon"]}
+                                    role="img"
+                                    aria-label={translator.translate("Screen Share Settings")}
+                                >
                                     {screenShareOn && <ScreenIcon />}
                                     {!screenShareOn && <NoScreenIcon />}
                                 </div>
