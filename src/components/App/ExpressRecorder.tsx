@@ -20,15 +20,39 @@ declare var KalturaPlayer: any;
 export type ExpressRecorderProps = {
     ks: string;
     serviceUrl: string;
-    app: string; // parent app for client creation
+
+    /**
+     * client tag for Kaltura API client
+     */
+    app: string;
     playerUrl: string;
     partnerId: number;
-    uiConfId: number; // playerId for playback
-    conversionProfileId?: number; // conversion profile for media upload
+
+    /**
+     * id of the player that will be used for playback
+     */
+    uiConfId: number;
+
+    /**
+     * conversion profile to use when creating the new entry
+     */
+    conversionProfileId?: number;
     entryName?: string;
-    allowVideo?: boolean; // whether to enable video recording
-    allowAudio?: boolean; // whether to enable audio recording
-    allowScreenShare?: boolean; // whether to enable screen sharing
+
+    /**
+     * allow recording video
+     */
+    allowVideo?: boolean;
+
+    /**
+     * allow recording audio
+     */
+    allowAudio?: boolean;
+
+    /**
+     * allow recording screen-share
+     */
+    allowScreenShare?: boolean;
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
     showUploadUI?: boolean;
