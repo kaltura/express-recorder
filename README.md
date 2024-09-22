@@ -39,7 +39,7 @@ execute - "npm run serve"
 1. unzip `v<version number>.zip` (attached to version release notes) to `Kaltura-server/apps/expressrecorder/v<version number>`
 
 ## API
-#### ExpressRecorder props:
+### ExpressRecorder props:
 <table>
     <tr>
         <th>name</th>
@@ -117,6 +117,13 @@ execute - "npm run serve"
         <td>boolean</td>
         <td>no</td>
         <td>true</td>
+    </tr>
+    <tr>
+        <td>allowScreenShare</td>
+        <td>allow screen sharing</td> 
+        <td>boolean</td>
+        <td>no</td>
+        <td>false</td>
     </tr>
     <tr>
         <td>maxRecordingTime</td>
