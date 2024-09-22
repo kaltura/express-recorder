@@ -10,6 +10,8 @@ Officially supported browsers: Chrome, Firefox, Opera.
 1. git clone
 2. npm install
 
+(assuming this failed running because node-sass issues, try npm ci instead)
+
 ## IMPORTANT NOTE!
 If npm install fails make sure you are using node 14 (node-sass is dependant on it). You can download nvm and use it to set the node engine to be the proper one 'nvm use 14'
 
