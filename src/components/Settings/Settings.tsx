@@ -1,7 +1,9 @@
 import { Component, h } from "preact";
 import { SettingsDevices } from "./Settings-devices";
 import { Translator } from "../Translator/Translator";
-import { VideoIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon, ScreenIcon, AudioIcon } from "./icons";
+import { AudioIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon, ScreenIcon, VideoIcon } from "./icons";
+import AnalyticsSender from "../../services/analytics/AnalyticsSender";
+import { ButtonClickAnalyticsEventType } from "../../services/analytics/ButtonClickAnalyticsEventType";
 
 const styles = require("./style.scss");
 type Props = {
@@ -21,6 +23,7 @@ type Props = {
     onStartRecording: () => void;
     allowVideo: boolean;
     allowAudio: boolean;
+    analyticsSender?: AnalyticsSender;
 };
 type State = {
     showSettingsOf?: ResourceTypes;
@@ -187,7 +190,7 @@ export class Settings extends Component<Props, State> {
             case "Enter":
             case "ArrowRight":
             case " ":
-                this.setState({ showSettingsOf: type });
+                this.toggleSettingsShow(type);
                 break;
             case "ArrowDown":
                 const nextMenuItem = (e.target as HTMLElement).nextSibling;
@@ -215,7 +218,33 @@ export class Settings extends Component<Props, State> {
             this.handleClose();
             return;
         }
+        this.sendShowMenuAnalytics(clickedResource);
         this.setState({ showSettingsOf: clickedResource });
+    };
+
+    sendShowMenuAnalytics = (resource: ResourceTypes) => {
+        let name: string;
+        switch (resource) {
+            case ResourceTypes.VIDEO:
+                name = "Camera settings";
+                break;
+            case ResourceTypes.AUDIO:
+                name = "Audio settings";
+                break;
+            case ResourceTypes.SCREEN_SHARE:
+                name = "Screen share settings";
+                break;
+            default:
+                name = "unspecified resource settings";
+                break;
+        }
+        this.sendAnalytics(name, ButtonClickAnalyticsEventType.MENU);
+    };
+    //TODO see if function is necessary
+    sendAnalytics = (buttonName: string, buttonType: ButtonClickAnalyticsEventType) => {
+        if (this.props.analyticsSender) {
+            this.props.analyticsSender.sendAnalytics(buttonName, buttonType);
+        }
     };
 
     render() {
