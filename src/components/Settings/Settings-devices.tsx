@@ -31,6 +31,8 @@ type Props = {
      * @param isOn
      */
     onToggleChange: (isOn: boolean) => void;
+
+    onClose: () => void;
 };
 
 type State = {};
@@ -95,6 +97,9 @@ export class SettingsDevices extends Component<Props, State> {
                 if (prevMenuItem) {
                     (prevMenuItem as HTMLElement).focus();
                 }
+                break;
+            case "Escape":
+                this.props.onClose();
                 break;
             default:
         }
@@ -161,6 +166,7 @@ export class SettingsDevices extends Component<Props, State> {
                     id={resourceName}
                     text={translator.translate(resourceName)}
                     onClick={this.handleToggleClick}
+                    onClose={() => this.props.onClose()}
                     isToggleOn={isOn}
                     toggleRef={node => (this.toggleRef = node)}
                     containerRef={node => (this.containerRef = node)}
