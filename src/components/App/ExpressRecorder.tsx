@@ -13,6 +13,7 @@ import { UploadManager } from "../Uploader/UploadManager";
 import { Translator } from "../Translator/Translator";
 import fixWebmDuration from "fix-webm-duration";
 import { Playback } from "../Playback/Playback";
+import AnalyticsSender, { AnalyticsEventBaseArgs } from "../../services/analytics/AnalyticsSender";
 const styles = require("./style.scss");
 // player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
@@ -57,6 +58,11 @@ export type ExpressRecorderProps = {
     maxRecordingTime?: number;
     showUploadUI?: boolean;
     translations?: Record<string, string>;
+
+    analytics?: {
+        analyticsEventBaseArgs: AnalyticsEventBaseArgs;
+        analyticsServiceUrl: string;
+    };
 };
 
 type State = {
@@ -99,6 +105,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     translator: Translator;
     cancelButtonRef: HTMLElement | null;
     stopButtonRef: HTMLElement | null;
+    analyticsSender?: AnalyticsSender;
 
     constructor(props: ExpressRecorderProps) {
         super(props);
@@ -126,6 +133,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         this.translator = Translator.getTranslator();
         this.translator.init(props.translations);
+
+        if (props.analytics) {
+            this.analyticsSender = new AnalyticsSender(
+                props.analytics.analyticsServiceUrl,
+                props.analytics.analyticsEventBaseArgs
+            );
+        }
 
         this.handleError = this.handleError.bind(this);
         this.initiateUpload = this.initiateUpload.bind(this);
@@ -851,6 +865,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 onStartRecording={this.handleStartClick}
                                 allowVideo={allowVideo}
                                 allowAudio={allowAudio}
+                                analyticsSender={this.analyticsSender}
                             />
                         )}
                     </div>
