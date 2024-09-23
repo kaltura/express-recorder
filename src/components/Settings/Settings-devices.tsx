@@ -8,17 +8,35 @@ const styles = require("./style.scss");
 type Props = {
     resourceName: string;
     devices: MediaDeviceInfo[];
+
+    /**
+     * triggered when a device is selected from the list
+     * @param device
+     */
     onChooseDevice: (device: MediaDeviceInfo) => void;
+
+    /**
+     * is the resource currently on
+     */
     isOn: boolean;
     disabled?: boolean;
+
+    /**
+     * currently selected device
+     */
     selected?: MediaDeviceInfo;
+
+    /**
+     * triggered when a resource is turned on/off
+     * @param isOn
+     */
     onToggleChange: (isOn: boolean) => void;
 };
 
 type State = {};
 
 /**
- * Component to display devices for one resource (camera / audio)
+ * Component to display devices menu for one resource (camera / audio)
  */
 export class SettingsDevices extends Component<Props, State> {
     static defaultProps = {
