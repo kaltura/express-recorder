@@ -234,6 +234,7 @@ export class Settings extends Component<Props, State> {
 
         let devicesSettings = null;
         if (showSettingsOf === ResourceTypes.SCREEN_SHARE) {
+            // show submenu for screen share
             devicesSettings = (
                 <SettingsDevices
                     resourceName={ResourceTypes.SCREEN_SHARE}
@@ -244,12 +245,14 @@ export class Settings extends Component<Props, State> {
                     onToggleChange={(isOn: boolean) => {
                         this.handleToggleChange(isOn, ResourceTypes.SCREEN_SHARE);
                     }}
+                    onClose={() => this.handleClose()}
                 />
             );
         } else if (
             showSettingsOf === ResourceTypes.AUDIO ||
             showSettingsOf === ResourceTypes.VIDEO
         ) {
+            // show submenu for audio or video
             devicesSettings = (
                 <SettingsDevices
                     resourceName={
@@ -278,6 +281,7 @@ export class Settings extends Component<Props, State> {
                                 : ResourceTypes.AUDIO
                         );
                     }}
+                    onClose={() => this.handleClose()}
                 />
             );
         }
