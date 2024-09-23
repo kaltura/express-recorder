@@ -79,18 +79,11 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     handleItemPress = (e: KeyboardEvent, item: MediaDeviceInfo) => {
-        if (e.key === "Enter" || e.key === " ") {
-            this.handleItemClick(item);
-        }
-        this.handleKeyboardInput(e);
-    };
-
-    handleToggleClick = () => {
-        this.props.onToggleChange(!this.props.isOn);
-    };
-
-    handleKeyboardInput = (e: KeyboardEvent) => {
         switch (e.key) {
+            case "Enter": // intentional case falldown
+            case " ":
+                this.handleItemClick(item);
+                break;
             case "ArrowDown":
                 const nextMenuItem = (e.target as HTMLElement).nextSibling;
                 if (nextMenuItem) {
@@ -105,6 +98,10 @@ export class SettingsDevices extends Component<Props, State> {
                 break;
             default:
         }
+    };
+
+    handleToggleClick = () => {
+        this.props.onToggleChange(!this.props.isOn);
     };
 
     render() {
