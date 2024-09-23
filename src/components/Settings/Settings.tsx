@@ -70,17 +70,21 @@ export class Settings extends Component<Props, State> {
         document.removeEventListener("click", this.handleExternalClick, true);
     }
 
-    // handle global window click event
+    /**
+     * handle global window click event
+     */
     handleExternalClick = (e: any) => {
         let element = e.target;
 
         do {
             if (element === this.menuBoxRef) {
+                // clicked inside settings menu, do nothing
                 return;
             }
             element = element.parentElement || element.parentNode;
         } while (element !== null && element.nodeType === 1);
 
+        // clicked elsewhere on the screen, close menu
         this.handleClose();
     };
 
@@ -204,7 +208,6 @@ export class Settings extends Component<Props, State> {
     /**
      * Close/open resource settings according to clicked element.
      */
-
     toggleSettingsShow = (clickedResource: ResourceTypes) => {
         const { showSettingsOf } = this.state;
 
