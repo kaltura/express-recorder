@@ -9,7 +9,6 @@ type Props = {
     onClick?: (isOn: boolean) => void;
     isToggleOn: boolean;
     disabled?: boolean;
-    onKeyPress?: () => void;
     toggleRef?: (element: HTMLElement | null) => void;
     containerRef?: (element: HTMLElement | null) => void;
 };
@@ -28,7 +27,7 @@ export class ToggleButton extends Component<Props, State> {
         super(props);
 
         this.handleClick = this.handleClick.bind(this);
-        this.handleContainerKeyPress = this.handleContainerKeyPress.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
     }
     handleClick = () => {
         if (this.props.onClick) {
@@ -36,17 +35,11 @@ export class ToggleButton extends Component<Props, State> {
         }
     };
 
-    handleKeyPress = (e: KeyboardEvent) => {
-        if (e.key !== "Space") {
-            return;
-        }
-        this.handleClick();
-        if (this.props.onKeyPress) {
-            this.props.onKeyPress();
-        }
-    };
-
-    handleContainerKeyPress = (e: KeyboardEvent) => {
+    /**
+     * keydown handler
+     * @param e
+     */
+    handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === " ") {
             e.preventDefault();
             this.handleClick();
@@ -78,7 +71,7 @@ export class ToggleButton extends Component<Props, State> {
         return (
             <div
                 ref={containerRef}
-                onKeyDown={this.handleContainerKeyPress}
+                onKeyDown={this.handleKeyDown}
                 tabIndex={0}
                 class={`xr_toggle-button ${styles["toggle-button"]}`}
             >
@@ -97,7 +90,6 @@ export class ToggleButton extends Component<Props, State> {
                             checked={isToggleOn}
                             tabIndex={-1}
                             disabled={disabled}
-                            onKeyDown={this.handleKeyPress}
                         />
                         <label
                             for={id}
