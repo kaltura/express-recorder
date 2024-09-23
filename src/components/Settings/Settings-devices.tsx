@@ -168,7 +168,6 @@ export class SettingsDevices extends Component<Props, State> {
                     toggleRef={node => (this.toggleRef = node)}
                     containerRef={node => (this.containerRef = node)}
                     disabled={disabled}
-                    onKeyPress={this.handleToggleClick}
                 />
                 <div className={styles["devices-list"]} aria-live="polite">
                     {resourcesList}
