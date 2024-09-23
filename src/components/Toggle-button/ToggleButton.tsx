@@ -7,6 +7,7 @@ type Props = {
     text: string;
     screenReaderText?: string;
     onClick?: (isOn: boolean) => void;
+    onClose: () => void;
     isToggleOn: boolean;
     disabled?: boolean;
     toggleRef?: (element: HTMLElement | null) => void;
@@ -43,6 +44,9 @@ export class ToggleButton extends Component<Props, State> {
         if (e.key === " ") {
             e.preventDefault();
             this.handleClick();
+        } else if (e.key === "Escape") {
+            e.preventDefault();
+            this.props.onClose();
         }
     };
 
