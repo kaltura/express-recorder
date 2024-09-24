@@ -717,6 +717,16 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, status);
     };
 
+    sendAnalytics = (
+        buttonName: string,
+        buttonType: ButtonClickAnalyticsEventType,
+        value?: string
+    ) => {
+        if (this.analyticsSender) {
+            this.analyticsSender.sendAnalytics(buttonName, buttonType, value);
+        }
+    };
+
     render(props: ExpressRecorderProps, state: State) {
         const {
             partnerId,
@@ -865,7 +875,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 onStartRecording={this.handleStartClick}
                                 allowVideo={allowVideo}
                                 allowAudio={allowAudio}
-                                analyticsSender={this.analyticsSender}
+                                sendAnalytics={this.sendAnalytics}
                             />
                         )}
                     </div>

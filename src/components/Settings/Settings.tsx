@@ -23,7 +23,7 @@ type Props = {
     onStartRecording: () => void;
     allowVideo: boolean;
     allowAudio: boolean;
-    analyticsSender?: AnalyticsSender;
+    sendAnalytics: AnalyticsSender["sendAnalytics"];
 };
 type State = {
     showSettingsOf?: ResourceTypes;
@@ -239,7 +239,7 @@ export class Settings extends Component<Props, State> {
                 name = "unspecified resource toggle";
                 break;
         }
-        this._sendAnalytics(name, ButtonClickAnalyticsEventType.TOGGLE, isOn ? "on" : "off");
+        this.props.sendAnalytics(name, ButtonClickAnalyticsEventType.TOGGLE, isOn ? "on" : "off");
     };
 
     sendShowMenuAnalytics = (resource: ResourceTypes) => {
@@ -258,17 +258,7 @@ export class Settings extends Component<Props, State> {
                 name = "unspecified resource settings";
                 break;
         }
-        this._sendAnalytics(name, ButtonClickAnalyticsEventType.MENU);
-    };
-
-    _sendAnalytics = (
-        buttonName: string,
-        buttonType: ButtonClickAnalyticsEventType,
-        value?: string
-    ) => {
-        if (this.props.analyticsSender) {
-            this.props.analyticsSender.sendAnalytics(buttonName, buttonType, value);
-        }
+        this.props.sendAnalytics(name, ButtonClickAnalyticsEventType.MENU);
     };
 
     render() {
