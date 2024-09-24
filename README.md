@@ -10,6 +10,8 @@ Officially supported browsers: Chrome, Firefox, Opera.
 1. git clone
 2. npm install
 
+(assuming this failed running because node-sass issues, try npm ci instead)
+
 ## IMPORTANT NOTE!
 If npm install fails make sure you are using node 14 (node-sass is dependant on it). You can download nvm and use it to set the node engine to be the proper one 'nvm use 14'
 
@@ -37,7 +39,7 @@ execute - "npm run serve"
 1. unzip `v<version number>.zip` (attached to version release notes) to `Kaltura-server/apps/expressrecorder/v<version number>`
 
 ## API
-#### ExpressRecorder props:
+### ExpressRecorder props:
 <table>
     <tr>
         <th>name</th>
@@ -115,6 +117,13 @@ execute - "npm run serve"
         <td>boolean</td>
         <td>no</td>
         <td>true</td>
+    </tr>
+    <tr>
+        <td>allowScreenShare</td>
+        <td>allow screen sharing</td> 
+        <td>boolean</td>
+        <td>no</td>
+        <td>false</td>
     </tr>
     <tr>
         <td>maxRecordingTime</td>

@@ -8,17 +8,37 @@ const styles = require("./style.scss");
 type Props = {
     resourceName: string;
     devices: MediaDeviceInfo[];
+
+    /**
+     * triggered when a device is selected from the list
+     * @param device
+     */
     onChooseDevice: (device: MediaDeviceInfo) => void;
+
+    /**
+     * is the resource currently on
+     */
     isOn: boolean;
     disabled?: boolean;
+
+    /**
+     * currently selected device
+     */
     selected?: MediaDeviceInfo;
+
+    /**
+     * triggered when a resource is turned on/off
+     * @param isOn
+     */
     onToggleChange: (isOn: boolean) => void;
+
+    onClose: () => void;
 };
 
 type State = {};
 
 /**
- * Component to display devices for one resource (camera / audio)
+ * Component to display devices menu for one resource (camera / audio)
  */
 export class SettingsDevices extends Component<Props, State> {
     static defaultProps = {
@@ -61,18 +81,11 @@ export class SettingsDevices extends Component<Props, State> {
     };
 
     handleItemPress = (e: KeyboardEvent, item: MediaDeviceInfo) => {
-        if (e.key === "Enter" || e.key === " ") {
-            this.handleItemClick(item);
-        }
-        this.handleKeyboardInput(e);
-    };
-
-    handleToggleClick = () => {
-        this.props.onToggleChange(!this.props.isOn);
-    };
-
-    handleKeyboardInput = (e: KeyboardEvent) => {
         switch (e.key) {
+            case "Enter": // intentional case falldown
+            case " ":
+                this.handleItemClick(item);
+                break;
             case "ArrowDown":
                 const nextMenuItem = (e.target as HTMLElement).nextSibling;
                 if (nextMenuItem) {
@@ -85,8 +98,15 @@ export class SettingsDevices extends Component<Props, State> {
                     (prevMenuItem as HTMLElement).focus();
                 }
                 break;
+            case "Escape":
+                this.props.onClose();
+                break;
             default:
         }
+    };
+
+    handleToggleClick = () => {
+        this.props.onToggleChange(!this.props.isOn);
     };
 
     render() {
@@ -146,11 +166,11 @@ export class SettingsDevices extends Component<Props, State> {
                     id={resourceName}
                     text={translator.translate(resourceName)}
                     onClick={this.handleToggleClick}
+                    onClose={() => this.props.onClose()}
                     isToggleOn={isOn}
                     toggleRef={node => (this.toggleRef = node)}
                     containerRef={node => (this.containerRef = node)}
                     disabled={disabled}
-                    onKeyPress={this.handleToggleClick}
                 />
                 <div className={styles["devices-list"]} aria-live="polite">
                     {resourcesList}

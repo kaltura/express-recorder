@@ -13,6 +13,9 @@ import { UploadManager } from "../Uploader/UploadManager";
 import { Translator } from "../Translator/Translator";
 import fixWebmDuration from "fix-webm-duration";
 import { Playback } from "../Playback/Playback";
+import AnalyticsSender, { AnalyticsEventBaseArgs } from "../../services/analytics/AnalyticsSender";
+import { ButtonClickAnalyticsEventType } from "../../services/analytics/ButtonClickAnalyticsEventType";
+
 const styles = require("./style.scss");
 // player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
@@ -20,19 +23,48 @@ declare var KalturaPlayer: any;
 export type ExpressRecorderProps = {
     ks: string;
     serviceUrl: string;
-    app: string; // parent app for client creation
+
+    /**
+     * client tag for Kaltura API client
+     */
+    app: string;
     playerUrl: string;
     partnerId: number;
-    uiConfId: number; // playerId for playback
-    conversionProfileId?: number; // conversion profile for media upload
+
+    /**
+     * id of the player that will be used for playback
+     */
+    uiConfId: number;
+
+    /**
+     * conversion profile to use when creating the new entry
+     */
+    conversionProfileId?: number;
     entryName?: string;
-    allowVideo?: boolean; // whether to enable video recording
-    allowAudio?: boolean; // whether to enable audio recording
-    allowScreenShare?: boolean; // whether to enable screen sharing
+
+    /**
+     * allow recording video
+     */
+    allowVideo?: boolean;
+
+    /**
+     * allow recording audio
+     */
+    allowAudio?: boolean;
+
+    /**
+     * allow recording screen-share
+     */
+    allowScreenShare?: boolean;
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
     showUploadUI?: boolean;
     translations?: Record<string, string>;
+
+    analytics?: {
+        analyticsEventBaseArgs: AnalyticsEventBaseArgs;
+        analyticsServiceUrl: string;
+    };
 };
 
 type State = {
@@ -75,6 +107,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     translator: Translator;
     cancelButtonRef: HTMLElement | null;
     stopButtonRef: HTMLElement | null;
+    analyticsSender?: AnalyticsSender;
 
     constructor(props: ExpressRecorderProps) {
         super(props);
@@ -102,6 +135,13 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         this.translator = Translator.getTranslator();
         this.translator.init(props.translations);
+
+        if (props.analytics) {
+            this.analyticsSender = new AnalyticsSender(
+                props.analytics.analyticsServiceUrl,
+                props.analytics.analyticsEventBaseArgs
+            );
+        }
 
         this.handleError = this.handleError.bind(this);
         this.initiateUpload = this.initiateUpload.bind(this);
@@ -365,6 +405,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({
             doUpload: true
         });
+        this.sendAnalytics("Use this", ButtonClickAnalyticsEventType.ADD);
     };
 
     /**
@@ -425,6 +466,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     handleStartClick = () => {
         this.setBeforeunload(true);
         this.setState({ doCountdown: true });
+        this.sendAnalytics("Start recording", ButtonClickAnalyticsEventType.LAUNCH);
         this.dispatcher.dispatchEvent(RecorderEvents.recordingStarted);
     };
 
@@ -433,6 +475,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      */
     handleStopClick = () => {
         this.setState({ doRecording: false });
+        this.sendAnalytics("Stop recording", ButtonClickAnalyticsEventType.CLOSE);
     };
 
     /**
@@ -440,6 +483,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      */
     handleCancelClick = () => {
         this.setState({ doCountdown: false });
+        this.sendAnalytics("Cancel recording", ButtonClickAnalyticsEventType.CLOSE);
         this.dispatcher.dispatchEvent(RecorderEvents.recordingCancelled);
     };
     recordAgain = () => {
@@ -449,6 +493,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doPlayback: false,
             processing: false
         });
+        this.sendAnalytics("Record again", ButtonClickAnalyticsEventType.LAUNCH);
     };
     handleCountdownComplete = () => {
         if (this.state.doCountdown) {
@@ -621,6 +666,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (cameraBlob) {
             this.invokeDownload(cameraBlob, entryName);
         }
+        this.sendAnalytics("Download a copy", ButtonClickAnalyticsEventType.DOWNLOAD);
     };
 
     invokeDownload = (blob: Blob, name: string) => {
@@ -677,6 +723,16 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             total: total
         };
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, status);
+    };
+
+    sendAnalytics = (
+        buttonName: string,
+        buttonType: ButtonClickAnalyticsEventType,
+        value?: string
+    ) => {
+        if (this.analyticsSender) {
+            this.analyticsSender.sendAnalytics(buttonName, buttonType, value);
+        }
     };
 
     render(props: ExpressRecorderProps, state: State) {
@@ -827,6 +883,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 onStartRecording={this.handleStartClick}
                                 allowVideo={allowVideo}
                                 allowAudio={allowAudio}
+                                sendAnalytics={this.sendAnalytics}
                             />
                         )}
                     </div>

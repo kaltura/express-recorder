@@ -1,7 +1,9 @@
 import { Component, h } from "preact";
 import { SettingsDevices } from "./Settings-devices";
 import { Translator } from "../Translator/Translator";
-import { VideoIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon, ScreenIcon, AudioIcon } from "./icons";
+import { AudioIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon, ScreenIcon, VideoIcon } from "./icons";
+import AnalyticsSender from "../../services/analytics/AnalyticsSender";
+import { ButtonClickAnalyticsEventType } from "../../services/analytics/ButtonClickAnalyticsEventType";
 
 const styles = require("./style.scss");
 type Props = {
@@ -21,6 +23,7 @@ type Props = {
     onStartRecording: () => void;
     allowVideo: boolean;
     allowAudio: boolean;
+    sendAnalytics: AnalyticsSender["sendAnalytics"];
 };
 type State = {
     showSettingsOf?: ResourceTypes;
@@ -70,17 +73,21 @@ export class Settings extends Component<Props, State> {
         document.removeEventListener("click", this.handleExternalClick, true);
     }
 
-    // handle global window click event
+    /**
+     * handle global window click event
+     */
     handleExternalClick = (e: any) => {
         let element = e.target;
 
         do {
             if (element === this.menuBoxRef) {
+                // clicked inside settings menu, do nothing
                 return;
             }
             element = element.parentElement || element.parentNode;
         } while (element !== null && element.nodeType === 1);
 
+        // clicked elsewhere on the screen, close menu
         this.handleClose();
     };
 
@@ -134,6 +141,7 @@ export class Settings extends Component<Props, State> {
 
         onSettingsChanged(false, true, screen, camera, audio);
 
+        this.sendToggleDeviceAnalytics(resourceType, isOn);
         this.handleClose();
     };
 
@@ -183,7 +191,7 @@ export class Settings extends Component<Props, State> {
             case "Enter":
             case "ArrowRight":
             case " ":
-                this.setState({ showSettingsOf: type });
+                this.toggleSettingsShow(type);
                 break;
             case "ArrowDown":
                 const nextMenuItem = (e.target as HTMLElement).nextSibling;
@@ -204,7 +212,6 @@ export class Settings extends Component<Props, State> {
     /**
      * Close/open resource settings according to clicked element.
      */
-
     toggleSettingsShow = (clickedResource: ResourceTypes) => {
         const { showSettingsOf } = this.state;
 
@@ -212,7 +219,46 @@ export class Settings extends Component<Props, State> {
             this.handleClose();
             return;
         }
+        this.sendShowMenuAnalytics(clickedResource);
         this.setState({ showSettingsOf: clickedResource });
+    };
+
+    sendToggleDeviceAnalytics = (resource: ResourceTypes, isOn: boolean) => {
+        let name: string;
+        switch (resource) {
+            case ResourceTypes.VIDEO:
+                name = "Camera toggle";
+                break;
+            case ResourceTypes.AUDIO:
+                name = "Audio toggle";
+                break;
+            case ResourceTypes.SCREEN_SHARE:
+                name = "Screen share toggle";
+                break;
+            default:
+                name = "unspecified resource toggle";
+                break;
+        }
+        this.props.sendAnalytics(name, ButtonClickAnalyticsEventType.TOGGLE, isOn ? "on" : "off");
+    };
+
+    sendShowMenuAnalytics = (resource: ResourceTypes) => {
+        let name: string;
+        switch (resource) {
+            case ResourceTypes.VIDEO:
+                name = "Camera settings";
+                break;
+            case ResourceTypes.AUDIO:
+                name = "Audio settings";
+                break;
+            case ResourceTypes.SCREEN_SHARE:
+                name = "Screen share settings";
+                break;
+            default:
+                name = "unspecified resource settings";
+                break;
+        }
+        this.props.sendAnalytics(name, ButtonClickAnalyticsEventType.MENU);
     };
 
     render() {
@@ -231,6 +277,7 @@ export class Settings extends Component<Props, State> {
 
         let devicesSettings = null;
         if (showSettingsOf === ResourceTypes.SCREEN_SHARE) {
+            // show submenu for screen share
             devicesSettings = (
                 <SettingsDevices
                     resourceName={ResourceTypes.SCREEN_SHARE}
@@ -241,12 +288,14 @@ export class Settings extends Component<Props, State> {
                     onToggleChange={(isOn: boolean) => {
                         this.handleToggleChange(isOn, ResourceTypes.SCREEN_SHARE);
                     }}
+                    onClose={() => this.handleClose()}
                 />
             );
         } else if (
             showSettingsOf === ResourceTypes.AUDIO ||
             showSettingsOf === ResourceTypes.VIDEO
         ) {
+            // show submenu for audio or video
             devicesSettings = (
                 <SettingsDevices
                     resourceName={
@@ -275,6 +324,7 @@ export class Settings extends Component<Props, State> {
                                 : ResourceTypes.AUDIO
                         );
                     }}
+                    onClose={() => this.handleClose()}
                 />
             );
         }
