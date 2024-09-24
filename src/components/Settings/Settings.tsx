@@ -141,6 +141,7 @@ export class Settings extends Component<Props, State> {
 
         onSettingsChanged(false, true, screen, camera, audio);
 
+        this.sendToggleDeviceAnalytics(resourceType, isOn);
         this.handleClose();
     };
 
@@ -222,6 +223,25 @@ export class Settings extends Component<Props, State> {
         this.setState({ showSettingsOf: clickedResource });
     };
 
+    sendToggleDeviceAnalytics = (resource: ResourceTypes, isOn: boolean) => {
+        let name: string;
+        switch (resource) {
+            case ResourceTypes.VIDEO:
+                name = "Camera toggle";
+                break;
+            case ResourceTypes.AUDIO:
+                name = "Audio toggle";
+                break;
+            case ResourceTypes.SCREEN_SHARE:
+                name = "Screen share toggle";
+                break;
+            default:
+                name = "unspecified resource toggle";
+                break;
+        }
+        this._sendAnalytics(name, ButtonClickAnalyticsEventType.TOGGLE, isOn ? "on" : "off");
+    };
+
     sendShowMenuAnalytics = (resource: ResourceTypes) => {
         let name: string;
         switch (resource) {
@@ -238,12 +258,16 @@ export class Settings extends Component<Props, State> {
                 name = "unspecified resource settings";
                 break;
         }
-        this.sendAnalytics(name, ButtonClickAnalyticsEventType.MENU);
+        this._sendAnalytics(name, ButtonClickAnalyticsEventType.MENU);
     };
-    //TODO see if function is necessary
-    sendAnalytics = (buttonName: string, buttonType: ButtonClickAnalyticsEventType) => {
+
+    _sendAnalytics = (
+        buttonName: string,
+        buttonType: ButtonClickAnalyticsEventType,
+        value?: string
+    ) => {
         if (this.props.analyticsSender) {
-            this.props.analyticsSender.sendAnalytics(buttonName, buttonType);
+            this.props.analyticsSender.sendAnalytics(buttonName, buttonType, value);
         }
     };
 
