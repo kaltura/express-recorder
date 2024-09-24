@@ -405,6 +405,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({
             doUpload: true
         });
+        this.sendAnalytics("Use this", ButtonClickAnalyticsEventType.ADD);
     };
 
     /**
@@ -492,6 +493,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doPlayback: false,
             processing: false
         });
+        this.sendAnalytics("Record again", ButtonClickAnalyticsEventType.LAUNCH);
     };
     handleCountdownComplete = () => {
         if (this.state.doCountdown) {
@@ -664,6 +666,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         if (cameraBlob) {
             this.invokeDownload(cameraBlob, entryName);
         }
+        this.sendAnalytics("Download a copy", ButtonClickAnalyticsEventType.DOWNLOAD);
     };
 
     invokeDownload = (blob: Blob, name: string) => {
