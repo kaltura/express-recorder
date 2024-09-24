@@ -14,6 +14,8 @@ import { Translator } from "../Translator/Translator";
 import fixWebmDuration from "fix-webm-duration";
 import { Playback } from "../Playback/Playback";
 import AnalyticsSender, { AnalyticsEventBaseArgs } from "../../services/analytics/AnalyticsSender";
+import { ButtonClickAnalyticsEventType } from "../../services/analytics/ButtonClickAnalyticsEventType";
+
 const styles = require("./style.scss");
 // player is loaded to global scope, let TypeScript know about it
 declare var KalturaPlayer: any;
@@ -463,6 +465,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     handleStartClick = () => {
         this.setBeforeunload(true);
         this.setState({ doCountdown: true });
+        this.sendAnalytics("Start recording", ButtonClickAnalyticsEventType.LAUNCH);
         this.dispatcher.dispatchEvent(RecorderEvents.recordingStarted);
     };
 
@@ -471,6 +474,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      */
     handleStopClick = () => {
         this.setState({ doRecording: false });
+        this.sendAnalytics("Stop recording", ButtonClickAnalyticsEventType.CLOSE);
     };
 
     /**
@@ -478,6 +482,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
      */
     handleCancelClick = () => {
         this.setState({ doCountdown: false });
+        this.sendAnalytics("Cancel recording", ButtonClickAnalyticsEventType.CLOSE);
         this.dispatcher.dispatchEvent(RecorderEvents.recordingCancelled);
     };
     recordAgain = () => {
