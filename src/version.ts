@@ -6,4 +6,4 @@
  * changed by pre-build script.
  * @type {string}
  */
-export const version = "2.2.3";
+export const version = "2.2.5";
