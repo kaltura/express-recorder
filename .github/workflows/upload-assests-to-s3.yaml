@@ -1,0 +1,27 @@
+name: Upload Assets
+
+on:
+  push:
+    branches:
+      - upload-to-s3
+
+#on:
+#  release:
+#    types: [published]
+
+jobs:
+  trigger-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger workflow in private repository
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          ASSET: ${{ github.event.repository.name }}
+        run: |
+          curl -L \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $ACCESS_TOKEN" \
+          https://api.github.com/repos/kaltura/ovp-statboy/actions/workflows/upload-assets-to-s3-express-recorder.yaml/dispatches \
+          -d "{\"ref\":\"express-recorder\",\"inputs\":{\"tag\":\"$TAG\",\"asset\":\"$ASSET\"}}"
