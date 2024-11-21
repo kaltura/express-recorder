@@ -31,6 +31,15 @@
 .express-recorder__countdown {
     position: relative;
     margin-top: -363px;
+    @media(max-width: 512px) {
+        margin-top: -300px;
+    }
+    @media(max-width: 427px) {
+        margin-top: -280px;
+    }
+    @media(max-width: 320px) {
+        margin-top: -190px;
+    }
 }
 .controls__cancel {
     margin-top: 175px;
@@ -43,6 +52,14 @@
     height: 43px;
     width: 100px;
     cursor: pointer;
+    @media(max-width: 512px) {
+        margin-top: 100px;
+    }
+    @media(max-width: 320px) {
+        margin-top: 5px;
+        height: 30px;
+        font-size: 10px;
+    }
 }
 .bottom__btn {
     height: 36px;

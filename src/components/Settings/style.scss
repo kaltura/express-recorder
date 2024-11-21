@@ -126,6 +126,9 @@
         left: 70px;
         top: -8px;
     }
+    @media (max-width: 320px) {
+        margin-left: 0;
+    }
 }
 .selected-device:before {
     content: "";
@@ -202,6 +205,15 @@
     border-radius: 4px;
     background: #333333;
     color: #ffffff;
+    @media (max-width: 320px) {
+        bottom: 30px;
+        left: 8px;
+        padding: 4px 0;
+        max-height: 100%;
+        max-width: 90%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
 }
 .device-label__selected-icon {
     right: 20px;
