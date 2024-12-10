@@ -21,6 +21,14 @@ button.timer-button {
     align-items: center;
     justify-content: space-between;
     width: 82px;
+
+    @media (max-width: 512px) {
+        height: 15px;
+    }
+    @media (max-width: 320px) {
+        height: 8px;
+        padding: 13px 10px 13px 10px;
+    }
 }
 .recording-timer {
     display: inline-block;

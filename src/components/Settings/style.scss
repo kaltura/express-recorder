@@ -3,7 +3,11 @@
     height: 40px;
     background: #111111;
     border-radius: 28px;
+    @media (max-width: 512px) {
+        height: 20px;
+    }
     @media (max-width: 320px) {
+        height: 15px;
         padding: 0.5em 0.5em;
     }
 }
@@ -20,9 +24,12 @@
     &:hover {
         background-image: linear-gradient(-180deg, #ed2a38, #c51c22);
     }
+    @media (max-width: 512px) {
+        height: 18px;
+        width: 18px;
+    }
     @media (max-width: 320px) {
-        height: 1.8em;
-        width: 1.8em;
+        margin-left: 0;
     }
 }
 .resources-item {
@@ -119,6 +126,9 @@
         left: 70px;
         top: -8px;
     }
+    @media (max-width: 427px) {
+        position: fixed;
+    }
 }
 .selected-device:before {
     content: "";
@@ -137,6 +147,10 @@
     i {
         margin-left: 13px;
         margin-bottom: 2px;
+
+        @media (max-width: 320px) {
+            margin-left: 0;
+        }
     }
 }
 .resource-link {
@@ -152,8 +166,11 @@
         background-color: #666666;
         border-radius: 4px;
     }
+    @media (max-width: 512px) {
+        padding: 0;
+    }
     @media (max-width: 320px) {
-        padding: 0.1em;
+        margin: 0;
     }
 }
 .device-disabled {
@@ -188,6 +205,21 @@
     border-radius: 4px;
     background: #333333;
     color: #ffffff;
+    @media (max-width: 427px) {
+        bottom: 30px;
+        left: 8px;
+        padding: 4px 0;
+        max-height: 120px;
+        max-width: 90%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+    @media (max-width: 320px) {
+        max-height: 80px;
+    }
+    @media (max-width: 256px) {
+        max-height: 50px;
+    }
 }
 .device-label__selected-icon {
     right: 20px;
