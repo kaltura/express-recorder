@@ -120,6 +120,11 @@ export class SettingsDevices extends Component<Props, State> {
                 selectedClass = styles["selected-device"];
                 isSelected = true;
             }
+            /**
+             * Positions the tooltip for a menu item dynamically, especially when the menu is zoomed
+             * and scrolling is active. Adjusts the tooltip's position and size based on the screen width.
+             * @param event - The event triggered when interacting with a menu item.
+             */
             function showTooltip(event: any) {
                 const label = event.currentTarget;
                 const tooltip = label.querySelector(".device-label__popup");
