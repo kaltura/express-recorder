@@ -598,6 +598,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     });
                 })
                 .catch((e: any) => {
+                    if (e.name === "NotAllowedError") {
+                        //user cancelled
+                        this.setState({
+                            screenStream: undefined,
+                            shareScreenOn: false
+                        });
+                        return;
+                    }
                     this.handleError("Failed to allocate resource: " + e.message);
                 });
             return;
