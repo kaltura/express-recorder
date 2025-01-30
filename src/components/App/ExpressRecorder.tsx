@@ -556,6 +556,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     ) => {
         this.modifyConstraints(constraints).then(finalConstraints => {
             const isCameraOn = finalConstraints.video || (finalConstraints.audio && !screenOn);
+            const { screenStream } = this.state;
             this.setState((prevState: State) => {
                 return {
                     constraints: finalConstraints,
@@ -576,7 +577,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         this.handleError("Failed to allocate resource: " + e.message);
                     });
             }
-            if (screenOn) {
+            if (!screenStream && screenOn) {
                 this.createScreenStream(finalConstraints, toggleChanged);
             }
         });
@@ -597,6 +598,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                     });
                 })
                 .catch((e: any) => {
+                    if (e.name === "NotAllowedError") {
+                        //user cancelled
+                        this.setState({
+                            screenStream: undefined,
+                            shareScreenOn: false
+                        });
+                        return;
+                    }
                     this.handleError("Failed to allocate resource: " + e.message);
                 });
             return;
