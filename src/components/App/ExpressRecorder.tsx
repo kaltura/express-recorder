@@ -828,7 +828,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             );
         }
         return (
-            <div className={`express-recorder ${styles["express-recorder"]}`}>
+            <div
+                className={`express-recorder ${styles["express-recorder"]}`}
+                style={{ height: `${constraints.video && !shareScreenOn ? "auto" : "100%"}` }}
+            >
                 {processing ? (
                     <div
                         className={`express-recorder__processing ${styles["express-recorder__processing"]}`}
