@@ -343,9 +343,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         // MediaRecorder does not supported by Edge
         try {
-            const temp = MediaRecorder.isTypeSupported({
-                mimeType: "video/webm"
-            });
+            const temp = MediaRecorder.isTypeSupported("video/webm");
         } catch (e) {
             this.handleError(notSupportedError);
             return false;
@@ -421,37 +419,87 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         const isProcessing = () => processingCamera || processingScreen;
         this.setState({ processing: isProcessing() }, () => {
             if (cameraBlobs) {
+                // handle Safari compatibility
+                const browserName = this.getBrowserName();
+                const mimeType = browserName === "Safari" ? "video/mp4" : "video/webm";
+                const cameraBlob = new Blob(cameraBlobs, { type: mimeType });
                 // handle chrome blob duration issue
-                const cameraBlob = new Blob(cameraBlobs, { type: "video/webm" });
-                fixWebmDuration(cameraBlob, duration, (fixedBlob: Blob) => {
+                if (mimeType === "video/webm") {
+                    fixWebmDuration(cameraBlob, duration, (fixedBlob: Blob) => {
+                        processingCamera = false;
+                        this.setState({
+                            cameraBlob: fixedBlob,
+                            processing: isProcessing(),
+                            doPlayback: !isProcessing()
+                        });
+                        if (!isProcessing()) {
+                            this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                        }
+                    });
+                } else {
+                    // Safari does not support fix-webm-duration
                     processingCamera = false;
                     this.setState({
-                        cameraBlob: fixedBlob,
+                        cameraBlob: cameraBlob,
                         processing: isProcessing(),
                         doPlayback: !isProcessing()
                     });
                     if (!isProcessing()) {
                         this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
                     }
-                });
+                }
             }
             if (screenBlobs) {
-                const screenBlob = new Blob(screenBlobs, { type: "video/webm" });
-                fixWebmDuration(screenBlob, duration, (fixedBlob: Blob) => {
+                const browserName = this.getBrowserName();
+                const mimeType = browserName === "Safari" ? "video/mp4" : "video/webm";
+                const screenBlob = new Blob(screenBlobs, { type: mimeType });
+                if (mimeType === "video/webm") {
+                    fixWebmDuration(screenBlob, duration, (fixedBlob: Blob) => {
+                        processingScreen = false;
+                        this.setState({
+                            screenBlob: fixedBlob,
+                            processing: isProcessing(),
+                            doPlayback: !isProcessing()
+                        });
+                        if (!isProcessing()) {
+                            this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                        }
+                    });
+                } else {
+                    // Safari does not support fix-webm-duration
                     processingScreen = false;
                     this.setState({
-                        screenBlob: fixedBlob,
+                        screenBlob: screenBlob,
                         processing: isProcessing(),
                         doPlayback: !isProcessing()
                     });
                     if (!isProcessing()) {
                         this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
                     }
-                });
+                }
             }
         });
     };
 
+    getBrowserName(): string {
+        const userAgent = navigator.userAgent;
+        //to avoid misidentifying Edge as Chrome
+        if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
+            return "Chrome";
+        }
+        //Chrome on macOS and iOS also includes "Safari" and "Chrome"
+        else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+            return "Safari";
+        } else if (userAgent.includes("Firefox")) {
+            return "Firefox";
+        } else if (userAgent.includes("Edg")) {
+            return "Edge";
+        } else if (userAgent.includes("MSIE") || userAgent.includes("Trident")) {
+            return "Internet Explorer";
+        } else {
+            return "Unknown";
+        }
+    }
     getDefaultEntryName() {
         const { constraints, shareScreenOn } = this.state;
         if (constraints.video) {
