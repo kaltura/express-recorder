@@ -417,66 +417,41 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         let processingScreen = !!screenBlobs;
 
         const isProcessing = () => processingCamera || processingScreen;
+
+        const processBlobs = (
+            blobs: Blob[],
+            key: "cameraBlob" | "screenBlob",
+            setProcessingFlag: (value: boolean) => void
+        ) => {
+            const browserName = this.getBrowserName();
+            const mimeType = browserName === "Safari" ? "video/mp4" : "video/webm";
+            const finalBlob = new Blob(blobs, { type: mimeType });
+
+            const updateState = (blob: Blob) => {
+                setProcessingFlag(false);
+                this.setState({
+                    [key]: blob,
+                    processing: isProcessing(),
+                    doPlayback: !isProcessing()
+                } as any);
+                if (!isProcessing()) {
+                    this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                }
+            };
+            if (mimeType === "video/webm") {
+                fixWebmDuration(finalBlob, duration, updateState);
+            } else {
+                // Safari does not support fix-webm-duration
+                updateState(finalBlob);
+            }
+        };
+
         this.setState({ processing: isProcessing() }, () => {
             if (cameraBlobs) {
-                // handle Safari compatibility
-                const browserName = this.getBrowserName();
-                const mimeType = browserName === "Safari" ? "video/mp4" : "video/webm";
-                const cameraBlob = new Blob(cameraBlobs, { type: mimeType });
-                // handle chrome blob duration issue
-                if (mimeType === "video/webm") {
-                    fixWebmDuration(cameraBlob, duration, (fixedBlob: Blob) => {
-                        processingCamera = false;
-                        this.setState({
-                            cameraBlob: fixedBlob,
-                            processing: isProcessing(),
-                            doPlayback: !isProcessing()
-                        });
-                        if (!isProcessing()) {
-                            this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-                        }
-                    });
-                } else {
-                    // Safari does not support fix-webm-duration
-                    processingCamera = false;
-                    this.setState({
-                        cameraBlob: cameraBlob,
-                        processing: isProcessing(),
-                        doPlayback: !isProcessing()
-                    });
-                    if (!isProcessing()) {
-                        this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-                    }
-                }
+                processBlobs(cameraBlobs, "cameraBlob", val => (processingCamera = val));
             }
             if (screenBlobs) {
-                const browserName = this.getBrowserName();
-                const mimeType = browserName === "Safari" ? "video/mp4" : "video/webm";
-                const screenBlob = new Blob(screenBlobs, { type: mimeType });
-                if (mimeType === "video/webm") {
-                    fixWebmDuration(screenBlob, duration, (fixedBlob: Blob) => {
-                        processingScreen = false;
-                        this.setState({
-                            screenBlob: fixedBlob,
-                            processing: isProcessing(),
-                            doPlayback: !isProcessing()
-                        });
-                        if (!isProcessing()) {
-                            this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-                        }
-                    });
-                } else {
-                    // Safari does not support fix-webm-duration
-                    processingScreen = false;
-                    this.setState({
-                        screenBlob: screenBlob,
-                        processing: isProcessing(),
-                        doPlayback: !isProcessing()
-                    });
-                    if (!isProcessing()) {
-                        this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-                    }
-                }
+                processBlobs(screenBlobs, "screenBlob", val => (processingScreen = val));
             }
         });
     };
