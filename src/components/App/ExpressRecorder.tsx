@@ -90,6 +90,11 @@ const VIDEO_CONSTRAINT = {
     width: 1920
 };
 
+enum BlobKey {
+    Camera = "cameraBlob",
+    Screen = "screenBlob"
+}
+
 /**
  * This is the main component of the widget - contains the main flow.
  */
@@ -343,9 +348,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         // MediaRecorder does not supported by Edge
         try {
-            const temp = MediaRecorder.isTypeSupported({
-                mimeType: "video/webm"
-            });
+            const temp = MediaRecorder.isTypeSupported("video/webm");
         } catch (e) {
             this.handleError(notSupportedError);
             return false;
@@ -419,39 +422,64 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         let processingScreen = !!screenBlobs;
 
         const isProcessing = () => processingCamera || processingScreen;
+
+        const processBlobs = (
+            blobs: Blob[],
+            key: BlobKey,
+            setProcessingFlag: (value: boolean) => void
+        ) => {
+            const browserName = this.getBrowserName();
+            const mimeType = browserName === "Safari" ? "video/mp4" : "video/webm";
+            const finalBlob = new Blob(blobs, { type: mimeType });
+
+            const updateState = (blob: Blob) => {
+                setProcessingFlag(false);
+                this.setState({
+                    [key]: blob,
+                    processing: isProcessing(),
+                    doPlayback: !isProcessing()
+                } as any);
+                if (!isProcessing()) {
+                    this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
+                }
+            };
+            if (mimeType === "video/webm") {
+                fixWebmDuration(finalBlob, duration, updateState);
+            } else {
+                // Safari does not support fix-webm-duration
+                updateState(finalBlob);
+            }
+        };
+
         this.setState({ processing: isProcessing() }, () => {
             if (cameraBlobs) {
-                // handle chrome blob duration issue
-                const cameraBlob = new Blob(cameraBlobs, { type: "video/webm" });
-                fixWebmDuration(cameraBlob, duration, (fixedBlob: Blob) => {
-                    processingCamera = false;
-                    this.setState({
-                        cameraBlob: fixedBlob,
-                        processing: isProcessing(),
-                        doPlayback: !isProcessing()
-                    });
-                    if (!isProcessing()) {
-                        this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-                    }
-                });
+                processBlobs(cameraBlobs, BlobKey.Camera, val => (processingCamera = val));
             }
             if (screenBlobs) {
-                const screenBlob = new Blob(screenBlobs, { type: "video/webm" });
-                fixWebmDuration(screenBlob, duration, (fixedBlob: Blob) => {
-                    processingScreen = false;
-                    this.setState({
-                        screenBlob: fixedBlob,
-                        processing: isProcessing(),
-                        doPlayback: !isProcessing()
-                    });
-                    if (!isProcessing()) {
-                        this.dispatcher.dispatchEvent(RecorderEvents.recordingEnded);
-                    }
-                });
+                processBlobs(screenBlobs, BlobKey.Screen, val => (processingScreen = val));
             }
         });
     };
 
+    getBrowserName(): string {
+        const userAgent = navigator.userAgent;
+        //to avoid misidentifying Edge as Chrome
+        if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
+            return "Chrome";
+        }
+        //Chrome on macOS and iOS also includes "Safari" and "Chrome"
+        else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+            return "Safari";
+        } else if (userAgent.includes("Firefox")) {
+            return "Firefox";
+        } else if (userAgent.includes("Edg")) {
+            return "Edge";
+        } else if (userAgent.includes("MSIE") || userAgent.includes("Trident")) {
+            return "Internet Explorer";
+        } else {
+            return "Unknown";
+        }
+    }
     getDefaultEntryName() {
         const { constraints, shareScreenOn } = this.state;
         if (constraints.video) {
