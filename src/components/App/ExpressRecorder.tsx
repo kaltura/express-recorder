@@ -90,6 +90,11 @@ const VIDEO_CONSTRAINT = {
     width: 1920
 };
 
+enum BlobKey {
+    Camera = "cameraBlob",
+    Screen = "screenBlob"
+}
+
 /**
  * This is the main component of the widget - contains the main flow.
  */
@@ -420,7 +425,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         const processBlobs = (
             blobs: Blob[],
-            key: "cameraBlob" | "screenBlob",
+            key: BlobKey,
             setProcessingFlag: (value: boolean) => void
         ) => {
             const browserName = this.getBrowserName();
@@ -448,10 +453,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
         this.setState({ processing: isProcessing() }, () => {
             if (cameraBlobs) {
-                processBlobs(cameraBlobs, "cameraBlob", val => (processingCamera = val));
+                processBlobs(cameraBlobs, BlobKey.Camera, val => (processingCamera = val));
             }
             if (screenBlobs) {
-                processBlobs(screenBlobs, "screenBlob", val => (processingScreen = val));
+                processBlobs(screenBlobs, BlobKey.Screen, val => (processingScreen = val));
             }
         });
     };
