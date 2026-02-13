@@ -19,7 +19,8 @@
     "serve": "webpack-dev-server -d",
     "analyze": "npm run build && npx source-map-explorer dist/express-recorder.js",
     "storybook": "start-storybook -p 9001 -c .storybook -s ./src/public/assets",
-    "storybook-build": "build-storybook -c .storybook -s ./src/public/assets"
+    "storybook-build": "build-storybook -c .storybook -s ./src/public/assets",
+    "watch": "webpack --watch --mode development"
   },
   "keywords": [],
   "author": "",
