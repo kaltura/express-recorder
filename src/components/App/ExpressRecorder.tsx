@@ -65,6 +65,8 @@ export type ExpressRecorderProps = {
         analyticsEventBaseArgs: AnalyticsEventBaseArgs;
         analyticsServiceUrl: string;
     };
+
+    scriptNonce?: string;
 };
 
 type State = {
@@ -260,7 +262,15 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     }
 
     componentDidMount() {
-        const { serviceUrl, app, ks, playerUrl, uiConfId, partnerId } = this.props;
+        const {
+            serviceUrl,
+            app,
+            ks,
+            playerUrl,
+            uiConfId,
+            partnerId,
+            scriptNonce = null
+        } = this.props;
         this.checkProps();
         if (!this.isBrowserCompatible()) {
             return;
@@ -287,6 +297,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             tag.async = true;
             tag.src = playerUrl + `/p/${partnerId}/embedPlaykitJs/uiconf_id/${uiConfId}`;
             tag.type = "text/javascript";
+            if (scriptNonce) {
+                tag.nonce = scriptNonce;
+            }
+
             document.body.appendChild(tag);
         } else if (typeof KalturaPlayer === "undefined") {
             this.handleError(
