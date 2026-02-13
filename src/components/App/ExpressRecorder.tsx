@@ -269,7 +269,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             playerUrl,
             uiConfId,
             partnerId,
-            scriptNonce = null
+            scriptNonce = undefined
         } = this.props;
         this.checkProps();
         if (!this.isBrowserCompatible()) {
