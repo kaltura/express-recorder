@@ -1,0 +1,10 @@
+SERVICE_URL="https://www.kaltura.com"
+PARTNER_ID=123456
+ADMIN_SECRET=abcdefghijk1234567890abcdefghijk
+KS_EXPIRY=86400
+USER_ID=test
+UI_CONF_ID=
+APP_NAME=ExpressRecorderTest
+APP_DOMAIN=www.example.com
+PRIVACY_CONTEXT=
+SESSION_TYPE=0
