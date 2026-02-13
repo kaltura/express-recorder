@@ -2,28 +2,26 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
-const isDevServer = process.argv.find(v => v.indexOf('webpack-dev-server') !== -1);
+const isDevServer = process.argv.find(v => v.indexOf("webpack-dev-server") !== -1);
 const testFolder = path.join(__dirname, "/test");
 const distFolder = path.join(__dirname, "/dist");
 
 const plugins = [];
 
 if (isDevServer) {
-  plugins.push(
-    new HtmlWebpackPlugin({
-      alwaysWriteToDisk: true,
-      filename: path.resolve(distFolder, "index.html"),
-      template: path.resolve(testFolder, "index.ejs"),
-      inject: false,
-      hash: true,
-      config: {
-        ks: 'sss'
-      }
-    }),
-    new CopyPlugin([
-      { from: testFolder, to: distFolder }
-    ])
-  );
+    plugins.push(
+        new HtmlWebpackPlugin({
+            alwaysWriteToDisk: true,
+            filename: path.resolve(distFolder, "index.html"),
+            template: path.resolve(testFolder, "index.ejs"),
+            inject: false,
+            hash: true,
+            config: {
+                ks: "sss"
+            }
+        }),
+        new CopyPlugin([{ from: testFolder, to: distFolder }])
+    );
 }
 
 module.exports = (env, options) => {
