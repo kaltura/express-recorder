@@ -39,7 +39,6 @@ $ks = file_get_contents($sessionStartUrl);
 
 <head>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'nonce-random' <?php echo $serviceUrl; ?> https://fonts.googleapis.com/css2 https://fonts.gstatic.com data:">
-  <meta http-equiv="csp-nonce" content="random">
   <script nonce="random">
     globalThis.kalturaGlobalConfig ||= {};
     globalThis.kalturaGlobalConfig.scriptsNonce = 'random';
