@@ -24,6 +24,11 @@
   },
   "keywords": [],
   "author": "",
+  "dependencies": {
+    "fix-webm-duration": "^1.0.5",
+    "kaltura-typescript-client": "file:libs/kaltura-typescript-client-6.4.2-v20181223-153243.tgz",
+    "preact": "^8.4.2"
+  },
   "devDependencies": {
     "@storybook/react": "^4.1.1",
     "@types/jest": "^23.3.10",
@@ -57,11 +62,7 @@
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1"
   },
-  "dependencies": {
-    "fix-webm-duration": "^1.0.5",
-    "kaltura-typescript-client": "file:libs/kaltura-typescript-client-6.4.2-v20181223-153243.tgz",
-    "preact": "^8.4.2"
-  },
+
   "files": [
     "dist"
   ],
