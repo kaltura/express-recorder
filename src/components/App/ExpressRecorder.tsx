@@ -66,7 +66,7 @@ export type ExpressRecorderProps = {
         analyticsServiceUrl: string;
     };
 
-    scriptNonce?: string;
+    scriptsNonce?: string;
 };
 
 type State = {
@@ -269,7 +269,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             playerUrl,
             uiConfId,
             partnerId,
-            scriptNonce = undefined
+            scriptsNonce = undefined
         } = this.props;
         this.checkProps();
         if (!this.isBrowserCompatible()) {
@@ -297,8 +297,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             tag.async = true;
             tag.src = playerUrl + `/p/${partnerId}/embedPlaykitJs/uiconf_id/${uiConfId}`;
             tag.type = "text/javascript";
-            if (scriptNonce) {
-                tag.nonce = scriptNonce;
+            if (scriptsNonce) {
+                tag.nonce = scriptsNonce;
             }
 
             document.body.appendChild(tag);

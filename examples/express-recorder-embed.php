@@ -64,7 +64,7 @@ $ks = file_get_contents($sessionStartUrl);
         "partnerId": "<?php echo $partnerId; ?>",
         "uiConfId": "<?php echo $uiConfId; ?>",
         "entryName": "custom entry name",
-        "scriptNonce": "random",
+        "scriptsNonce": "random",
       });
     </script>
   </div>
