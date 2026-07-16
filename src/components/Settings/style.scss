@@ -153,6 +153,13 @@
         }
     }
 }
+.resource-link--icon-only {
+    width: 32px !important;
+    justify-content: center;
+    .resources-item {
+        justify-content: center;
+    }
+}
 .resource-link {
     color: white;
     width: 50px;

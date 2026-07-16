@@ -13,6 +13,7 @@ import { UploadManager } from "../Uploader/UploadManager";
 import { Translator } from "../Translator/Translator";
 import fixWebmDuration from "fix-webm-duration";
 import { Playback } from "../Playback/Playback";
+import { SettingsRecording } from "../Settings/Settings-recording";
 import AnalyticsSender, { AnalyticsEventBaseArgs } from "../../services/analytics/AnalyticsSender";
 import { ButtonClickAnalyticsEventType } from "../../services/analytics/ButtonClickAnalyticsEventType";
 
@@ -84,6 +85,7 @@ type State = {
     constraints: MediaStreamConstraints;
     shareScreenOn: boolean;
     processing: boolean;
+    showSettingsPanel: boolean;
 };
 
 const VIDEO_CONSTRAINT = {
@@ -128,6 +130,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             doPlayback: false,
             error: "",
             processing: false,
+            showSettingsPanel: false,
             constraints: {
                 video:
                     props.allowVideo !== false
@@ -776,6 +779,14 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, status);
     };
 
+    handleOpenSettingsPanel = () => {
+        this.setState({ showSettingsPanel: true });
+    };
+
+    handleCloseSettingsPanel = () => {
+        this.setState({ showSettingsPanel: false });
+    };
+
     sendAnalytics = (
         buttonName: string,
         buttonType: ButtonClickAnalyticsEventType,
@@ -812,7 +823,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             constraints,
             cameraBlob,
             screenBlob,
-            processing
+            processing,
+            showSettingsPanel
         } = state;
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
@@ -915,6 +927,25 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                         />
                     </div>
                 )}
+                {showSettingsPanel && (
+                    <div className={`express-recorder__settings-panel ${styles["settings-panel"]}`}>
+                        <div className={styles["settings-panel__header"]}>
+                            <span className={styles["settings-panel__title"]}>
+                                {this.translator.translate("Recording Settings")}
+                            </span>
+                            <button
+                                className={styles["settings-panel__close"]}
+                                onClick={this.handleCloseSettingsPanel}
+                                aria-label={this.translator.translate("Close Settings")}
+                            >
+                                &#x2715;
+                            </button>
+                        </div>
+                        <div className={styles["settings-panel__content"]}>
+                            <SettingsRecording cameraStream={cameraStream} />
+                        </div>
+                    </div>
+                )}
                 <div
                     className={`express-recorder__controls ${styles["express-recorder__controls"]}`}
                 >
@@ -939,6 +970,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 allowVideo={allowVideo}
                                 allowAudio={allowAudio}
                                 sendAnalytics={this.sendAnalytics}
+                                onOpenSettingsPanel={this.handleOpenSettingsPanel}
                             />
                         )}
                     </div>

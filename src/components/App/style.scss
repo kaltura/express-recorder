@@ -21,7 +21,7 @@
 }
 .express-recorder__controls {
     position: relative;
-    margin-top: -79px;
+    margin-top: -120px;
     @media (max-width: 512px) {
         margin-top: -50px;
     }
@@ -124,6 +124,50 @@
     position: absolute;
     background-color: black;
     z-index: 999;
+}
+.settings-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #111111;
+    color: #ffffff;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+.settings-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #333333;
+    flex-shrink: 0;
+}
+.settings-panel__title {
+    font-size: 18px;
+    font-weight: 600;
+}
+.settings-panel__close {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    &:hover {
+        background-color: #333333;
+    }
+}
+.settings-panel__content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
 }
 .express-recorder__playback {
     height: 100%;

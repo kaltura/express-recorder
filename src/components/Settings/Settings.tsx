@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
 import { SettingsDevices } from "./Settings-devices";
 import { Translator } from "../Translator/Translator";
-import { AudioIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon, ScreenIcon, VideoIcon } from "./icons";
+import { AudioIcon, GearIcon, NoAudioIcon, NoScreenIcon, NoVideoIcon, ScreenIcon, VideoIcon } from "./icons";
 import AnalyticsSender from "../../services/analytics/AnalyticsSender";
 import { ButtonClickAnalyticsEventType } from "../../services/analytics/ButtonClickAnalyticsEventType";
 
@@ -24,6 +24,7 @@ type Props = {
     allowVideo: boolean;
     allowAudio: boolean;
     sendAnalytics: AnalyticsSender["sendAnalytics"];
+    onOpenSettingsPanel: () => void;
 };
 type State = {
     showSettingsOf?: ResourceTypes;
@@ -269,7 +270,8 @@ export class Settings extends Component<Props, State> {
             onStartRecording,
             screenShareOn,
             allowAudio,
-            allowVideo
+            allowVideo,
+            onOpenSettingsPanel
         } = this.props;
         const { showSettingsOf } = this.state;
         const translator = Translator.getTranslator();
@@ -340,6 +342,32 @@ export class Settings extends Component<Props, State> {
                     role="menu"
                     aria-labelledby="dropdownMenu"
                 >
+                    <div
+                        className={`${styles["resource-link"]} ${styles["resource-link--icon-only"]}`}
+                        onClick={onOpenSettingsPanel}
+                        tabIndex={0}
+                        role="menuitem"
+                        data-title={translator.translate("Additional Settings")}
+                        onKeyDown={e => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                onOpenSettingsPanel();
+                            }
+                        }}
+                    >
+                        <span className={styles["sr-only"]}>
+                            {translator.translate("Additional Settings")}
+                        </span>
+                        <div className={styles["resources-item"]}>
+                            <div
+                                className={styles["resources-icon"]}
+                                aria-hidden="true"
+                                role="img"
+                                aria-label={translator.translate("Additional Settings")}
+                            >
+                                <GearIcon />
+                            </div>
+                        </div>
+                    </div>
                     <div
                         className={styles["resource-link"]}
                         onClick={() => {

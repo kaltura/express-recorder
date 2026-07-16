@@ -5,4 +5,5 @@ import { ScreenIcon } from "./screen";
 import { NoVideoIcon } from "./noVideo";
 import { NoScreenIcon } from "./noScreen";
 import { CheckIcon } from "./check";
-export { VideoIcon, AudioIcon, ScreenIcon, NoVideoIcon, NoScreenIcon, NoAudioIcon, CheckIcon };
+import { GearIcon } from "./gear";
+export { VideoIcon, AudioIcon, ScreenIcon, NoVideoIcon, NoScreenIcon, NoAudioIcon, CheckIcon, GearIcon };
