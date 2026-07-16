@@ -14,6 +14,7 @@ import { Translator } from "../Translator/Translator";
 import fixWebmDuration from "fix-webm-duration";
 import { Playback } from "../Playback/Playback";
 import { SettingsRecording } from "../Settings/Settings-recording";
+import { BackgroundBlurProcessor, BlurLevel } from "../../services/BackgroundBlurProcessor";
 import AnalyticsSender, { AnalyticsEventBaseArgs } from "../../services/analytics/AnalyticsSender";
 import { ButtonClickAnalyticsEventType } from "../../services/analytics/ButtonClickAnalyticsEventType";
 
@@ -86,6 +87,8 @@ type State = {
     shareScreenOn: boolean;
     processing: boolean;
     showSettingsPanel: boolean;
+    blurLevel: BlurLevel;
+    processedCameraStream?: MediaStream;
 };
 
 const VIDEO_CONSTRAINT = {
@@ -113,6 +116,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
     kClient: KalturaClient | undefined;
     dispatcher: PubSub = new PubSub(this);
+    blurProcessor: BackgroundBlurProcessor = new BackgroundBlurProcessor();
     translator: Translator;
     cancelButtonRef: HTMLElement | null;
     stopButtonRef: HTMLElement | null;
@@ -131,6 +135,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             error: "",
             processing: false,
             showSettingsPanel: false,
+            blurLevel: "none",
+            processedCameraStream: undefined,
             constraints: {
                 video:
                     props.allowVideo !== false
@@ -376,6 +382,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
 
     resetApp = () => {
         this.uploadedOnce = false;
+        this.blurProcessor.stop();
         this.setState(
             {
                 doUpload: false,
@@ -386,7 +393,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 screenBlob: undefined,
                 doPlayback: false,
                 error: "",
-                shareScreenOn: false
+                shareScreenOn: false,
+                blurLevel: "none",
+                processedCameraStream: undefined
             },
             () => {
                 this.stopStreams();
@@ -787,6 +796,27 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ showSettingsPanel: false });
     };
 
+    handleBlurChange = (level: BlurLevel) => {
+        const { cameraStream, processedCameraStream } = this.state;
+        if (level === "none") {
+            this.blurProcessor.stop();
+            this.setState({ blurLevel: level, processedCameraStream: undefined });
+        } else {
+            if (!cameraStream) {
+                this.setState({ blurLevel: level });
+                return;
+            }
+            if (processedCameraStream) {
+                // processor already running — just change the blur strength, keep same stream object
+                this.blurProcessor.updateLevel(level);
+                this.setState({ blurLevel: level });
+            } else {
+                const processedStream = this.blurProcessor.start(cameraStream, level);
+                this.setState({ blurLevel: level, processedCameraStream: processedStream });
+            }
+        }
+    };
+
     sendAnalytics = (
         buttonName: string,
         buttonType: ButtonClickAnalyticsEventType,
@@ -824,7 +854,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             cameraBlob,
             screenBlob,
             processing,
-            showSettingsPanel
+            showSettingsPanel,
+            blurLevel,
+            processedCameraStream
         } = state;
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
@@ -909,7 +941,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 ) : null}
                 {!doUpload && !doPlayback ? (
                     <Recorder
-                        cameraStream={cameraStream}
+                        cameraStream={processedCameraStream || cameraStream}
                         screenStream={screenStream}
                         onRecordingEnd={this.handleRecordingEnd}
                         doRecording={doRecording}
@@ -942,7 +974,12 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                             </button>
                         </div>
                         <div className={styles["settings-panel__content"]}>
-                            <SettingsRecording cameraStream={cameraStream} />
+                            <SettingsRecording
+                                cameraStream={cameraStream}
+                                processedCameraStream={processedCameraStream}
+                                blurLevel={blurLevel}
+                                onBlurChange={this.handleBlurChange}
+                            />
                         </div>
                     </div>
                 )}

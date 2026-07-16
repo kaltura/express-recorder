@@ -1,4 +1,5 @@
 import { Component, h } from "preact";
+import { BlurLevel } from "../../services/BackgroundBlurProcessor";
 
 const styles = require("./settings-recording.scss");
 
@@ -7,6 +8,9 @@ type LightingStatus = "optimal" | "dark" | "bright" | "unknown";
 
 type Props = {
     cameraStream?: MediaStream;
+    processedCameraStream?: MediaStream;
+    onBlurChange: (level: BlurLevel) => void;
+    blurLevel: BlurLevel;
 };
 
 type State = {
@@ -17,10 +21,8 @@ type State = {
 
 declare var blazeface: any;
 
-const BLAZEFACE_URL =
-    "https://unpkg.com/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js";
-const TFJS_URL =
-    "https://unpkg.com/@tensorflow/tfjs@4.17.0/dist/tf.min.js";
+const BLAZEFACE_URL = "https://unpkg.com/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js";
+const TFJS_URL = "https://unpkg.com/@tensorflow/tfjs@4.17.0/dist/tf.min.js";
 
 const UserIcon = ({ color }: { color: string }) => (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,6 +32,13 @@ const UserIcon = ({ color }: { color: string }) => (
         />
     </svg>
 );
+
+const BLUR_OPTIONS: { label: string; value: BlurLevel }[] = [
+    { label: "No blur", value: "none" },
+    { label: "Light", value: "light" },
+    { label: "Medium", value: "medium" },
+    { label: "Heavy", value: "heavy" }
+];
 
 export class SettingsRecording extends Component<Props, State> {
     videoRef: HTMLVideoElement | null = null;
@@ -48,7 +57,9 @@ export class SettingsRecording extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        if (prevProps.cameraStream !== this.props.cameraStream) {
+        const activeStream = this.props.processedCameraStream || this.props.cameraStream;
+        const prevActive = prevProps.processedCameraStream || prevProps.cameraStream;
+        if (prevActive !== activeStream) {
             this.attachStream();
         }
     }
@@ -66,8 +77,11 @@ export class SettingsRecording extends Component<Props, State> {
     };
 
     attachStream() {
-        if (this.videoRef && this.props.cameraStream) {
-            this.videoRef.srcObject = this.props.cameraStream;
+        if (this.videoRef) {
+            const stream = this.props.processedCameraStream || this.props.cameraStream;
+            if (stream) {
+                this.videoRef.srcObject = stream;
+            }
         }
     }
 
@@ -121,7 +135,7 @@ export class SettingsRecording extends Component<Props, State> {
 
         this.setState({ modelLoading: false });
 
-        this.intervalId = setInterval(async () => {
+        this.intervalId = (setInterval(async () => {
             const video = this.videoRef;
             if (!video || !video.videoWidth) {
                 return;
@@ -161,11 +175,12 @@ export class SettingsRecording extends Component<Props, State> {
             } else {
                 this.setState({ headPosition: "center" });
             }
-        }, 350) as any as number;
+        }, 350) as any) as number;
     }
 
     render() {
         const { headPosition, lightingStatus, modelLoading } = this.state;
+        const { blurLevel, onBlurChange } = this.props;
 
         const grey = "#555555";
         const green = "#00cc66";
@@ -175,35 +190,35 @@ export class SettingsRecording extends Component<Props, State> {
         const centerColor = headPosition === "center" ? green : grey;
         const rightColor = headPosition === "right" ? orange : grey;
 
-        const lightingColor = lightingStatus === "optimal" ? green : lightingStatus === "unknown" ? grey : orange;
+        const lightingColor =
+            lightingStatus === "optimal" ? green : lightingStatus === "unknown" ? grey : orange;
         const lightingLabel =
-            lightingStatus === "optimal" ? "Optimal" :
-            lightingStatus === "dark" ? "Too dark" :
-            lightingStatus === "bright" ? "Too bright" : "";
+            lightingStatus === "optimal"
+                ? "Optimal"
+                : lightingStatus === "dark"
+                ? "Too dark"
+                : lightingStatus === "bright"
+                ? "Too bright"
+                : "";
 
         return (
             <div className={styles["recording-settings"]}>
                 <div className={styles["recording-settings__preview"]}>
-                    <video
-                        ref={this.setVideoRef}
-                        className={styles["recording-settings__video"]}
-                        autoPlay={true}
-                        muted={true}
-                    />
-                    <canvas
-                        ref={this.setCanvasRef}
-                        style={{ display: "none" }}
-                    />
+                    <div className={styles["recording-settings__video-border"]}>
+                        <video
+                            ref={this.setVideoRef}
+                            className={styles["recording-settings__video"]}
+                            autoPlay={true}
+                            muted={true}
+                        />
+                    </div>
+                    <canvas ref={this.setCanvasRef} style={{ display: "none" }} />
                 </div>
                 <div className={styles["recording-settings__controls"]}>
                     <div className={styles["head-positioning"]}>
-                        <div className={styles["head-positioning__title"]}>
-                            Head positioning
-                        </div>
+                        <div className={styles["head-positioning__title"]}>Head positioning</div>
                         {modelLoading ? (
-                            <div className={styles["head-positioning__loading"]}>
-                                Loading...
-                            </div>
+                            <div className={styles["head-positioning__loading"]}>Loading...</div>
                         ) : (
                             <div className={styles["head-positioning__icons"]}>
                                 <UserIcon color={leftColor} />
@@ -213,18 +228,33 @@ export class SettingsRecording extends Component<Props, State> {
                         )}
                     </div>
                     <div className={styles["lighting"]}>
-                        <div className={styles["lighting__title"]}>
-                            Lighting
-                        </div>
+                        <div className={styles["lighting__title"]}>Lighting</div>
                         {modelLoading ? (
-                            <div className={styles["lighting__loading"]}>
-                                Loading...
-                            </div>
+                            <div className={styles["lighting__loading"]}>Loading...</div>
                         ) : lightingLabel ? (
-                            <div className={styles["lighting__status"]} style={{ color: lightingColor }}>
+                            <div
+                                className={styles["lighting__status"]}
+                                style={{ color: lightingColor }}
+                            >
                                 {lightingLabel}
                             </div>
                         ) : null}
+                    </div>
+                    <div className={styles["blur-settings"]}>
+                        <div className={styles["blur-settings__title"]}>Blur</div>
+                        <div className={styles["blur-settings__options"]}>
+                            {BLUR_OPTIONS.map(opt => (
+                                <button
+                                    key={opt.value}
+                                    className={`${styles["blur-option"]} ${
+                                        blurLevel === opt.value ? styles["blur-option--active"] : ""
+                                    }`}
+                                    onClick={() => onBlurChange(opt.value)}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
