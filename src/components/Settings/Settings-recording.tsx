@@ -1,5 +1,5 @@
 import { Component, h } from "preact";
-import { BlurLevel } from "../../services/BackgroundBlurProcessor";
+import { BackgroundBlurProcessor, BlurLevel } from "../../services/BackgroundBlurProcessor";
 
 const styles = require("./settings-recording.scss");
 
@@ -11,18 +11,13 @@ type Props = {
     processedCameraStream?: MediaStream;
     onBlurChange: (level: BlurLevel) => void;
     blurLevel: BlurLevel;
+    blurProcessor: BackgroundBlurProcessor;
 };
 
 type State = {
     headPosition: HeadPosition;
     lightingStatus: LightingStatus;
-    modelLoading: boolean;
 };
-
-declare var blazeface: any;
-
-const BLAZEFACE_URL = "https://unpkg.com/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js";
-const TFJS_URL = "https://unpkg.com/@tensorflow/tfjs@4.17.0/dist/tf.min.js";
 
 const UserIcon = ({ color }: { color: string }) => (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -40,20 +35,88 @@ const BLUR_OPTIONS: { label: string; value: BlurLevel }[] = [
     { label: "Heavy", value: "heavy" }
 ];
 
+// Off-screen canvas for brightness sampling
+const brightnessCanvas = document.createElement("canvas");
+const brightnessCtx = brightnessCanvas.getContext("2d");
+
+function getLightingStatus(
+    image: HTMLCanvasElement | HTMLVideoElement | ImageBitmap
+): LightingStatus {
+    if (!brightnessCtx) {
+        return "unknown";
+    }
+    // Sample at reduced resolution for performance
+    const W = 64;
+    const H = 36;
+    brightnessCanvas.width = W;
+    brightnessCanvas.height = H;
+    brightnessCtx.drawImage(image as any, 0, 0, W, H);
+    const { data } = brightnessCtx.getImageData(0, 0, W, H);
+    let sum = 0;
+    const total = data.length / 4;
+    for (let i = 0; i < data.length; i += 4) {
+        sum += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+    }
+    const brightness = sum / total;
+    return brightness < 125 ? "dark" : brightness > 180 ? "bright" : "optimal";
+}
+
+function getHeadPosition(
+    mask: ImageBitmap | HTMLCanvasElement,
+    width: number,
+    height: number
+): HeadPosition {
+    // Draw top 25% of mask into a small canvas and find horizontal centroid of foreground pixels
+    const W = 64;
+    const H = 16; // 25% of normalized height at small res
+    const tmpCanvas = document.createElement("canvas");
+    tmpCanvas.width = W;
+    tmpCanvas.height = H;
+    const ctx = tmpCanvas.getContext("2d");
+    if (!ctx) {
+        return "none";
+    }
+    // Draw only the top quarter of the mask
+    ctx.drawImage(mask as any, 0, 0, width, height * 0.25, 0, 0, W, H);
+    const { data } = ctx.getImageData(0, 0, W, H);
+
+    let weightedX = 0;
+    let total = 0;
+    for (let i = 0; i < data.length; i += 4) {
+        // mask is white (255) where person is detected
+        const val = data[i]; // R channel
+        if (val > 128) {
+            const px = (i / 4) % W;
+            weightedX += px;
+            total++;
+        }
+    }
+
+    if (total < 20) {
+        return "none";
+    }
+
+    const cx = weightedX / total;
+    const third = W / 3;
+    if (cx < third) {
+        return "left";
+    } else if (cx > third * 2) {
+        return "right";
+    }
+    return "center";
+}
+
 export class SettingsRecording extends Component<Props, State> {
     videoRef: HTMLVideoElement | null = null;
-    canvasRef: HTMLCanvasElement | null = null;
-    intervalId: number = 0;
-    model: any = null;
 
     constructor(props: Props) {
         super(props);
-        this.state = { headPosition: "none", lightingStatus: "unknown", modelLoading: true };
+        this.state = { headPosition: "none", lightingStatus: "unknown" };
     }
 
     componentDidMount() {
         this.attachStream();
-        this.loadModelAndStart();
+        this.startAnalysis();
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -62,18 +125,18 @@ export class SettingsRecording extends Component<Props, State> {
         if (prevActive !== activeStream) {
             this.attachStream();
         }
+        if (prevProps.cameraStream !== this.props.cameraStream) {
+            this.stopAnalysis(prevProps);
+            this.startAnalysis();
+        }
     }
 
     componentWillUnmount() {
-        this.stopDetection();
+        this.stopAnalysis(this.props);
     }
 
     setVideoRef = (node: HTMLVideoElement | null) => {
         this.videoRef = node;
-    };
-
-    setCanvasRef = (node: HTMLCanvasElement | null) => {
-        this.canvasRef = node;
     };
 
     attachStream() {
@@ -85,101 +148,31 @@ export class SettingsRecording extends Component<Props, State> {
         }
     }
 
-    stopDetection() {
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = 0;
+    startAnalysis() {
+        const { blurProcessor, cameraStream } = this.props;
+        if (!cameraStream) {
+            return;
         }
+        blurProcessor.onAnalysis = (results: any) => {
+            const lighting = getLightingStatus(results.image);
+            const headPosition = getHeadPosition(
+                results.segmentationMask,
+                results.image.width || results.image.videoWidth,
+                results.image.height || results.image.videoHeight
+            );
+            this.setState({ lightingStatus: lighting, headPosition });
+        };
+        blurProcessor.startAnalysis(cameraStream);
     }
 
-    loadModelAndStart() {
-        const loadBlazeFace = () => {
-            blazeface.load().then((model: any) => {
-                this.model = model;
-                this.startDetection();
-            });
-        };
-
-        if (typeof blazeface !== "undefined") {
-            loadBlazeFace();
-            return;
-        }
-
-        const loadTF = () => {
-            const bfScript = document.createElement("script");
-            bfScript.src = BLAZEFACE_URL;
-            bfScript.onload = loadBlazeFace;
-            document.head.appendChild(bfScript);
-        };
-
-        if (typeof (window as any).tf !== "undefined") {
-            loadTF();
-            return;
-        }
-
-        const tfScript = document.createElement("script");
-        tfScript.src = TFJS_URL;
-        tfScript.onload = loadTF;
-        document.head.appendChild(tfScript);
-    }
-
-    startDetection() {
-        const canvas = this.canvasRef;
-        if (!canvas) {
-            return;
-        }
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-            return;
-        }
-
-        this.setState({ modelLoading: false });
-
-        this.intervalId = (setInterval(async () => {
-            const video = this.videoRef;
-            if (!video || !video.videoWidth) {
-                return;
-            }
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            let sum = 0;
-            const total = data.length / 4;
-            for (let i = 0; i < data.length; i += 4) {
-                sum += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            }
-            const brightness = sum / total;
-            const lightingStatus: LightingStatus =
-                brightness < 125 ? "dark" : brightness > 180 ? "bright" : "optimal";
-            this.setState({ lightingStatus });
-
-            const predictions = await this.model.estimateFaces(canvas, false);
-
-            if (!predictions.length) {
-                this.setState({ headPosition: "none" });
-                return;
-            }
-
-            const face = predictions[0];
-            const [x1] = face.topLeft;
-            const [x2] = face.bottomRight;
-            const centerX = (x1 + x2) / 2;
-            const third = canvas.width / 3;
-
-            if (centerX < third) {
-                this.setState({ headPosition: "left" });
-            } else if (centerX > third * 2) {
-                this.setState({ headPosition: "right" });
-            } else {
-                this.setState({ headPosition: "center" });
-            }
-        }, 350) as any) as number;
+    stopAnalysis(props: Props) {
+        const { blurProcessor } = props;
+        blurProcessor.onAnalysis = null;
+        blurProcessor.stopAnalysis();
     }
 
     render() {
-        const { headPosition, lightingStatus, modelLoading } = this.state;
+        const { headPosition, lightingStatus } = this.state;
         const { blurLevel, onBlurChange } = this.props;
 
         const grey = "#555555";
@@ -212,26 +205,19 @@ export class SettingsRecording extends Component<Props, State> {
                             muted={true}
                         />
                     </div>
-                    <canvas ref={this.setCanvasRef} style={{ display: "none" }} />
                 </div>
                 <div className={styles["recording-settings__controls"]}>
                     <div className={styles["head-positioning"]}>
                         <div className={styles["head-positioning__title"]}>Head positioning</div>
-                        {modelLoading ? (
-                            <div className={styles["head-positioning__loading"]}>Loading...</div>
-                        ) : (
-                            <div className={styles["head-positioning__icons"]}>
-                                <UserIcon color={leftColor} />
-                                <UserIcon color={centerColor} />
-                                <UserIcon color={rightColor} />
-                            </div>
-                        )}
+                        <div className={styles["head-positioning__icons"]}>
+                            <UserIcon color={leftColor} />
+                            <UserIcon color={centerColor} />
+                            <UserIcon color={rightColor} />
+                        </div>
                     </div>
                     <div className={styles["lighting"]}>
                         <div className={styles["lighting__title"]}>Lighting</div>
-                        {modelLoading ? (
-                            <div className={styles["lighting__loading"]}>Loading...</div>
-                        ) : lightingLabel ? (
+                        {lightingLabel ? (
                             <div
                                 className={styles["lighting__status"]}
                                 style={{ color: lightingColor }}

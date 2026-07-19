@@ -20,6 +20,9 @@ export class BackgroundBlurProcessor {
     private currentLevel: Exclude<BlurLevel, "none"> = "light";
     private processing: boolean = false;
 
+    // Set this to receive segmentation results for analysis (head position, lighting)
+    onAnalysis: ((results: any) => void) | null = null;
+
     constructor() {
         this.inputVideo = document.createElement("video");
         this.inputVideo.muted = true;
@@ -29,6 +32,7 @@ export class BackgroundBlurProcessor {
         this.loadModel();
     }
 
+    // Start blur output stream
     start(sourceStream: MediaStream, level: Exclude<BlurLevel, "none">): MediaStream {
         if (this.outputStream && this.inputVideo.srcObject === sourceStream) {
             this.currentLevel = level;
@@ -48,6 +52,33 @@ export class BackgroundBlurProcessor {
 
         this.loop();
         return this.outputStream;
+    }
+
+    // Start segmentation loop for analysis only (no blur output)
+    startAnalysis(sourceStream: MediaStream): void {
+        // Already running with blur — loop is active, onAnalysis will fire
+        if (this.outputStream) {
+            return;
+        }
+        // Already running analysis on this stream
+        if (this.animFrameId && this.inputVideo.srcObject === sourceStream) {
+            return;
+        }
+        this.stopLoop();
+        this.inputVideo.srcObject = sourceStream;
+        this.inputVideo.play().catch(_e => {
+            return;
+        });
+        this.loop();
+    }
+
+    // Stop analysis-only loop (no-op if blur is also running)
+    stopAnalysis(): void {
+        if (this.outputStream) {
+            return;
+        }
+        this.stopLoop();
+        this.inputVideo.srcObject = null;
     }
 
     updateLevel(level: Exclude<BlurLevel, "none">) {
@@ -85,32 +116,30 @@ export class BackgroundBlurProcessor {
     }
 
     private onResults = (results: any) => {
-        const ctx = this.canvas.getContext("2d");
-        if (!ctx) {
-            this.processing = false;
-            return;
+        // Apply blur if output stream is active
+        if (this.outputStream) {
+            const ctx = this.canvas.getContext("2d");
+            if (ctx) {
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+
+                ctx.clearRect(0, 0, w, h);
+                ctx.globalCompositeOperation = "copy";
+                ctx.drawImage(results.segmentationMask, 0, 0, w, h);
+                ctx.globalCompositeOperation = "source-in";
+                ctx.drawImage(results.image, 0, 0, w, h);
+                ctx.globalCompositeOperation = "destination-over";
+                ctx.filter = `blur(${BLUR_PX[this.currentLevel]}px)`;
+                ctx.drawImage(results.image, 0, 0, w, h);
+                ctx.filter = "none";
+                ctx.globalCompositeOperation = "source-over";
+            }
         }
 
-        const w = this.canvas.width;
-        const h = this.canvas.height;
+        if (this.onAnalysis) {
+            this.onAnalysis(results);
+        }
 
-        ctx.clearRect(0, 0, w, h);
-
-        // Step 1: draw the segmentation mask — white where person is
-        ctx.globalCompositeOperation = "copy";
-        ctx.drawImage(results.segmentationMask, 0, 0, w, h);
-
-        // Step 2: keep only the person area from the original (sharp)
-        ctx.globalCompositeOperation = "source-in";
-        ctx.drawImage(results.image, 0, 0, w, h);
-
-        // Step 3: draw blurred full image behind the sharp person
-        ctx.globalCompositeOperation = "destination-over";
-        ctx.filter = `blur(${BLUR_PX[this.currentLevel]}px)`;
-        ctx.drawImage(results.image, 0, 0, w, h);
-        ctx.filter = "none";
-
-        ctx.globalCompositeOperation = "source-over";
         this.processing = false;
     };
 
@@ -127,9 +156,12 @@ export class BackgroundBlurProcessor {
         }
 
         if (!this.segmentation) {
-            const ctx = this.canvas.getContext("2d");
-            if (ctx) {
-                ctx.drawImage(video, 0, 0, this.canvas.width, this.canvas.height);
+            // Model not ready — draw raw frame (only matters when outputStream is active)
+            if (this.outputStream) {
+                const ctx = this.canvas.getContext("2d");
+                if (ctx) {
+                    ctx.drawImage(video, 0, 0, this.canvas.width, this.canvas.height);
+                }
             }
             return;
         }

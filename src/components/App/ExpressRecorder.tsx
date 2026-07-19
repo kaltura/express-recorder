@@ -58,6 +58,7 @@ export type ExpressRecorderProps = {
      * allow recording screen-share
      */
     allowScreenShare?: boolean;
+    allowAdvancedSettings?: boolean;
     browserNotSupportedText?: string;
     maxRecordingTime?: number;
     showUploadUI?: boolean;
@@ -110,7 +111,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         conversionProfileId: KalturaConversionProfileType.media,
         allowVideo: true,
         allowAudio: true,
-        showUploadUI: true
+        showUploadUI: true,
+        allowAdvancedSettings: true
     };
 
     uploadedOnce: boolean = false; // to prevent user from continue recording after the record has been uploaded
@@ -838,7 +840,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             showUploadUI,
             allowVideo = true,
             allowAudio = true,
-            allowScreenShare = false
+            allowScreenShare = false,
+            allowAdvancedSettings = true
         } = props;
         const {
             doCountdown,
@@ -979,6 +982,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 processedCameraStream={processedCameraStream}
                                 blurLevel={blurLevel}
                                 onBlurChange={this.handleBlurChange}
+                                blurProcessor={this.blurProcessor}
                             />
                         </div>
                     </div>
@@ -1008,6 +1012,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 allowAudio={allowAudio}
                                 sendAnalytics={this.sendAnalytics}
                                 onOpenSettingsPanel={this.handleOpenSettingsPanel}
+                                allowAdvancedSettings={allowAdvancedSettings}
                             />
                         )}
                     </div>
