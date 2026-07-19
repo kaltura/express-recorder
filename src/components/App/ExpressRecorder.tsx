@@ -90,6 +90,8 @@ type State = {
     showSettingsPanel: boolean;
     blurLevel: BlurLevel;
     processedCameraStream?: MediaStream;
+    backgroundImage?: HTMLImageElement;
+    imageModeSelected: boolean;
 };
 
 const VIDEO_CONSTRAINT = {
@@ -139,6 +141,8 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             showSettingsPanel: false,
             blurLevel: "none",
             processedCameraStream: undefined,
+            backgroundImage: undefined,
+            imageModeSelected: false,
             constraints: {
                 video:
                     props.allowVideo !== false
@@ -385,6 +389,7 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
     resetApp = () => {
         this.uploadedOnce = false;
         this.blurProcessor.stop();
+        this.blurProcessor.setBackgroundImage(null);
         this.setState(
             {
                 doUpload: false,
@@ -397,7 +402,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                 error: "",
                 shareScreenOn: false,
                 blurLevel: "none",
-                processedCameraStream: undefined
+                processedCameraStream: undefined,
+                backgroundImage: undefined,
+                imageModeSelected: false
             },
             () => {
                 this.stopStreams();
@@ -790,6 +797,21 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.dispatcher.dispatchEvent(RecorderEvents.mediaUploadProgress, status);
     };
 
+    handleBackgroundImageSelect = (img: HTMLImageElement | null) => {
+        this.blurProcessor.setBackgroundImage(img);
+        const { cameraStream, processedCameraStream } = this.state;
+        if (!img) {
+            this.setState({ backgroundImage: undefined });
+            return;
+        }
+        this.setState({ backgroundImage: img, imageModeSelected: true });
+        // ensure the processor output stream is active
+        if (!processedCameraStream && cameraStream) {
+            const processedStream = this.blurProcessor.start(cameraStream, "light");
+            this.setState({ processedCameraStream: processedStream });
+        }
+    };
+
     handleOpenSettingsPanel = () => {
         this.setState({ showSettingsPanel: true });
     };
@@ -798,23 +820,39 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
         this.setState({ showSettingsPanel: false });
     };
 
+    handleImageModeSelect = () => {
+        this.setState({ imageModeSelected: true, blurLevel: "none" });
+        // stop blur processing but keep processor ready for when image is chosen
+        this.blurProcessor.setBackgroundImage(null);
+    };
+
     handleBlurChange = (level: BlurLevel) => {
         const { cameraStream, processedCameraStream } = this.state;
+        // Switching to a blur level clears image mode and any background image
+        this.blurProcessor.setBackgroundImage(null);
+        const clearImageState = { backgroundImage: undefined, imageModeSelected: false };
         if (level === "none") {
             this.blurProcessor.stop();
-            this.setState({ blurLevel: level, processedCameraStream: undefined });
+            this.setState({
+                blurLevel: level,
+                processedCameraStream: undefined,
+                ...clearImageState
+            });
         } else {
             if (!cameraStream) {
-                this.setState({ blurLevel: level });
+                this.setState({ blurLevel: level, ...clearImageState });
                 return;
             }
             if (processedCameraStream) {
-                // processor already running — just change the blur strength, keep same stream object
                 this.blurProcessor.updateLevel(level);
-                this.setState({ blurLevel: level });
+                this.setState({ blurLevel: level, ...clearImageState });
             } else {
                 const processedStream = this.blurProcessor.start(cameraStream, level);
-                this.setState({ blurLevel: level, processedCameraStream: processedStream });
+                this.setState({
+                    blurLevel: level,
+                    processedCameraStream: processedStream,
+                    ...clearImageState
+                });
             }
         }
     };
@@ -859,7 +897,9 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
             processing,
             showSettingsPanel,
             blurLevel,
-            processedCameraStream
+            processedCameraStream,
+            backgroundImage,
+            imageModeSelected
         } = state;
         if (doUpload && !this.uploadedOnce) {
             this.uploadedOnce = true;
@@ -983,6 +1023,10 @@ export class ExpressRecorder extends Component<ExpressRecorderProps, State> {
                                 blurLevel={blurLevel}
                                 onBlurChange={this.handleBlurChange}
                                 blurProcessor={this.blurProcessor}
+                                backgroundImage={backgroundImage}
+                                imageModeSelected={imageModeSelected}
+                                onImageModeSelect={this.handleImageModeSelect}
+                                onBackgroundImageSelect={this.handleBackgroundImageSelect}
                             />
                         </div>
                     </div>

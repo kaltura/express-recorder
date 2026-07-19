@@ -12,6 +12,10 @@ type Props = {
     onBlurChange: (level: BlurLevel) => void;
     blurLevel: BlurLevel;
     blurProcessor: BackgroundBlurProcessor;
+    backgroundImage?: HTMLImageElement;
+    imageModeSelected: boolean;
+    onImageModeSelect: () => void;
+    onBackgroundImageSelect: (img: HTMLImageElement | null) => void;
 };
 
 type State = {
@@ -29,10 +33,10 @@ const UserIcon = ({ color }: { color: string }) => (
 );
 
 const BLUR_OPTIONS: { label: string; value: BlurLevel }[] = [
-    { label: "No blur", value: "none" },
-    { label: "Light", value: "light" },
-    { label: "Medium", value: "medium" },
-    { label: "Heavy", value: "heavy" }
+    { label: "No effect", value: "none" },
+    { label: "Light blur", value: "light" },
+    { label: "Medium blur", value: "medium" },
+    { label: "Heavy blur", value: "heavy" }
 ];
 
 // Off-screen canvas for brightness sampling
@@ -108,6 +112,7 @@ function getHeadPosition(
 
 export class SettingsRecording extends Component<Props, State> {
     videoRef: HTMLVideoElement | null = null;
+    fileInputRef: HTMLInputElement | null = null;
 
     constructor(props: Props) {
         super(props);
@@ -137,6 +142,36 @@ export class SettingsRecording extends Component<Props, State> {
 
     setVideoRef = (node: HTMLVideoElement | null) => {
         this.videoRef = node;
+    };
+
+    setFileInputRef = (node: HTMLInputElement | null) => {
+        this.fileInputRef = node;
+    };
+
+    handleImageModeSelect = () => {
+        this.props.onImageModeSelect();
+    };
+
+    handleSelectImageClick = () => {
+        if (this.fileInputRef) {
+            this.fileInputRef.click();
+        }
+    };
+
+    handleFileChange = (e: Event) => {
+        const input = e.target as HTMLInputElement;
+        const file = input.files && input.files[0];
+        if (!file) {
+            return;
+        }
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            this.props.onBackgroundImageSelect(img);
+        };
+        img.src = url;
+        // reset so selecting the same file again triggers change
+        input.value = "";
     };
 
     attachStream() {
@@ -173,7 +208,7 @@ export class SettingsRecording extends Component<Props, State> {
 
     render() {
         const { headPosition, lightingStatus } = this.state;
-        const { blurLevel, onBlurChange } = this.props;
+        const { blurLevel, onBlurChange, backgroundImage, imageModeSelected } = this.props;
 
         const grey = "#555555";
         const green = "#00cc66";
@@ -227,20 +262,47 @@ export class SettingsRecording extends Component<Props, State> {
                         ) : null}
                     </div>
                     <div className={styles["blur-settings"]}>
-                        <div className={styles["blur-settings__title"]}>Blur</div>
+                        <div className={styles["blur-settings__title"]}>Background</div>
                         <div className={styles["blur-settings__options"]}>
                             {BLUR_OPTIONS.map(opt => (
                                 <button
                                     key={opt.value}
                                     className={`${styles["blur-option"]} ${
-                                        blurLevel === opt.value ? styles["blur-option--active"] : ""
+                                        !imageModeSelected && blurLevel === opt.value
+                                            ? styles["blur-option--active"]
+                                            : ""
                                     }`}
                                     onClick={() => onBlurChange(opt.value)}
                                 >
                                     {opt.label}
                                 </button>
                             ))}
+                            <button
+                                className={`${styles["blur-option"]} ${
+                                    imageModeSelected ? styles["blur-option--active"] : ""
+                                }`}
+                                onClick={this.handleImageModeSelect}
+                            >
+                                Background image
+                            </button>
                         </div>
+                        {imageModeSelected && (
+                            <div className={styles["blur-settings__image-row"]}>
+                                <a
+                                    className={styles["blur-settings__select-link"]}
+                                    onClick={this.handleSelectImageClick}
+                                >
+                                    {backgroundImage ? "Change image" : "Select image"}
+                                </a>
+                                <input
+                                    ref={this.setFileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: "none" }}
+                                    onChange={this.handleFileChange}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -120,6 +120,23 @@
     background-color: #333333;
 }
 
+.blur-settings__image-row {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.blur-settings__select-link {
+    font-size: 13px;
+    color: #aaaaaa;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+        color: #ffffff;
+    }
+}
+
 .head-positioning__icons {
     flex: 1;
     display: flex;
